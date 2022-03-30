@@ -1,0 +1,238 @@
+---
+title: "CMP_DataWrangling"
+author: "Caroline Newell"
+date: "3/28/2022"
+output: html_document
+---
+
+#Step 1
+Isolate the data sheet from each sample set from SIF.
+Note: Use corrected sheets for CMPKrabby, POM_VOL_1, 2, 3, 4, 5, CMPZoopSoup, CMPSmallFry, CMPeas, CMPhragmites, CMPLiverRoast, CMPLeftovers.
+ 
+##Load packages
+```{r}
+library(readxl)
+library(tidyverse)
+```
+
+#Step 2
+##Read in all the isotope data sheets
+
+
+### CN
+```{r}
+CMPandemic_CN <- read_excel("~/CERFTalk2021/Data/RawIsotopeData/CMPandemic_CN.xlsx", 
++     col_types = c("text", "numeric", "numeric", 
++         "text", "numeric", "numeric", "text", 
++         "text", "text", "text", "text", "numeric", 
++         "numeric", "numeric", "text", "numeric", 
++         "numeric", "numeric", "numeric"))
+
+CMPFish4Ever_CN <- read_excel("~/CERFTalk2021/Data/RawIsotopeData/CMPFish4Ever_CN.xls", 
++     col_types = c("text", "numeric", "numeric", 
++         "text", "numeric", "numeric", "text", 
++         "text", "text", "text", "text", "numeric", 
++         "numeric", "numeric", "text", "numeric", 
++         "numeric", "numeric", "numeric"))
+
+CMPFishRFriends_CN <- read_excel("~/CERFTalk2021/Data/RawIsotopeData/CMPFishRFriends_CN.xls", 
++     col_types = c("text", "numeric", "numeric", 
++         "text", "numeric", "numeric", "text", 
++         "text", "text", "text", "text", "numeric", 
++         "numeric", "numeric", "text", "numeric", 
++         "numeric", "numeric", "numeric"))
+
+
+CMPflanzen_CN <- read_excel("~/CERFTalk2021/Data/RawIsotopeData/CMPflanzen_CN.xlsx", 
++     col_types = c("text", "numeric", "numeric", 
++         "text", "numeric", "numeric", "text", 
++         "text", "text", "text", "text", "numeric", 
++         "numeric", "numeric", "text", "numeric", 
++         "numeric", "numeric", "numeric"))
+
+
+CMPLiverLaVida_CN <- read_excel("~/CERFTalk2021/Data/RawIsotopeData/CMPLiverLaVida_CN.xls", 
++     col_types = c("text", "numeric", "numeric", 
++         "text", "numeric", "numeric", "text", 
++         "text", "text", "text", "text", "numeric", 
++         "numeric", "numeric", "text", "numeric", 
++         "numeric", "numeric", "numeric"))
+
+
+CMPLiverPool_CN <- read_excel("~/CERFTalk2021/Data/RawIsotopeData/CMPLiverPool_CN.xlsx", 
++     col_types = c("text", "numeric", "numeric", 
++         "text", "numeric", "numeric", "text", 
++         "text", "text", "text", "text", "numeric", 
++         "numeric", "numeric", "text", "numeric", 
++         "numeric", "numeric", "numeric"))
+
+CMPLiverWorst_CN <- read_excel("~/CERFTalk2021/Data/RawIsotopeData/CMPLiverWorst_CN.xlsx", 
++     col_types = c("text", "numeric", "numeric", 
++         "text", "numeric", "numeric", "text", 
++         "text", "text", "text", "text", "numeric", 
++         "numeric", "numeric", "text", "numeric", 
++         "numeric", "numeric", "numeric"))
+
+CMPMuscleBob_CN <- read_excel("~/CERFTalk2021/Data/RawIsotopeData/CMPMuscleBob_CN.xlsx", 
++     col_types = c("text", "numeric", "numeric", 
++         "text", "numeric", "numeric", "text", 
++         "text", "text", "text", "text", "numeric", 
++         "numeric", "numeric", "text", "numeric", 
++         "numeric", "numeric", "numeric"))
+
+CMPMuscleStuffin_CN <- read_excel("~/CERFTalk2021/Data/RawIsotopeData/CMPMuscleStuffin_CN.xlsx", 
++     col_types = c("text", "numeric", "numeric", 
++         "text", "numeric", "numeric", "text", 
++         "text", "text", "text", "text", "numeric", 
++         "numeric", "numeric", "text", "numeric", 
++         "numeric", "numeric", "numeric"))
+
+CMPMysteryMeat_CN <- read_excel("~/CERFTalk2021/Data/RawIsotopeData/CMPMysteryMeat_CN.xls", 
++     col_types = c("text", "numeric", "numeric", 
++         "text", "numeric", "numeric", "text", 
++         "text", "text", "text", "text", "numeric", 
++         "numeric", "numeric", "text", "numeric", 
++         "numeric", "numeric", "numeric"))
+
+CMPSilenceOThLab_CN <- read_excel("~/CERFTalk2021/Data/RawIsotopeData/CMPSilenceOThLab_CN.xlsx", 
++     col_types = c("text", "numeric", "numeric", 
++         "text", "numeric", "numeric", "text", 
++         "text", "text", "text", "text", "numeric", 
++         "numeric", "numeric", "text", "numeric", 
++         "numeric", "numeric", "numeric"))
+
+CMPTheGovernatorCN <- read_excel("~/CERFTalk2021/Data/RawIsotopeData/CMPTheGovernatorCN.xlsx", 
++     col_types = c("text", "numeric", "numeric", 
++         "text", "numeric", "numeric", "text", 
++         "text", "text", "text", "text", "numeric", 
++         "numeric", "numeric", "text", "numeric", 
++         "numeric", "numeric", "numeric"))
+
+
+CMPVeryStable_CN <- read_excel("~/CERFTalk2021/Data/RawIsotopeData/CMPVeryStable_CN.xlsx", 
++     col_types = c("text", "numeric", "numeric", 
++         "text", "numeric", "numeric", "text", 
++         "text", "text", "text", "text", "numeric", 
++         "numeric", "numeric", "text", "numeric", 
++         "numeric", "numeric", "numeric"))
+
+LiverLetDie_CN <- read_excel("~/CERFTalk2021/Data/RawIsotopeData/LiverLetDie_CN.xlsx", 
++     col_types = c("text", "numeric", "numeric", 
++         "text", "numeric", "numeric", "text", 
++         "text", "text", "text", "text", "numeric", 
++         "numeric", "numeric", "text", "numeric", 
++         "numeric", "numeric", "numeric"))
+```
+
+Next: Remove rows of samples where samples were lost (mixed up or destroyed at SIF)
+List of lost samples:
+CMPFishRFriends: 199m, 200m, 201m, 202m
+CMPSkrimp: CMP-INVERT-EXO82-CN, CMP-INVERT-EXO83-CN, CMP-INVERT-EXO84-CN, CMP-INVERT-EXO85-CN, CMP-INVERT-EXO86-CN, CMP-INVERT-EXO87-CN, CMP-INVERT-HMC64-CN, CMP-INVERT-HMC65-CN, CMP-INVERT-HMC66-CN, CMP-INVERT-HMC67-CN, CMP-INVERT-HMC68-CN, CMP-INVERT-HMC69-CN, CMP-INVERT-HMC70-CN, CMP-INVERT-HMC71-CN, CMP-INVERT-HMC13-CN, CMP-INVERT-HMC14-CN, CMP-INVERT-HMC17-CN, CMP-INVERT-HMC18-CN, CMP-INVERT-HMC16-CN, CMP-INVERT-HMC27-CN, CMP-INVERT-HMC26-CN, CMP-INVERT-HMC25-CN, CMP-INVERT-HMC30-CN, CMP-INVERT-HMC28-CN, CMP-INVERT-HMC21-CN, CMP-INVERT-HMC29-CN, CMP-INVERT-HMC15-CN, CMP-INVERT-EXO40-CN, CMP-INVERT-EXO41-CN, CMP-INVERT-EXO42-CN, CMP-INVERT-EXO26-CN, CMP-INVERT-EXO25-CN, CMP-INVERT-EXO24-CN, CMP-INVERT-EXO23-CN, CMP-INVERT-EXO44-CN, CMP-INVERT-EXO22-CN, CMP-INVERT-EXO45-CN, CMP-INVERT-EXO43-CN, CMP-INVERT-EXO15-CN, CMP-INVERT-EXO14-CN, CMP-INVERT-EXO13-CN, CMP-INVERT-EXO35-CN, CMP-INVERT-EXO19-CN, CMP-INVERT-EXO34-CN, CMP-INVERT-HMC22-CN, CMP-INVERT-RSC11-CN, CMP-INVERT-RSC15-CN, CMP-INVERT-RSC14-CN, CMP-INVERT-RSC2-CN, CMP-INVERT-RSC12-CN, CMP-INVERT-RSC10-CN, CMP-INVERT-RSC18-CN, CMP-INVERT-RSC16-CN, CMP-INVERT-RSC13-CN, CMP-INVERT-RSC3-CN, CMP-INVERT-RSC6-CN, CMP-INVERT-RSC17-CN, CMP-INVERT-RSC5-CN, CMP-INVERT-RSC9-CN, CMP-INVERT-RSC1-CN, CMP-INVERT-RSC7-CN, CMP-INVERT-RSC8-CN, CMP-INVERT-HMC19-CN, CMP-INVERT-HMC11-CN, CMP-INVERT-HMC10-CN, CMP-INVERT-HMC31-CN, CMP-INVERT-HMC23-CN, CMP-INVERT-HMC24-CN, CMP-INVERT-HMC32-CN, CMP-INVERT-HMC33-CN, CMP-INVERT-HMC34-CN, CMP-INVERT-HMC35-CN, CMP-INVERT-HMC20-CN, CMP-INVERT-HMC36-CN.
+POMVol2: CMP-POM-150-CN, CMP-POM-151-CN
+
+Other issues:
+POMVol4: CMP-POM-51-CN <-"Mass 45 saturated; estimated value used"
+POMVol4: CMP-POM-52-CN <- "Mass 44 & 45 saturated, totals underestimated"
+
+May also want to remove samples with low C/N precision - Make them NA?
+
+N TOO LOW: "Precision decreases for samples containing less than 20ugN"
+POMVol1: CMP-POM-18-CN, CMP-POM-28-CN, CMP-POM-46-CN, CMP-POM-66-CN, CMP-POM-76-CN, CMP-POM-81-CN, CMP-POM-91-CN, CMP-POM-106-CN, CMP-POM-110-CN, CMP-POM-121-CN, CMP-POM-122-CN, CMP-POM-125-CN, CMP-POM-127-CN, CMP-POM-129-CN
+POMVol2: CMP-POM-135-CN, CMP-POM-137-CN, CMP-POM-146-CN, CMP-POM-147-CN, CMP-POM-149-CN, CMP-POM-153-CN, CMP-POM-154-CN, CMP-POM-155-CN, CMP-POM-156-CN, CMP-POM-158-CN, CMP-POM-159-CN, CMP-POM-160-CN, CMP-POM-161-CN, CMP-POM-163-CN, CMP-POM-170-CN, CMP-POM-173-CN, CMP-POM-175-CN, CMP-POM-176-CN, CMP-POM-178-CN, CMP-POM-179-CN, CMP-POM-180-CN, CMP-POM-180-CN, CMP-POM-183-CN, CMP-POM-126rep-CN, CMP-POM-121rep-CN, CMP-POM-183rep-CN, CMP-POM-123rep-CN, CMP-POM-150rep-CN, CMP-POM-111rep-CN.
+POMVol4: CMP-POM-36-CN, CMP-POM-38-CN, CMP-POM-40-CN, CMP-POM-93-CN, CMP-POM-94-CN, CMP-POM-171-CN
+CMPeas:CMP-Plant45D-1-CN, CMP-Plant46T-2-CN, CMP-Plant46D-1-CN, CMP-Plant46D-2-CN, CMP-Plant42T-2-CN, CMP-Plant42T-3-CN, CMP-Plant42D-2-CN, CMP-Plant42D-3-CN, CMP-Plant47D-1-CN, CMP-Plant47D-2-CN, CMP-Plant47D-3-CN
+CMPhragmites: CMP-Plant50D-2-CN, CMP-Plant55T-1-CN, CMP-Plant55T-2-CN, CMP-Plant55D-1-CN, CMP-Plant55D-2-CN, CMP-Plant55D-3-CN, CMP-Plant57T-3-CN, CMP-Plant57D-1-CN, CMP-Plant57D-2-CN, CMP-Plant57D-3-CN, CMP-Plant59T-1-CN, CMP-Plant59T-3-CN, CMP-Plant59D-2-CN, CMP-Plant59D-3-CN, CMP-Plant60T-2-CN, CMP-Plant60T-3-CN, CMP-Plant60D-1-CN, CMP-Plant60D-3-CN
+CMPflanzen: CMP-Plant4-1-CN
+CMPLiverWorst: CMP-FISH-694L-CN
+
+"Contained less nitrogen than smallest reference"
+CMPeas:CMP-Plant40T-3-CN
+CMPhragmites: CMP-Plant57T-1-CN, CMP-Plant57T-2-CN, CMP-Plant59T-2-CN, CMP-Plant59D-1-CN
+POMVol5: CMP-POM-38redo-CN
+
+C TOO LOW ("Contained less carbon than smallest reference"):
+POMVol1: CMP-POM-125-CN
+POMVol4: CMP-POM-38-CN
+POMVol2: CMP-POM-148-CN, CMP-POM-158-CN
+POMVol5: CMP-POM-38redo-CN
+Should separate C and N. 
+
+CONTAINS MORE N THAN LARGEST REFERENCE:"Contained more nitrogen than largest reference"
+CMPZoopSoup: CMP-Zoop-B5-CN
+POMVol4: CMP-POM-51-CN, CMP-POM-52-CN, CMP-POM-192-CN
+CMPLeftovers: CMP-FISH-778M-CN
+CMPLiverPool: CMP-FISH-441L-CN
+CMPVeryStable: CMP-FISH-428M-CN, CMP-FISH-505M-CN, CMP-FISH-494M-CN
+
+CONTAINS MORE C THAN LARGEST REFERENCE: "Contained more carbon than largest reference"
+POMVol4: CMP-POM-192-CN
+
+###S
+```{r}
+
+CMPBuffPants_S <- read_excel("~/CERFTalk2021/Data/RawIsotopeData/CMPBuffPants_S.xlsx", 
++     col_types = c("text", "numeric", "numeric", 
++         "text", "text", "text", "text", "numeric", 
++         "numeric", "numeric"))
+
+CMPChoppedLiver_S <- read_excel("~/CERFTalk2021/Data/RawIsotopeData/CMPChoppedLiver_S.xlsx", 
++     col_types = c("text", "numeric", "numeric", 
++         "text", "numeric", "text", "text", 
++         "text", "numeric", "numeric"))
+
+CMPeace_S <- read_excel("~/CERFTalk2021/Data/RawIsotopeData/CMPeace_S.xlsx", 
++     col_types = c("text", "numeric", "numeric", 
++         "text", "text", "text", "text", "numeric", 
++         "numeric", "numeric"))
+
+CMPeachment_S <- read_excel("~/CERFTalk2021/Data/RawIsotopeData/CMPeachment_S.xlsx", 
++     col_types = c("text", "numeric", "numeric", 
++         "text", "text", "text", "text", "numeric", 
++         "numeric", "numeric"))
+
+
+CMPLiverItUp_S <- read_excel("~/CERFTalk2021/Data/RawIsotopeData/CMPLiverItUp_S.xlsx", 
++     col_types = c("text", "numeric", "numeric", 
++         "text", "numeric", "text", "text", 
++         "text", "numeric", "numeric"))
+
+CMPLiverLaughLov_S <- read_excel("~/CERFTalk2021/Data/RawIsotopeData/CMPLiverLaughLov_S.xlsx", 
++     col_types = c("text", "numeric", "numeric", 
++         "text", "text", "text", "text", "numeric", 
++         "numeric", "numeric"))
+
+CMPLiverOfMine_S <- read_excel("~/CERFTalk2021/Data/RawIsotopeData/CMPLiverOfMine_S.xlsx", 
++     col_types = c("text", "numeric", "numeric", 
++         "text", "text", "text", "text", "numeric", 
++         "numeric", "numeric"))
+
+CMPNotFood_S <- read_excel("~/CERFTalk2021/Data/RawIsotopeData/CMPNotFood_S.xlsx", 
++     col_types = c("text", "numeric", "numeric", 
++         "text", "numeric", "text", "text", 
++         "text", "numeric", "numeric"))
+
+CMPSchwarzeneger_S <- read_excel("~/CERFTalk2021/Data/RawIsotopeData/CMPSchwarzeneger_S.xlsx", 
++     col_types = c("text", "numeric", "numeric", 
++         "text", "text", "text", "text", "numeric", 
++         "numeric", "numeric"))
+
+
+
+CMPTunaOfTheFarm_S <- read_excel("~/CERFTalk2021/Data/RawIsotopeData/CMPTunaOfTheFarm_S.xlsx", 
++     col_types = c("text", "numeric", "numeric", 
++         "text", "numeric", "text", "text", 
++         "text", "numeric", "numeric"))
+
+
+```
+
+Next: remove samples with bad readings
+"Contained less sulfur than smallest reference"
+CMPLiverOfMine: CMP_FISH_291L_S, CMP_FISH_293L_S, CMP_FISH_294L_S
+
+"No Signal"
+CMPBuffPants: CMP_FISH_379M_S
+ 
+Fell together:
+CMPBuffPants: CMP_FISH_379M_S, CMP_FISH_382M_S
+
