@@ -3,6 +3,8 @@ title: "CMP_DataWrangling"
 author: "Caroline Newell"
 date: "3/28/2022"
 output: html_document
+editor_options: 
+  chunk_output_type: console
 ---
 
 
@@ -16,116 +18,115 @@ library(readxl)
 library(tidyverse)
 ```
 
-#Step 2
-##Read in all the isotope data sheets
-
-
-### CN
+# Read in metadata
 ```{r}
-CMPandemic_CN <- read_excel("~/CERFTalk2021/Data/RawIsotopeData/CMPandemic_CN.xlsx", 
-+     col_types = c("text", "numeric", "numeric", 
-+         "text", "numeric", "numeric", "text", 
-+         "text", "text", "text", "text", "numeric", 
-+         "numeric", "numeric", "text", "numeric", 
-+         "numeric", "numeric", "numeric"))
+#Fish
+FishInfo_040122 <- read_excel("Data/FishInfo_040122.xlsx")
 
-CMPFish4Ever_CN <- read_excel("~/CERFTalk2021/Data/RawIsotopeData/CMPFish4Ever_CN.xls", 
-+     col_types = c("text", "numeric", "numeric", 
-+         "text", "numeric", "numeric", "text", 
-+         "text", "text", "text", "text", "numeric", 
-+         "numeric", "numeric", "text", "numeric", 
-+         "numeric", "numeric", "numeric"))
+LargeMacroinvetInfo_040322 <- read_excel("Data/LargeMacroinvetInfo_040322.xlsx")
 
-CMPFishRFriends_CN <- read_excel("~/CERFTalk2021/Data/RawIsotopeData/CMPFishRFriends_CN.xls", 
-+     col_types = c("text", "numeric", "numeric", 
-+         "text", "numeric", "numeric", "text", 
-+         "text", "text", "text", "text", "numeric", 
-+         "numeric", "numeric", "text", "numeric", 
-+         "numeric", "numeric", "numeric"))
+CMP_SmallMacroinvertInfo_04022022 <- read_excel("Data/CMP_SmallMacroinvertInfo_04022022.xlsx")
 
+PlantInfo_121721 <- read_excel("Data/PlantInfo_121721.xlsx")
 
-CMPflanzen_CN <- read_excel("~/CERFTalk2021/Data/RawIsotopeData/CMPflanzen_CN.xlsx", 
-+     col_types = c("text", "numeric", "numeric", 
-+         "text", "numeric", "numeric", "text", 
-+         "text", "text", "text", "text", "numeric", 
-+         "numeric", "numeric", "text", "numeric", 
-+         "numeric", "numeric", "numeric"))
+POM_BENTHIC_Info <- read_excel("Data/POM_BENTHIC_Info.xlsx")
 
-
-CMPLiverLaVida_CN <- read_excel("~/CERFTalk2021/Data/RawIsotopeData/CMPLiverLaVida_CN.xls", 
-+     col_types = c("text", "numeric", "numeric", 
-+         "text", "numeric", "numeric", "text", 
-+         "text", "text", "text", "text", "numeric", 
-+         "numeric", "numeric", "text", "numeric", 
-+         "numeric", "numeric", "numeric"))
-
-
-CMPLiverPool_CN <- read_excel("~/CERFTalk2021/Data/RawIsotopeData/CMPLiverPool_CN.xlsx", 
-+     col_types = c("text", "numeric", "numeric", 
-+         "text", "numeric", "numeric", "text", 
-+         "text", "text", "text", "text", "numeric", 
-+         "numeric", "numeric", "text", "numeric", 
-+         "numeric", "numeric", "numeric"))
-
-CMPLiverWorst_CN <- read_excel("~/CERFTalk2021/Data/RawIsotopeData/CMPLiverWorst_CN.xlsx", 
-+     col_types = c("text", "numeric", "numeric", 
-+         "text", "numeric", "numeric", "text", 
-+         "text", "text", "text", "text", "numeric", 
-+         "numeric", "numeric", "text", "numeric", 
-+         "numeric", "numeric", "numeric"))
-
-CMPMuscleBob_CN <- read_excel("~/CERFTalk2021/Data/RawIsotopeData/CMPMuscleBob_CN.xlsx", 
-+     col_types = c("text", "numeric", "numeric", 
-+         "text", "numeric", "numeric", "text", 
-+         "text", "text", "text", "text", "numeric", 
-+         "numeric", "numeric", "text", "numeric", 
-+         "numeric", "numeric", "numeric"))
-
-CMPMuscleStuffin_CN <- read_excel("~/CERFTalk2021/Data/RawIsotopeData/CMPMuscleStuffin_CN.xlsx", 
-+     col_types = c("text", "numeric", "numeric", 
-+         "text", "numeric", "numeric", "text", 
-+         "text", "text", "text", "text", "numeric", 
-+         "numeric", "numeric", "text", "numeric", 
-+         "numeric", "numeric", "numeric"))
-
-CMPMysteryMeat_CN <- read_excel("~/CERFTalk2021/Data/RawIsotopeData/CMPMysteryMeat_CN.xls", 
-+     col_types = c("text", "numeric", "numeric", 
-+         "text", "numeric", "numeric", "text", 
-+         "text", "text", "text", "text", "numeric", 
-+         "numeric", "numeric", "text", "numeric", 
-+         "numeric", "numeric", "numeric"))
-
-CMPSilenceOThLab_CN <- read_excel("~/CERFTalk2021/Data/RawIsotopeData/CMPSilenceOThLab_CN.xlsx", 
-+     col_types = c("text", "numeric", "numeric", 
-+         "text", "numeric", "numeric", "text", 
-+         "text", "text", "text", "text", "numeric", 
-+         "numeric", "numeric", "text", "numeric", 
-+         "numeric", "numeric", "numeric"))
-
-CMPTheGovernatorCN <- read_excel("~/CERFTalk2021/Data/RawIsotopeData/CMPTheGovernatorCN.xlsx", 
-+     col_types = c("text", "numeric", "numeric", 
-+         "text", "numeric", "numeric", "text", 
-+         "text", "text", "text", "text", "numeric", 
-+         "numeric", "numeric", "text", "numeric", 
-+         "numeric", "numeric", "numeric"))
-
-
-CMPVeryStable_CN <- read_excel("~/CERFTalk2021/Data/RawIsotopeData/CMPVeryStable_CN.xlsx", 
-+     col_types = c("text", "numeric", "numeric", 
-+         "text", "numeric", "numeric", "text", 
-+         "text", "text", "text", "text", "numeric", 
-+         "numeric", "numeric", "text", "numeric", 
-+         "numeric", "numeric", "numeric"))
-
-LiverLetDie_CN <- read_excel("~/CERFTalk2021/Data/RawIsotopeData/LiverLetDie_CN.xlsx", 
-+     col_types = c("text", "numeric", "numeric", 
-+         "text", "numeric", "numeric", "text", 
-+         "text", "text", "text", "text", "numeric", 
-+         "numeric", "numeric", "text", "numeric", 
-+         "numeric", "numeric", "numeric"))
+ZoopInfo <- read_excel("Data/ZoopInfo.xlsx")
 ```
 
-Next: Remove rows of samples where samples were lost (mixed up or destroyed at SIF)
+#Read in all the isotope data sheets
+
+### CN
+
+Note: Not reading in the GlassHalfFull or POMParty data since they were test runs and data not useful.
+
+```{r}
+CMPandemic_CN <- read_excel("Data/SIF-CN/DataOnly/CMPandemic_CN.xlsx", col_types = c("text", "numeric", "numeric", "text", "numeric", "numeric", "text", "text", "text", "text", "text", "numeric", "numeric", "numeric", "text", "numeric", "numeric", "numeric", "numeric"))
+View(CMPandemic_CN)
+
+CMPeas_CN<-  read_excel("Data/SIF-CN/DataOnly/CMPeas_TotalCNCorrected.xlsx", col_types = c("text", "numeric", "numeric", "text", "numeric", "numeric", "text", "text", "text", "text", "text", "numeric", "numeric", "numeric", "text", "numeric",  "numeric", "numeric", "numeric"))
+glimpse(CMPeas_CN)
+
+CMPFish4Ever_CN <- read_excel("Data/SIF-CN/DataOnly/CMPFish4Ever_CN.xls", col_types = c("text", "numeric", "numeric", "text", "numeric", "numeric", "text", "text", "text", "text", "text", "numeric", "numeric", "numeric", "text", "numeric",  "numeric", "numeric", "numeric"))
+glimpse(CMPFish4Ever_CN)
+
+CMPFishRFriends_CN <- read_excel("Data/SIF-CN/DataOnly/CMPFishRFriends_CN.xls", col_types = c("text", "numeric", "numeric", "text", "numeric", "numeric", "text", "text", "text", "text", "text", "numeric",       "numeric", "numeric", "text", "numeric", "numeric", "numeric", "numeric"))
+glimpse(CMPFishRFriends_CN)
+
+CMPflanzen_CN <- read_excel("Data/SIF-CN/DataOnly/CMPflanzen_CN_edited.xlsx", col_types = c("text", "numeric", "numeric", "numeric", "text", "numeric", "numeric", "text", "text", "text", "text", "text", "numeric", "numeric", "numeric", "text", "numeric",     "numeric", "numeric", "numeric"))
+View(CMPflanzen_CN) #Are these all tapwater? Can I put in "tap" treatment so it aligns with CMPhragmites?
+
+CMPhragmites_CN <- read_excel("Data/SIF-CN/DataOnly/CMPhragmites_TotalCNCorrected.xlsx", col_types = c("text", "numeric", "text", "numeric", "numeric", "text", "numeric", "numeric", "text", "text", "text", "text", "text", "numeric", "numeric", "numeric", "text", "numeric",     "numeric", "numeric", "numeric"))
+glimpse(CMPhragmites_CN)
+
+CMPKrabby_CN <- read_excel("Data/SIF-CN/DataOnly/CMPKrabby_TotalCNCorrected.xlsx", col_types = c("text", "numeric", "numeric", "text", "numeric", "numeric", "text", "text", "text", "text", "text", "numeric", "numeric", "numeric", "text", "numeric", "numeric", "numeric", "numeric"))
+glimpse(CMPKrabby_CN)
+
+CMPLeftovers_CN <- read_excel("Data/SIF-CN/DataOnly/CMPLeftovers_TotalCNCorrected.xlsx", col_types = c("text", "numeric", "numeric", "text", "numeric", "numeric", "text", "text", "text", "text", "text", "numeric", "numeric", "numeric", "text", "numeric", "numeric", "numeric", "numeric"))
+glimpse(CMPLeftovers_CN)
+
+CMPLiverLaVida_CN <- read_excel("Data/SIF-CN/DataOnly/CMPLiverLaVida_CN.xls", col_types = c("text", "numeric", "numeric", "text", "numeric", "numeric", "text", "text", "text", "text", "text", "numeric", "numeric", "numeric", "text", "numeric", "numeric", "numeric", "numeric"))
+glimpse(CMPLiverLaVida_CN)
+
+CMPLiverLetDie_CN <- read_excel("Data/SIF-CN/DataOnly/LiverLetDie_CN.xlsx", col_types = c("text", "numeric", "numeric", "text", "numeric", "numeric", "text", "text", "text", "text", "text", "numeric", "numeric", "numeric", "text", "numeric",   "numeric", "numeric", "numeric"))
+glimpse(CMPLiverLetDie_CN)
+
+CMPLiverPool_CN <- read_excel("Data/SIF-CN/DataOnly/CMPLiverPool_CN.xlsx", col_types = c("text", "numeric", "numeric", "text", "numeric", "numeric", "text", "text", "text", "text", "text", "numeric", "numeric", "numeric", "text", "numeric", "numeric", "numeric", "numeric"))
+glimpse(CMPLiverPool_CN)
+
+CMPLiverRoast_CN <- read_excel("Data/SIF-CN/DataOnly/CMPLiverRoast_TotalCNCorrected.xlsx", col_types = c("text", "numeric", "numeric", "text", "numeric", "numeric", "text", "text", "text", "text", "text", "numeric", "numeric", "numeric", "text", "numeric", "numeric", "numeric", "numeric"))
+glimpse(CMPLiverRoast_CN)
+
+CMPLiverWorst_CN <- read_excel("Data/SIF-CN/DataOnly/CMPLiverWorst_CN.xlsx", col_types = c("text", "numeric", "numeric", "text", "numeric", "numeric", "text", "text", "text", "text", "text", "numeric", "numeric", "numeric", "text", "numeric", "numeric", "numeric", "numeric"))
+glimpse(CMPLiverWorst_CN)
+
+CMPMuscleBob_CN <- read_excel("Data/SIF-CN/DataOnly/CMPMuscleBob_CN.xlsx", col_types = c("text", "numeric", "numeric", "text", "numeric", "numeric", "text", "text", "text", "text", "text", "numeric", "numeric", "numeric", "text", "numeric", "numeric", "numeric", "numeric"))
+glimpse(CMPMuscleBob_CN)
+
+CMPMuscleStuffin_CN <- read_excel("Data/SIF-CN/DataOnly/CMPMuscleStuffin_CN.xlsx", col_types = c("text", "numeric", "numeric", "text", "numeric", "numeric", "text", "text", "text", "text", "text", "numeric", "numeric", "numeric", "text", "numeric",        "numeric", "numeric", "numeric"))
+glimpse(CMPMuscleStuffin_CN)
+
+CMPMysteryMeat_CN <- read_excel("Data/SIF-CN/DataOnly/CMPMysteryMeat_CN.xls", col_types = c("text", "numeric", "numeric", "text", "numeric", "numeric", "text", "text", "text", "text", "text", "numeric", "numeric", "numeric", "text", "numeric",     "numeric", "numeric", "numeric"))
+glimpse(CMPMysteryMeat_CN)
+
+CMPSilenceOThLab_CN <- read_excel("Data/SIF-CN/DataOnly/CMPSilenceOThLab_CN.xlsx", col_types = c("text", "numeric", "numeric", "text", "numeric", "numeric", "text", "text", "text", "text", "text", "numeric", "numeric", "numeric", "text", "numeric", "numeric", "numeric", "numeric"))
+glimpse(CMPSilenceOThLab_CN)
+
+CMPSkrimp_CN <- read_excel("Data/SIF-CN/DataOnly/CMPSkrimp_CN.xlsx", col_types = c("text", "numeric", "numeric", "text", "numeric", "numeric", "text", "text", "text", "text", "text", "numeric", "numeric", "numeric", "text", "numeric", "numeric", "numeric", "numeric"))
+glimpse(CMPSkrimp_CN)
+
+CMPSkrimp2_CN <- read_excel("Data/SIF-CN/DataOnly/CMPSkrimp2_CN.xlsx", col_types = c("text", "numeric", "numeric", "text", "numeric", "numeric", "text", "text", "text", "text", "text", "numeric", "numeric", "numeric", "text", "numeric", "numeric", "numeric", "numeric"))
+glimpse(CMPSkrimp2_CN)
+
+CMPSmallFry_CN <- read_excel("Data/SIF-CN/DataOnly/CMPSmallFry_TotalCNCorrected.xlsx", col_types = c("text", "numeric", "numeric", "text", "numeric", "numeric", "text", "text", "text", "text", "text", "numeric", "numeric", "numeric", "text", "numeric", "numeric", "numeric", "numeric"))
+glimpse(CMPSmallFry_CN)
+
+CMPTheGovernator_CN <- read_excel("Data/SIF-CN/DataOnly/CMPTheGovernatorCN.xlsx", col_types = c("text", "numeric", "numeric", "text", "numeric", "numeric", "text", "text", "text", "text", "text", "numeric", "numeric", "numeric", "text", "numeric", "numeric", "numeric", "numeric"))
+glimpse(CMPTheGovernator_CN)
+
+CMPVeryStable_CN <- read_excel("Data/SIF-CN/DataOnly/CMPVeryStable_CN.xlsx", col_types = c("text", "numeric", "numeric", "text", "numeric", "numeric", "text", "text", "text", "text", "text", "numeric", "numeric", "numeric", "text", "numeric", "numeric", "numeric", "numeric"))
+glimpse(CMPVeryStable_CN)
+
+CMPZoopSoup_CN <- read_excel("Data/SIF-CN/DataOnly/CMPZoopSoup_TotalCNcorrected.xlsx", col_types = c("text", "numeric", "numeric", "text", "numeric", "numeric", "text", "text", "text", "text", "text", "numeric", "numeric", "numeric", "text", "numeric", "numeric", "numeric", "numeric"))
+glimpse(CMPZoopSoup_CN)
+
+PomVol1_CN <- read_excel("Data/SIF-CN/DataOnly/POMVol1_TotalCNCorrected.xlsx", col_types = c("text", "numeric", "numeric", "text", "numeric", "numeric", "text", "text", "text", "text", "text", "numeric", "numeric", "numeric", "text", "numeric",   "numeric", "numeric", "numeric"))
+glimpse(PomVol1_CN)
+
+PomVol2_CN <- read_excel("Data/SIF-CN/DataOnly/POMVol2_TotalCNCorrected.xlsx", col_types = c("text", "numeric", "numeric", "text", "numeric", "numeric", "text", "text", "text", "text", "text", "numeric", "numeric", "numeric", "text", "numeric",   "numeric", "numeric", "numeric"))
+glimpse(PomVol2_CN)
+
+PomVol3_CN <- read_excel("Data/SIF-CN/DataOnly/POMVol3_TotalCNCorrected.xlsx", col_types = c("text", "numeric", "numeric", "text", "numeric", "numeric", "text", "text", "text", "text", "text", "numeric", "numeric", "numeric", "text", "numeric",   "numeric", "numeric", "numeric"))
+glimpse(PomVol3_CN)
+
+PomVol4_CN <- read_excel("Data/SIF-CN/DataOnly/POMVol4_TotalCNCorrected.xlsx", col_types = c("text", "numeric", "numeric", "text", "numeric", "numeric", "text", "text", "text", "text", "text", "numeric", "numeric", "numeric", "text", "numeric",   "numeric", "numeric", "numeric"))
+glimpse(PomVol4_CN)
+
+PomVol5_CN <- read_excel("Data/SIF-CN/DataOnly/POMVol5_TotalCNCorrected.xlsx", col_types = c("text", "numeric", "numeric", "text", "numeric", "numeric", "text", "text", "text", "text", "text", "numeric", "numeric", "numeric", "text", "numeric",   "numeric", "numeric", "numeric"))
+glimpse(PomVol5_CN)
+```
+
+Next: flag rows of samples where samples were lost (mixed up or destroyed at SIF)
 List of lost samples:
 CMPFishRFriends: 199m, 200m, 201m, 202m
 CMPSkrimp: CMP-INVERT-EXO82-CN, CMP-INVERT-EXO83-CN, CMP-INVERT-EXO84-CN, CMP-INVERT-EXO85-CN, CMP-INVERT-EXO86-CN, CMP-INVERT-EXO87-CN, CMP-INVERT-HMC64-CN, CMP-INVERT-HMC65-CN, CMP-INVERT-HMC66-CN, CMP-INVERT-HMC67-CN, CMP-INVERT-HMC68-CN, CMP-INVERT-HMC69-CN, CMP-INVERT-HMC70-CN, CMP-INVERT-HMC71-CN, CMP-INVERT-HMC13-CN, CMP-INVERT-HMC14-CN, CMP-INVERT-HMC17-CN, CMP-INVERT-HMC18-CN, CMP-INVERT-HMC16-CN, CMP-INVERT-HMC27-CN, CMP-INVERT-HMC26-CN, CMP-INVERT-HMC25-CN, CMP-INVERT-HMC30-CN, CMP-INVERT-HMC28-CN, CMP-INVERT-HMC21-CN, CMP-INVERT-HMC29-CN, CMP-INVERT-HMC15-CN, CMP-INVERT-EXO40-CN, CMP-INVERT-EXO41-CN, CMP-INVERT-EXO42-CN, CMP-INVERT-EXO26-CN, CMP-INVERT-EXO25-CN, CMP-INVERT-EXO24-CN, CMP-INVERT-EXO23-CN, CMP-INVERT-EXO44-CN, CMP-INVERT-EXO22-CN, CMP-INVERT-EXO45-CN, CMP-INVERT-EXO43-CN, CMP-INVERT-EXO15-CN, CMP-INVERT-EXO14-CN, CMP-INVERT-EXO13-CN, CMP-INVERT-EXO35-CN, CMP-INVERT-EXO19-CN, CMP-INVERT-EXO34-CN, CMP-INVERT-HMC22-CN, CMP-INVERT-RSC11-CN, CMP-INVERT-RSC15-CN, CMP-INVERT-RSC14-CN, CMP-INVERT-RSC2-CN, CMP-INVERT-RSC12-CN, CMP-INVERT-RSC10-CN, CMP-INVERT-RSC18-CN, CMP-INVERT-RSC16-CN, CMP-INVERT-RSC13-CN, CMP-INVERT-RSC3-CN, CMP-INVERT-RSC6-CN, CMP-INVERT-RSC17-CN, CMP-INVERT-RSC5-CN, CMP-INVERT-RSC9-CN, CMP-INVERT-RSC1-CN, CMP-INVERT-RSC7-CN, CMP-INVERT-RSC8-CN, CMP-INVERT-HMC19-CN, CMP-INVERT-HMC11-CN, CMP-INVERT-HMC10-CN, CMP-INVERT-HMC31-CN, CMP-INVERT-HMC23-CN, CMP-INVERT-HMC24-CN, CMP-INVERT-HMC32-CN, CMP-INVERT-HMC33-CN, CMP-INVERT-HMC34-CN, CMP-INVERT-HMC35-CN, CMP-INVERT-HMC20-CN, CMP-INVERT-HMC36-CN.
@@ -168,66 +169,64 @@ CMPVeryStable: CMP-FISH-428M-CN, CMP-FISH-505M-CN, CMP-FISH-494M-CN
 CONTAINS MORE C THAN LARGEST REFERENCE: "Contained more carbon than largest reference"
 POMVol4: CMP-POM-192-CN
 
+
 ###S
 ```{r}
+#CMPatty (data not back yet)
 
-CMPBuffPants_S <- read_excel("~/CERFTalk2021/Data/RawIsotopeData/CMPBuffPants_S.xlsx", 
-+     col_types = c("text", "numeric", "numeric", 
-+         "text", "text", "text", "text", "numeric", 
-+         "numeric", "numeric"))
+CMPBuffPants_S <- read_excel("Data/SIF-S/DataOnly/CMPBuffPants_S.xlsx", col_types = c("text", "numeric", "numeric", "text", "text", "text", "text", "numeric", "numeric", "numeric"))
+glimpse(CMPBuffPants_S)
 
-CMPChoppedLiver_S <- read_excel("~/CERFTalk2021/Data/RawIsotopeData/CMPChoppedLiver_S.xlsx", 
-+     col_types = c("text", "numeric", "numeric", 
-+         "text", "numeric", "text", "text", 
-+         "text", "numeric", "numeric"))
+CMPChoppedLiver_S <- read_excel("Data/SIF-S/DataOnly/CMPChoppedLiver_S.xlsx", col_types = c("text", "numeric", "numeric", "text", "numeric", "text", "text", "text", "numeric", "numeric"))
+glimpse(CMPChoppedLiver_S)
 
-CMPeace_S <- read_excel("~/CERFTalk2021/Data/RawIsotopeData/CMPeace_S.xlsx", 
-+     col_types = c("text", "numeric", "numeric", 
-+         "text", "text", "text", "text", "numeric", 
-+         "numeric", "numeric"))
+CMPeace_S <- read_excel("Data/SIF-S/DataOnly/CMPeace_S.xlsx", col_types = c("text", "numeric", "numeric", "text", "text", "text", "text", "numeric", "numeric", "numeric"))
+glimpse(CMPeace_S)
 
-CMPeachment_S <- read_excel("~/CERFTalk2021/Data/RawIsotopeData/CMPeachment_S.xlsx", 
-+     col_types = c("text", "numeric", "numeric", 
-+         "text", "text", "text", "text", "numeric", 
-+         "numeric", "numeric"))
+CMPeachment_S <- read_excel("Data/SIF-S/DataOnly/CMPeachment_S.xlsx", col_types = c("text", "numeric", "numeric", "text", "text", "text", "text", "numeric", "numeric", "numeric"))
+glimpse(CMPeachment_S)
 
+#CMPlants (data not back yet)
 
-CMPLiverItUp_S <- read_excel("~/CERFTalk2021/Data/RawIsotopeData/CMPLiverItUp_S.xlsx", 
-+     col_types = c("text", "numeric", "numeric", 
-+         "text", "numeric", "text", "text", 
-+         "text", "numeric", "numeric"))
+#CMPLiverGiver (data not back yet)
 
-CMPLiverLaughLov_S <- read_excel("~/CERFTalk2021/Data/RawIsotopeData/CMPLiverLaughLov_S.xlsx", 
-+     col_types = c("text", "numeric", "numeric", 
-+         "text", "text", "text", "text", "numeric", 
-+         "numeric", "numeric"))
+CMPLiverItUp_S <- read_excel("Data/SIF-S/DataOnly/CMPLiverItUp_S.xlsx", col_types = c("text", "numeric", "numeric", "text", "numeric", "text", "text", "text", "numeric", "numeric"))
+glimpse(CMPLiverItUp_S)
 
-CMPLiverOfMine_S <- read_excel("~/CERFTalk2021/Data/RawIsotopeData/CMPLiverOfMine_S.xlsx", 
-+     col_types = c("text", "numeric", "numeric", 
-+         "text", "text", "text", "text", "numeric", 
-+         "numeric", "numeric"))
+CMPLiverLaughLov_S <- read_excel("Data/SIF-S/DataOnly/CMPLiverLaughLov_S.xlsx", col_types = c("text", "numeric", "numeric", "text", "text", "text", "text", "numeric", "numeric", "numeric"))
+glimpse(CMPLiverLaughLov_S)
 
-CMPNotFood_S <- read_excel("~/CERFTalk2021/Data/RawIsotopeData/CMPNotFood_S.xlsx", 
-+     col_types = c("text", "numeric", "numeric", 
-+         "text", "numeric", "text", "text", 
-+         "text", "numeric", "numeric"))
+CMPLiverOfMine_S <- read_excel("Data/SIF-S/DataOnly/CMPLiverOfMine_S.xlsx", col_types = c("text", "numeric", "numeric", "text", "text", "text", "text", "numeric", "numeric", "numeric"))
+glimpse(CMPLiverOfMine_S)
 
-CMPSchwarzeneger_S <- read_excel("~/CERFTalk2021/Data/RawIsotopeData/CMPSchwarzeneger_S.xlsx", 
-+     col_types = c("text", "numeric", "numeric", 
-+         "text", "text", "text", "text", "numeric", 
-+         "numeric", "numeric"))
+#CMPluchea
 
+#CMPMudBugs
 
+#CMPMuscleMeat
 
-CMPTunaOfTheFarm_S <- read_excel("~/CERFTalk2021/Data/RawIsotopeData/CMPTunaOfTheFarm_S.xlsx", 
-+     col_types = c("text", "numeric", "numeric", 
-+         "text", "numeric", "text", "text", 
-+         "text", "numeric", "numeric"))
+CMPNotFood_S <- read_excel("Data/SIF-S/DataOnly/CMPNotFood_S.xlsx", col_types = c("text", "numeric", "numeric", "text", "numeric", "text", "text", "text", "numeric", "numeric"))
+glimpse(CMPNotFood_S)
 
+#CMPoaceae
 
+#CMPSampler
+
+CMPSchwarzeneger_S <- read_excel("Data/SIF-S/DataOnly/CMPSchwarzeneger_S.xlsx", col_types = c("text", "numeric", "numeric", "text", "text", "text", "text", "numeric", "numeric", "numeric"))
+glimpse(CMPSchwarzeneger_S)
+
+#CMPScud
+
+CMPTunaOfTheFarm_S <- read_excel("Data/SIF-S/DataOnly/CMPTunaOfTheFarm_S.xlsx", col_types = c("text", "numeric", "numeric", "text", "numeric", "text", "text", "text", "numeric", "numeric"))
+glimpse(CMPTunaOfTheFarm_S)
+
+#CMPZooptopia
+
+CMPISeeDeadCMPeople_S <- read_excel("Data/SIF-S/DataOnly/ISeeDeadCMPeople_S.xlsx", col_types = c("text", "numeric", "numeric", "text", "text", "text", "text", "numeric", "numeric", "numeric"))
+glimpse(CMPISeeDeadCMPeople_S)
 ```
 
-Next: remove samples with bad readings
+Next: flag samples with bad readings
 "Contained less sulfur than smallest reference"
 CMPLiverOfMine: CMP_FISH_291L_S, CMP_FISH_293L_S, CMP_FISH_294L_S
 
@@ -237,3 +236,19 @@ CMPBuffPants: CMP_FISH_379M_S
 Fell together:
 CMPBuffPants: CMP_FISH_379M_S, CMP_FISH_382M_S
 
+# Merge dataframes
+I will address flagging the warning messages of the data after I have merged everything together.
+```{r}
+RawIsotopeData<-bind_rows(CMPandemic_CN, CMPeas_CN, CMPFish4Ever_CN, CMPFishRFriends_CN, CMPflanzen_CN, CMPhragmites_CN, CMPKrabby_CN, CMPLeftovers_CN, CMPLiverLaVida_CN, CMPLiverLetDie_CN, CMPLiverPool_CN, CMPLiverRoast_CN, CMPLiverWorst_CN, CMPMuscleBob_CN, CMPMuscleStuffin_CN, CMPMysteryMeat_CN, CMPSilenceOThLab_CN, CMPSkrimp_CN, CMPSkrimp2_CN, CMPSmallFry_CN, CMPTheGovernatorCN, CMPVeryStable_CN, CMPZoopSoup_CN, PomVol1_CN, PomVol2_CN, PomVol3_CN, PomVol4_CN, PomVol5_CN, CMPBuffPants_S, CMPChoppedLiver_S, CMPeace_S, CMPeachment_S, CMPLiverItUp_S, CMPLiverLaughLov_S, CMPLiverOfMine_S, CMPNotFood_S,  CMPSchwarzeneger_S, CMPTunaOfTheFarm_S, CMPISeeDeadCMPeople_S)
+View(RawIsotopeData)
+
+write.csv(RawIsotopeData, "Data/RawIsotopeData_03302022.csv")
+```
+
+# Now I want to attach sample information (species ID, site, etc) to this table.
+
+## Joining fish data to SIF data
+```{r}
+
+
+```
