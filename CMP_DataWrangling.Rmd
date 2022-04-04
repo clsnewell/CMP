@@ -16,6 +16,7 @@ Note: Use corrected sheets for CMPKrabby, POM_VOL_1, 2, 3, 4, 5, CMPZoopSoup, CM
 ```{r}
 library(readxl)
 library(tidyverse)
+library(stringr)
 ```
 
 # Read in metadata
@@ -35,7 +36,10 @@ ZoopInfo <- read_excel("Data/ZoopInfo.xlsx")
 ```
 
 #Read in all the isotope data sheets
-
+```{r}
+#Created this datasheet in the code below...
+RawIsotopeData_03302022 <- read_excel("Data/RawIsotopeData_03302022.xlsx")
+```
 ### CN
 
 Note: Not reading in the GlassHalfFull or POMParty data since they were test runs and data not useful.
@@ -249,6 +253,66 @@ write.csv(RawIsotopeData, "Data/RawIsotopeData_03302022.csv")
 
 ## Joining fish data to SIF data
 ```{r}
+#okay so I forgot I have to do each taxonomic group separately because of the different naming techniques...
+#So let's pull all the rows of fish out first and foremost
+str(RawIsotopeData_03302022$Taxon)
+FishIsotopeData<- RawIsotopeData_03302022 %>% filter(Taxon == "FISH")
+
+FishIsotopeData$Fish_Number<- regmatches(FishIsotopeData$SampleID, gregexpr("[[:digit:]]+", FishIsotopeData$SampleID)) #makes a list.
+
+FishIsotopeData$Fish_Number<-as.numeric(FishIsotopeData$Fish_Number)
+
+FishIsotopeAndMetaData<-merge(FishIsotopeData, FishInfo_040122, by = "Fish_Number")
+
+write.csv(FishIsotopeAndMetaData, "Data/FishIsotopeAndMetaData_040322.csv")
+```
+
+## Let's do plants next.
+```{r}
+str(RawIsotopeData_03302022$Taxon)
+PlantIsotopeData<- RawIsotopeData_03302022 %>% filter(Taxon == "PLANT")
+#I can't use the quick fix from before. Gotta find another way...
+str(PlantIsotopeData$SampleID)
+writeLines(PlantIsotopeData$SampleID)
+
+PlantIsotopeData_Specimens<- separate(PlantIsotopeData, col=SampleID, into=c('Project', 'SpecimenID', 'Trial', 'CNorS'), sep='-') #PERFECT!
+#Okay now merge plant data with info data
+PlantInfo_121721$SpecimenID<-PlantInfo_121721$Sample_ID
+View(PlantInfo_121721)
+
+#DetritusData<- merge(PlantIsotopeData_Specimens, PlantInfo_121721, by="SpecimenID")
+#View(DetritusData)
 
 
+PlantIsotopeData_PlantSpecimens<- PlantIsotopeData_Specimens %>%
+    mutate(SpecimenID = str_remove_all(SpecimenID, "Plant"))
+View(PlantIsotopeData_PlantSpecimens) #HALLELUJAH
+
+#NOW we merge.
+PlantIsotopeAndMetadata<- merge(PlantIsotopeData_PlantSpecimens, PlantInfo_121721, by="SpecimenID")
+View(PlantIsotopeAndMetadata)
+#SAVE IT
+write.csv(PlantIsotopeAndMetadata, "Data/PlantIsotopeAndMetaData_040422.csv")
+```
+
+## Now zoops
+```{r}
+ZoopIsotopeData<- RawIsotopeData_03302022 %>% filter(Taxon == "ZOOP")
+
+ZoopIsotopeData_Vials<- separate(ZoopIsotopeData, col=SampleID, into=c('Project', 'Zooplankton', 'Vial', 'CNorS'), sep='-') 
+
+ZoopIsotopeAndMetadata<-merge(ZoopIsotopeData_Vials, ZoopInfo, by="Vial")
+
+write.csv(ZoopIsotopeAndMetadata, "Data/ZoopIsotopeAndMetaData_040422.csv")
+```
+
+## Now Pom and BA
+```{r}
+unique(RawIsotopeData_03302022$Taxon)
+POMIsotopeData<- RawIsotopeData_03302022 %>% filter(Taxon == "POM/BA")
+View(POMIsotopeData)
+View(POM_BENTHIC_Info)
+POM_BENTHIC_Info$SampleID<- POM_BENTHIC_Info$SIF_ID
+POM_BENTHIC_Info$SampleID <- gsub("_", "-", POM_BENTHIC_Info$SampleID)
+POM_BA_IsotopeAndMetadata<-merge(POM_BENTHIC_Info, POMIsotopeData, by="SampleID")
 ```
