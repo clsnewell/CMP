@@ -265,6 +265,49 @@ FishIsotopeData$Fish_Number<-as.numeric(FishIsotopeData$Fish_Number)
 FishIsotopeAndMetaData<-merge(FishIsotopeData, FishInfo_040122, by = "Fish_Number")
 
 write.csv(FishIsotopeAndMetaData, "Data/FishIsotopeAndMetaData_040322.csv")
+
+#Now let's follow the rest of the things I did in 2021...
+
+#Remove Pilot fish and WL-Out... 
+FishIsotopeAndMetaData_040322<- FishIsotopeAndMetaData_040322[!(FishIsotopeAndMetaData_040322$Site == "WL-O"),]
+unique(FishIsotopeAndMetaData_040322$Site) #done
+
+#Remove fish from pilot study
+FishIsotopeAndMetaData_040322<- FishIsotopeAndMetaData_040322[!(FishIsotopeAndMetaData_040322$Season == "Pilot"),]
+unique(FishIsotopeAndMetaData_040322$Season)
+
+#Fix spelling errors
+unique(FishIsotopeAndMetaData_040322$`Age Class`) #"Age 1+" & "age 1+", "adult" & "Adult"    
+FishIsotopeAndMetaData_040322$`Age Class`<- as.character(FishIsotopeAndMetaData_040322$`Age Class`)
+FishIsotopeAndMetaData_040322$`Age Class`[FishIsotopeAndMetaData_040322$`Age Class` == "age 1+"] <-"Age 1+"
+unique(FishIsotopeAndMetaData_040322$`Age Class`)
+
+FishIsotopeAndMetaData_040322$`Age Class`[FishIsotopeAndMetaData_040322$`Age Class` == "adult"] <-"Adult"
+
+FishIsotopeAndMetaData_040322$`Age Class`[FishIsotopeAndMetaData_040322$`Age Class` == "juvenile"] <-"Juvenile"
+unique(FishIsotopeAndMetaData_040322$`Age Class`)
+
+#Need to split up muscle and liver data.
+
+FishMuscleData<- FishIsotopeAndMetaData_040322[!(FishIsotopeAndMetaData_040322$Type_of_Material == "Liver"),]
+
+FishLiverData<- FishIsotopeAndMetaData_040322[!(FishIsotopeAndMetaData_040322$Type_of_Material == "Muscle"),]
+FishLiverData.<- FishLiverData[!(FishLiverData$Type_of_Material == "Muscle Tissue"),] 
+
+#Now I want to combine sulfur and carbon/nitrogen data into single row.
+
+glimpse(FishMuscleData)
+
+FishMuscleData_Summarized<-FishMuscleData %>% select(Fish_Number, `D13CVPDB(permill)`, `D15NAir(permill)`, `D34SVCDT(permill)`, Site, Species, Field_Date, Season, `SL_(mm)`, `TL_(mm)`, `Age Class`)%>% group_by(Fish_Number) %>% summarise_all(list(~first(na.omit(.)))) #YES
+
+FishLiverData_Summarized<-FishLiverData. %>% select(Fish_Number, `D13CVPDB(permill)`, `D15NAir(permill)`, `D34SVCDT(permill)`, Site, Species, Field_Date, Season, `SL_(mm)`, `TL_(mm)`, `Age Class`)%>% group_by(Fish_Number) %>% summarise_all(list(~first(na.omit(.)))) #YES
+#Save it
+
+
+
+write.csv(FishMuscleData_Summarized, "Data/FishMuscleDataSummarized_040422.csv")
+
+write.csv(FishLiverData_Summarized, "Data/FishLiverDataSummarized_040422.csv")
 ```
 
 ## Let's do plants next.
@@ -312,7 +355,34 @@ unique(RawIsotopeData_03302022$Taxon)
 POMIsotopeData<- RawIsotopeData_03302022 %>% filter(Taxon == "POM/BA")
 View(POMIsotopeData)
 View(POM_BENTHIC_Info)
-POM_BENTHIC_Info$SampleID<- POM_BENTHIC_Info$SIF_ID
-POM_BENTHIC_Info$SampleID <- gsub("_", "-", POM_BENTHIC_Info$SampleID)
+POM_BENTHIC_Info$SampleID<- POM_BENTHIC_Info$SIF_ID 
+POM_BENTHIC_Info$SampleID <- gsub("_", "-", POM_BENTHIC_Info$SampleID) #Changes all the underscores to hyphens to match sif data.
 POM_BA_IsotopeAndMetadata<-merge(POM_BENTHIC_Info, POMIsotopeData, by="SampleID")
+
+write.csv(POM_BA_IsotopeAndMetadata, "Data/POM_BA_IsotopeAndMetaData_040422.csv")
+
+```
+
+#Last but not least, inverts.
+```{r}
+InvertIsotopeData<- RawIsotopeData_03302022 %>% filter(Taxon == "INVERT")
+InvertIsotopeData_SampleIDs<- separate(InvertIsotopeData, col=SampleID, into=c('Project', 'Invertebrate', 'SpecimenID', 'Trial'), sep='-')
+View(InvertIsotopeData_SampleIDs) #NOTE: Trial column is CN or S for ones without trial numbers. 
+
+#Need to delete hyphen from sample ID in the LargeMacroinvert df
+LargeMacroinvetInfo_040322$Sample_ID<-gsub("-", "", LargeMacroinvetInfo_040322$Sample_ID)
+
+LargeMacroinvetInfo_040322$SpecimenID<-LargeMacroinvetInfo_040322$Sample_ID
+
+LargeMacroinvert_IsotopeAndMetadata<- merge(LargeMacroinvetInfo_040322, InvertIsotopeData_SampleIDs, by="SpecimenID")
+
+write.csv(LargeMacroinvert_IsotopeAndMetadata, "Data/LargeMacroinvert_IsotopeAndMetaData_040422.csv")
+
+#Okay, now small macroinverts
+
+View(CMP_SmallMacroinvertInfo_04022022)
+InvertIsotopeData_SampleIDs$SampleID_Simple<-InvertIsotopeData_SampleIDs$SpecimenID
+
+SmallMacroinvert_IsotopeAndMetadata<- merge(InvertIsotopeData_SampleIDs, CMP_SmallMacroinvertInfo_04022022, by="SampleID_Simple")
+write.csv(SmallMacroinvert_IsotopeAndMetadata, "Data/SmallMacroinvert_IsotopeAndMetaData_040422.csv")
 ```
