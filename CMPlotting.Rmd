@@ -3,6 +3,8 @@ title: "CMPlotting"
 author: "Caroline Newell"
 date: "4/3/2022"
 output: html_document
+editor_options: 
+  chunk_output_type: console
 ---
 ##Load packages
 ```{r}
@@ -10,7 +12,37 @@ library(readxl)
 library(tidyverse)
 ```
 
-## Read Data
+# Plot Fish Data
 ```{r}
 FishIsotopeAndMetaData_040322 <- read_excel("Data/FishIsotopeAndMetaData_040322.xlsx")
+
+FishLiverDataSummarized_040422 <- read_excel("Data/FishLiverDataSummarized_040422.xlsx")
+
+FishLiverDataSummarized_040422 %>% ggplot(aes(x=`D13CVPDB(permill)`, y= `D15NAir(permill)`)) + geom_point()
+
+FishMuscleDataSummarized_040422 <- read_excel("Data/FishMuscleDataSummarized_040422.xlsx")
+
+FishMuscleDataSummarized_040422$`D13CVPDB(permill)`<- as.numeric(FishMuscleDataSummarized_040422$`D13CVPDB(permill)`)
+
+FishMuscleDataSummarized_040422$`D15NAir(permill)`<- as.numeric(FishMuscleDataSummarized_040422$`D15NAir(permill)`)
+
+FishMuscleDataSummarized_040422$`D34SVCDT(permill)`<- as.numeric(FishMuscleDataSummarized_040422$`D34SVCDT(permill)`)
+
+FishMuscleDataSummarized_040422 %>% ggplot(aes(x=`D13CVPDB(permill)`, y= `D15NAir(permill)`)) + geom_point(aes(color=Site)) + facet_wrap(~Species) + labs(title= "Fish Muscle Data from all Seasons")
+
+FishMuscleData_Means<- FishMuscleDataSummarized_040422 %>% group_by(Species, `Age Class`, Site) %>% summarize(D13C = mean(`D13CVPDB(permill)`), D13C_SD = sd(`D13CVPDB(permill)`), D15N = mean(`D15NAir(permill)`), D15N_SD = sd(`D15NAir(permill)`), D34S = mean(`D34SVCDT(permill)`), D34S_SD = sd(`D34SVCDT(permill)`))
+
+FishMuscleData_Means %>% ggplot(aes(x=D13C, y= D15N)) + geom_point(aes(color=Site)) + facet_wrap(~Species)
+```
+
+# Plot Zoop data
+```{r}
+ZoopIsotopeAndMetaData_040422 <- read_excel("Data/ZoopIsotopeAndMetaData_040422.xlsx")
+
+ZoopIsotopeAndMetaData_040422$ZoopSpecies[ZoopIsotopeAndMetaData_040422$ZoopSpecies == "500um"] <-"500 um"
+
+ZoopIsotopeAndMetaData_040422$ZoopSpecies[ZoopIsotopeAndMetaData_040422$ZoopSpecies == ">500 um"] <-"500 um"
+
+ZoopIsotopeAndMetaData_040422 %>% ggplot(aes(x=`D13CVPDB(permill)`, y= `D15NAir(permill)`)) + geom_point(aes(color = Site))+facet_wrap(~ZoopSpecies) + labs(title = "Zoop Data all Seasons")
+
 ```
