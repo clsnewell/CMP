@@ -303,8 +303,6 @@ FishMuscleData_Summarized<-FishMuscleData %>% select(Fish_Number, `D13CVPDB(perm
 FishLiverData_Summarized<-FishLiverData. %>% select(Fish_Number, `D13CVPDB(permill)`, `D15NAir(permill)`, `D34SVCDT(permill)`, Site, Species, Field_Date, Season, `SL_(mm)`, `TL_(mm)`, `Age Class`)%>% group_by(Fish_Number) %>% summarise_all(list(~first(na.omit(.)))) #YES
 #Save it
 
-
-
 write.csv(FishMuscleData_Summarized, "Data/FishMuscleDataSummarized_040422.csv")
 
 write.csv(FishLiverData_Summarized, "Data/FishLiverDataSummarized_040422.csv")
