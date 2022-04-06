@@ -13,12 +13,34 @@ library(tidyverse)
 ```
 
 # Plot Fish Data
+
+##Liver
 ```{r}
 FishIsotopeAndMetaData_040322 <- read_excel("Data/FishIsotopeAndMetaData_040322.xlsx")
 
 FishLiverDataSummarized_040422 <- read_excel("Data/FishLiverDataSummarized_040422.xlsx")
 
+FishLiverDataSummarized_040422$`D13CVPDB(permill)`<- as.numeric(FishLiverDataSummarized_040422$`D13CVPDB(permill)`)
+
+FishLiverDataSummarized_040422$`D15NAir(permill)`<- as.numeric(FishLiverDataSummarized_040422$`D15NAir(permill)`)
+
+FishLiverDataSummarized_040422$`D34SVCDT(permill)`<- as.numeric(FishLiverDataSummarized_040422$`D34SVCDT(permill)`)
+
+FishLiverDataSummarized_040422 %>% ggplot(aes(x=`D13CVPDB(permill)`, y= `D15NAir(permill)`)) + geom_point(aes(color=Site)) + facet_wrap(~Species) + labs(title= "Fish Liver Data from all Seasons")
+
+
 FishLiverDataSummarized_040422 %>% ggplot(aes(x=`D13CVPDB(permill)`, y= `D15NAir(permill)`)) + geom_point()
+
+unique(FishLiverDataSummarized_040422$Species)
+
+FishLiverDataSummarized_040422 %>% filter(Season == "Summer") %>%  ggplot(aes(x=`D13CVPDB(permill)`, y= `D15NAir(permill)`)) + geom_point(aes(color=Site)) + facet_wrap(~factor(Species, levels = c("TFS", "ASH", "ISS", "SB", "ST", "BC", "TP", "STBK", "SKR", "CP", "SF", "SCP", "SG", "SKG", "YFG"))) + labs(title= "Fish Liver Data from Summer")
+
+FishLiverDataSummarized_040422 %>% filter(Season == "Fall") %>%  ggplot(aes(x=`D13CVPDB(permill)`, y= `D15NAir(permill)`)) + geom_point(aes(color=Site)) + facet_wrap(~factor(Species, levels = c("TFS", "ASH", "ISS", "SB", "ST", "BC", "TP", "STBK", "SKR", "CP", "SF", "SCP", "SG", "SKG", "YFG"))) + labs(title= "Fish Liver Data from Fall")
+```
+
+## Muscle
+```{r}
+FishIsotopeAndMetaData_040322 <- read_excel("Data/FishIsotopeAndMetaData_040322.xlsx")
 
 FishMuscleDataSummarized_040422 <- read_excel("Data/FishMuscleDataSummarized_040422.xlsx")
 
@@ -30,20 +52,57 @@ FishMuscleDataSummarized_040422$`D34SVCDT(permill)`<- as.numeric(FishMuscleDataS
 
 FishMuscleDataSummarized_040422 %>% ggplot(aes(x=`D13CVPDB(permill)`, y= `D15NAir(permill)`)) + geom_point(aes(color=Site)) + facet_wrap(~Species) + labs(title= "Fish Muscle Data from all Seasons")
 
-FishMuscleData_Means<- FishMuscleDataSummarized_040422 %>% group_by(Species, `Age Class`, Site) %>% summarize(D13C = mean(`D13CVPDB(permill)`), D13C_SD = sd(`D13CVPDB(permill)`), D15N = mean(`D15NAir(permill)`), D15N_SD = sd(`D15NAir(permill)`), D34S = mean(`D34SVCDT(permill)`), D34S_SD = sd(`D34SVCDT(permill)`))
+#FishMuscleData_Means<- FishMuscleDataSummarized_040422 %>% group_by(Species, `Age Class`, Site) %>% summarize(D13C = mean(`D13CVPDB(permill)`), D13C_SD = sd(`D13CVPDB(permill)`), D15N = mean(`D15NAir(permill)`), D15N_SD = sd(`D15NAir(permill)`), D34S = mean(`D34SVCDT(permill)`), D34S_SD = sd(`D34SVCDT(permill)`))
 
-FishMuscleData_Means %>% ggplot(aes(x=D13C, y= D15N)) + geom_point(aes(color=Site)) + facet_wrap(~Species)
+#FishMuscleData_Means %>% ggplot(aes(x=D13C, y= D15N)) + geom_point(aes(color=Site)) + facet_wrap(~Species)
+
+```
+
+Teejay asks: "Can we organize the fishes by community type rather than alphabetically (e.g., TFS, ASH, ISS, SB all together)?  And can we split 'em by seasons - lump June/July fish, then Sept fish?  At least for YOY SB and SCP."
+
+```{r}
+facet_wrap(~factor(Season, levels = c("Summer", "Fall")))
+
+unique(FishMuscleDataSummarized_040422$Species)
+
+FishMuscleDataSummarized_040422 %>% filter(Season == "Summer") %>%  ggplot(aes(x=`D13CVPDB(permill)`, y= `D15NAir(permill)`)) + geom_point(aes(color=Site)) + facet_wrap(~factor(Species, levels = c("TFS", "ASH", "ISS", "SB", "ST", "BC", "TP", "STBK", "SKR", "CP", "SF", "SCP", "SG", "SKG", "YFG"))) + labs(title= "Fish Muscle Data from Summer")
+
+FishMuscleDataSummarized_040422 %>% filter(Season == "Fall") %>%  ggplot(aes(x=`D13CVPDB(permill)`, y= `D15NAir(permill)`)) + geom_point(aes(color=Site)) + facet_wrap(~factor(Species, levels = c("TFS", "ASH", "ISS", "SB", "ST", "BC", "TP", "STBK", "SKR", "CP", "SF", "SCP", "SG", "SKG", "YFG"))) + labs(title= "Fish Muscle Data from Fall")
+```
+
+# Plot plant data
+```{r}
+
 ```
 
 # Plot Zoop data
 ```{r}
 ZoopIsotopeAndMetaData_040422 <- read_excel("Data/ZoopIsotopeAndMetaData_040422.xlsx")
-
+#Fixing a speling error
 ZoopIsotopeAndMetaData_040422$ZoopSpecies[ZoopIsotopeAndMetaData_040422$ZoopSpecies == "500um"] <-"500 um"
 
 ZoopIsotopeAndMetaData_040422$ZoopSpecies[ZoopIsotopeAndMetaData_040422$ZoopSpecies == ">500 um"] <-"500 um"
 
 ZoopIsotopeAndMetaData_040422 %>% ggplot(aes(x=`D13CVPDB(permill)`, y= `D15NAir(permill)`)) + geom_point(aes(color = Site))+facet_wrap(~ZoopSpecies) + labs(title = "Zoop Data all Seasons")
+```
 
+#Plot POM data
+```{r}
+POM_BA_IsotopeAndMetaData_040522 <- read_excel("Data/POM_BA_IsotopeAndMetaData_040522.xlsx")
+View(POM_BA_IsotopeAndMetaData_040522)
+glimpse(POM_BA_IsotopeAndMetaData_040522)
+
+POM_BA_IsotopeAndMetaData_040522$`D13CVPDB(permill)`<- as.numeric(POM_BA_IsotopeAndMetaData_040522$`D13CVPDB(permill)`)
+
+POM_BA_IsotopeAndMetaData_040522$`D15NAir(permill)`<- as.numeric(POM_BA_IsotopeAndMetaData_040522$`D15NAir(permill)`)
+
+POM_BA_IsotopeAndMetaData_040522$`D34SVCDT(permill)`<- as.numeric(POM_BA_IsotopeAndMetaData_040522$`D34SVCDT(permill)`)
+
+#Remove rows with uncertain sites.
+POM_BA_IsotopeAndMetaData<- POM_BA_IsotopeAndMetaData_040522[!(POM_BA_IsotopeAndMetaData_040522$Site == "SD or SM" | POM_BA_IsotopeAndMetaData_040522$Site == "NA"),]
+
+View(POM_BA_IsotopeAndMetaData)
+
+POM_BA_IsotopeAndMetaData %>% ggplot(aes(x=`D13CVPDB(permill)`, y= `D15NAir(permill)`)) + geom_point(aes(color = Site))+facet_wrap(~`Sample Type`) + labs(title = "POM and BA Data all Seasons")
 
 ```
