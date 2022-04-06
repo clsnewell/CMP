@@ -332,6 +332,20 @@ View(PlantIsotopeData_PlantSpecimens) #HALLELUJAH
 #NOW we merge.
 PlantIsotopeAndMetadata<- merge(PlantIsotopeData_PlantSpecimens, PlantInfo_121721, by="SpecimenID")
 View(PlantIsotopeAndMetadata)
+
+unique(PlantIsotopeAndMetadata$SpeciesCode)
+
+PlantIsotopeAndMetadata$Class[PlantIsotopeAndMetadata$SpeciesCode %in% c("SAGO", "MYSP", "FILA")]<- "SAV"
+
+PlantIsotopeAndMetadata$Class[PlantIsotopeAndMetadata$SpeciesCode %in% c("PHAU", "TYAN", "SCAC", "SCAM", "SCCA")]<- "EV"
+
+PlantIsotopeAndMetadata$Class[PlantIsotopeAndMetadata$SpeciesCode %in% c("ARSU", "SAPA", "CASE", "JACA", "LELA", "ROCA", "LAJE", "JUBA", "LOCO", "PLOD")]<- "Terrestrial"
+
+PlantIsotopeAndMetadata$Class[PlantIsotopeAndMetadata$SpeciesCode %in% c("LEMNA", "AZFI")]<- "Floating Veg"
+
+PlantIsotopeAndMetadata$Class[PlantIsotopeAndMetadata$SpeciesCode %in% "DET"]<- "Det"
+
+
 #SAVE IT
 write.csv(PlantIsotopeAndMetadata, "Data/PlantIsotopeAndMetaData_040422.csv")
 ```
@@ -349,15 +363,35 @@ write.csv(ZoopIsotopeAndMetadata, "Data/ZoopIsotopeAndMetaData_040422.csv")
 
 ## Now Pom and BA
 ```{r}
-unique(RawIsotopeData_03302022$Taxon)
-POMIsotopeData<- RawIsotopeData_03302022 %>% filter(Taxon == "POM/BA")
-View(POMIsotopeData)
-View(POM_BENTHIC_Info)
-POM_BENTHIC_Info$SampleID<- POM_BENTHIC_Info$SIF_ID 
-POM_BENTHIC_Info$SampleID <- gsub("_", "-", POM_BENTHIC_Info$SampleID) #Changes all the underscores to hyphens to match sif data.
-POM_BA_IsotopeAndMetadata<-merge(POM_BENTHIC_Info, POMIsotopeData, by="SampleID")
+#ID row for POM and BA were the same. I went through and manually changed BA samples to POM based on Alice's masterfile and the assumption that BA was submitted later than POM.
+IsotopeData_POMEdited_04052022 <- read_excel("Data/IsotopeData_POMEdited_04052022.xlsx")
 
-write.csv(POM_BA_IsotopeAndMetadata, "Data/POM_BA_IsotopeAndMetaData_040422.csv")
+POM_BENTHIC_Info_edited_040522 <- read_excel("Data/POM_BENTHIC_Info_edited_040522.xlsx")
+
+library(dplyr)
+
+POMBAIsotopeData<- IsotopeData_POMEdited_04052022 %>% filter(Taxon == "POM/BA")
+View(POMBAIsotopeData)
+
+# Rename column 
+names(POMBAIsotopeData)[names(POMBAIsotopeData) == "SampleID"] <- "CarolinesLabel"
+
+POM_BENTHIC_Info_edited_040522$CarolinesLabel <- gsub("_", "-", POM_BENTHIC_Info_edited_040522$CarolinesLabel) #Changes all the underscores to hyphens to match sif data.
+POM_BA_IsotopeAndMetadata<-merge(POM_BENTHIC_Info_edited_040522, POMBAIsotopeData, by="CarolinesLabel")
+View(POM_BA_IsotopeAndMetadata)
+
+#Fixing spelling errors
+POM_BA_IsotopeAndMetadata$Site[POM_BA_IsotopeAndMetadata$Site == "PT3"] <-"PT"
+
+POM_BA_IsotopeAndMetadata$Site[POM_BA_IsotopeAndMetadata$Site == "unknown"] <-"NA"
+
+POM_BA_IsotopeAndMetadata$`D13CVPDB(permill)`<- as.numeric(POM_BA_IsotopeAndMetadata$`D13CVPDB(permill)`)
+
+POM_BA_IsotopeAndMetadata$`D15NAir(permill)`<- as.numeric(POM_BA_IsotopeAndMetadata$`D15NAir(permill)`)
+
+POM_BA_IsotopeAndMetadata$`D34SVCDT(permill)`<- as.numeric(POM_BA_IsotopeAndMetadata$`D34SVCDT(permill)`)
+
+write.csv(POM_BA_IsotopeAndMetadata, "Data/POM_BA_IsotopeAndMetaData_040522.csv")
 
 ```
 
