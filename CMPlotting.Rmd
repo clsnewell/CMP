@@ -10,6 +10,7 @@ editor_options:
 ```{r}
 library(readxl)
 library(tidyverse)
+library(lubridate)
 ```
 
 # Plot Fish Data
@@ -52,10 +53,6 @@ FishMuscleDataSummarized_040422$`D34SVCDT(permill)`<- as.numeric(FishMuscleDataS
 
 FishMuscleDataSummarized_040422 %>% ggplot(aes(x=`D13CVPDB(permill)`, y= `D15NAir(permill)`)) + geom_point(aes(color=Site)) + facet_wrap(~Species) + labs(title= "Fish Muscle Data from all Seasons")
 
-#FishMuscleData_Means<- FishMuscleDataSummarized_040422 %>% group_by(Species, `Age Class`, Site) %>% summarize(D13C = mean(`D13CVPDB(permill)`), D13C_SD = sd(`D13CVPDB(permill)`), D15N = mean(`D15NAir(permill)`), D15N_SD = sd(`D15NAir(permill)`), D34S = mean(`D34SVCDT(permill)`), D34S_SD = sd(`D34SVCDT(permill)`))
-
-#FishMuscleData_Means %>% ggplot(aes(x=D13C, y= D15N)) + geom_point(aes(color=Site)) + facet_wrap(~Species)
-
 ```
 
 Teejay asks: "Can we organize the fishes by community type rather than alphabetically (e.g., TFS, ASH, ISS, SB all together)?  And can we split 'em by seasons - lump June/July fish, then Sept fish?  At least for YOY SB and SCP."
@@ -72,18 +69,56 @@ FishMuscleDataSummarized_040422 %>% filter(Season == "Fall") %>%  ggplot(aes(x=`
 
 # Plot plant data
 ```{r}
+PlantIsotopeAndMetaData_040422 <- read_excel("Data/PlantIsotopeAndMetaData_040422.xlsx")
 
+PlantIsotopeAndMetaData_040422$`D13CVPDB(permill)`<- as.numeric(PlantIsotopeAndMetaData_040422$`D13CVPDB(permill)`)
+
+PlantIsotopeAndMetaData_040422$`D15NAir(permill)`<- as.numeric(PlantIsotopeAndMetaData_040422$`D15NAir(permill)`)
+
+PlantIsotopeAndMetaData_040422$`D34SVCDT(permill)`<- as.numeric(PlantIsotopeAndMetaData_040422$`D34SVCDT(permill)`)
+
+glimpse(PlantIsotopeAndMetaData_040422)
+
+PlantIsotopeAndMetaData_040422 %>% ggplot(aes(x=`D13CVPDB(permill)`, y= `D15NAir(permill)`)) + geom_point(aes(color = Site))+facet_wrap(~SpeciesCode) + labs(title = "Plant Data all Seasons")
+
+PlantIsotopeAndMetaData_040422 %>% ggplot(aes(x=`D13CVPDB(permill)`, y= `D15NAir(permill)`)) + geom_point(aes(color = Site))+facet_wrap(~factor(SpeciesCode, levels = c("DET", "SAGO", "MYSP", "FILA", "PHAU", "TYAN", "SCAC", "SCAM", "SCCA", "LEMNA", "AZFI", "ARSU", "SAPA", "CASE", "JACA", "LELA", "ROCA", "LAJE", "JUBA", "LOCO", "PLOD"))) + labs(title = "Plant Species Data all Seasons")
+
+PlantIsotopeAndMetaData_040422 %>% ggplot(aes(x=`D13CVPDB(permill)`, y= `D15NAir(permill)`)) + geom_point(aes(color = Site))+facet_wrap(~Class) + labs(title = "Plant Data all Seasons")
+
+```
+
+# Plot Big Invert Data
+```{r}
+LargeMacroinvert_IsotopeAndMetaData_040422 <- read_excel("Data/LargeMacroinvert_IsotopeAndMetaData_040422.xlsx")
+
+LargeMacroinvert_IsotopeAndMetaData_040422$`D13CVPDB(permill)`<- as.numeric(LargeMacroinvert_IsotopeAndMetaData_040422$`D13CVPDB(permill)`)
+
+LargeMacroinvert_IsotopeAndMetaData_040422$`D15NAir(permill)`<- as.numeric(LargeMacroinvert_IsotopeAndMetaData_040422$`D15NAir(permill)`)
+
+LargeMacroinvert_IsotopeAndMetaData_040422$`D34SVCDT(permill)`<- as.numeric(LargeMacroinvert_IsotopeAndMetaData_040422$`D34SVCDT(permill)`)
+
+LargeMacroinvert_IsotopeAndMetaData_040422 %>% ggplot(aes(x=`D13CVPDB(permill)`, y= `D15NAir(permill)`)) + geom_point(aes(color = Site))+facet_wrap(~Species) + labs(title = "Large Invert Data all Seasons")
+
+```
+
+# Plot Small Inverts
+```{r}
+SmallMacroinvert_IsotopeAndMetaData_040422 <- read_excel("Data/SmallMacroinvert_IsotopeAndMetaData_040422.xlsx")
+
+SmallMacroinvert_IsotopeAndMetaData_040422$`D13CVPDB(permill)`<- as.numeric(SmallMacroinvert_IsotopeAndMetaData_040422$`D13CVPDB(permill)`)
+
+SmallMacroinvert_IsotopeAndMetaData_040422$`D15NAir(permill)`<- as.numeric(SmallMacroinvert_IsotopeAndMetaData_040422$`D15NAir(permill)`)
+
+SmallMacroinvert_IsotopeAndMetaData_040422$`D34SVCDT(permill)`<- as.numeric(SmallMacroinvert_IsotopeAndMetaData_040422$`D34SVCDT(permill)`)
+
+SmallMacroinvert_IsotopeAndMetaData_040422 %>% ggplot(aes(x=`D13CVPDB(permill)`, y= `D15NAir(permill)`)) + geom_point(aes(color = Site))+facet_wrap(~Species) + labs(title = "Small Invert Data all Seasons")
 ```
 
 # Plot Zoop data
 ```{r}
-ZoopIsotopeAndMetaData_040422 <- read_excel("Data/ZoopIsotopeAndMetaData_040422.xlsx")
-#Fixing a speling error
-ZoopIsotopeAndMetaData_040422$ZoopSpecies[ZoopIsotopeAndMetaData_040422$ZoopSpecies == "500um"] <-"500 um"
+ZoopIsotopeAndMetaData_040722 <- read_excel("Data/ZoopIsotopeAndMetaData_040722_edited.xlsx")
 
-ZoopIsotopeAndMetaData_040422$ZoopSpecies[ZoopIsotopeAndMetaData_040422$ZoopSpecies == ">500 um"] <-"500 um"
-
-ZoopIsotopeAndMetaData_040422 %>% ggplot(aes(x=`D13CVPDB(permill)`, y= `D15NAir(permill)`)) + geom_point(aes(color = Site))+facet_wrap(~ZoopSpecies) + labs(title = "Zoop Data all Seasons")
+ZoopIsotopeAndMetaData_040722 %>% ggplot(aes(x=`D13CVPDB(permill)`, y= `D15NAir(permill)`)) + geom_point(aes(color = Site))+facet_wrap(~ZoopSpecies) + labs(title = "Zoop Data all Seasons")
 ```
 
 #Plot POM data
@@ -105,4 +140,175 @@ View(POM_BA_IsotopeAndMetaData)
 
 POM_BA_IsotopeAndMetaData %>% ggplot(aes(x=`D13CVPDB(permill)`, y= `D15NAir(permill)`)) + geom_point(aes(color = Site))+facet_wrap(~`Sample Type`) + labs(title = "POM and BA Data all Seasons")
 
+```
+
+
+# 1. For organisms captured in both summer and fall, a plot of all data, differentiated by season by color ( if you want to include sites use symbols). Include a mean with SDs overlaying the data points. Main sp for which we have data: SB, ST, TP, SCP, SG, YFG
+
+Which species were captured in both summer and fall?
+## Fish Livers Caught Both Seasons
+```{r}
+#I'm going to filter the data for species that were captured in both summer and fall.
+#Use all Zoops, POM, BA. BUT I need to determine which inverts, fish, and plants were sampled both seasons...
+FishMuscleData_040722 <- read_excel("Data/FishMuscleData_040722.xlsx")
+
+FishLiverData_040722 <- read_excel("Data/FishLiverData_040722.xlsx")
+
+FishLiversSummer<-subset(FishLiverData_040722, Season == "Summer")
+FishLiversFall<-subset(FishLiverData_040722, Season == "Fall")
+
+FishLiversBothSeasons<- inner_join(FishLiversFall, FishLiversSummer, by= "Species")
+
+unique(FishLiversBothSeasons$Species)
+#Okay, if I did this right, these are the species we caught both seasons: "SB"  "ST"  "YFG" "SG"  "SCP" "SKG" "TP"  "BC"
+#Now filter out just these fish species from liver data
+
+unique(FishLiverData_040722$Species)
+
+FishLiverData_SpeciesBothSeasons<- FishLiverData_040722 %>% filter(Species == c("SB",  "ST",  "YFG", "SG",  "SCP", "SKG", "TP"))
+#Okay, now I want to get the average and sd of C and N values for these fish livers.
+View(FishLiverData_SpeciesBothSeasons)
+
+FishLivers_BothSeasons_MeansSd<-FishLiverData_SpeciesBothSeasons%>% 
+  group_by(Species, Site, Season, `Age Class`) %>% 
+  summarize(n=n(),
+            D13C_mean = sum(`D13CVPDB(permill)`/n, na.rm=TRUE), 
+            D13C_SD = sqrt(sum((`D13CVPDB(permill)`- (D13C_mean))^2)/(n-1)),
+            D15N_mean = sum(`D15NAir(permill)`/n, na.rm=TRUE),
+            D15N_SD = sqrt(sum((`D15NAir(permill)`- (D15N_mean))^2)/(n-1)))
+
+View(FishLivers_BothSeasons_MeansSd)
+
+#plot!
+# The palette with black:
+cbbPalette <- c("#000000", "#E69F00", "#56B4E9", "#009E73", "#CC79A7")
+
+Liver_Seasons<- FishLivers_BothSeasons_MeansSd %>% ggplot(aes(D13C_mean, D15N_mean, color= Site)) + 
+  geom_point(aes(color = Site)) + 
+  geom_text(aes(label=Species), hjust=1.25, vjust = 1) +
+  labs(title = "Liver results from Summer and Fall") +
+  theme_bw()+
+  geom_errorbar(aes(ymin = D15N_mean - D15N_SD, ymax = D15N_mean+ D15N_SD))+
+  geom_errorbarh(aes(xmin = D13C_mean - D13C_SD, xmax = D13C_mean + D13C_SD)) + 
+  facet_wrap(~factor(Season, levels=c("Summer", "Fall")))
+Liver_Seasons
+```
+
+## Fish Muscles
+```{r}
+#Now do the same for muscle.
+FishMuscle_Summer<-subset(FishMuscleData_040722, Season == "Summer")
+FishMusclesFall<-subset(FishMuscleData_040722, Season == "Fall")
+
+FishMusclessBothSeasons<- inner_join(FishMuscle_Summer, FishMusclesFall, by= "Species")
+
+unique(FishMusclessBothSeasons$Species)
+#Okay, if I did this right, these are the species we caught both seasons: "SCP" "ST"  "TP"  "SB"  "YFG" "SKG" "SG"
+
+#Now filter out just these fish species from muscle data
+
+unique(FishMuscleData_040722$Species)
+
+FishMuscleData_SpeciesBothSeasons<- FishMuscleData_040722 %>% filter(Species == c("SCP", "ST",  "TP",  "SB",  "YFG", "SKG", "SG"))
+
+#Okay, now I want to get the average and sd of C and N values for these fish livers.
+View(FishMuscleData_SpeciesBothSeasons)
+
+FishMuscleData_SpeciesBothSeasons$`D13CVPDB(permill)`<- as.numeric(FishMuscleData_SpeciesBothSeasons$`D13CVPDB(permill)`)
+
+FishMuscleData_SpeciesBothSeasons$`D15NAir(permill)`<- as.numeric(FishMuscleData_SpeciesBothSeasons$`D15NAir(permill)`)
+
+FishMuscleData_SpeciesBothSeasons$`D34SVCDT(permill)`<- as.numeric(FishMuscleData_SpeciesBothSeasons$`D34SVCDT(permill)`)
+  
+FishMuscles_BothSeasons_MeansSd<-FishMuscleData_SpeciesBothSeasons%>% 
+  group_by(Species, Site, Season, `Age Class`) %>% 
+  summarize(n=n(),
+            D13C_mean = sum(`D13CVPDB(permill)`/n, na.rm=TRUE), 
+            D13C_SD = sqrt(sum((`D13CVPDB(permill)`- (D13C_mean))^2)/(n-1)),
+            D15N_mean = sum(`D15NAir(permill)`/n, na.rm=TRUE),
+            D15N_SD = sqrt(sum((`D15NAir(permill)`- (D15N_mean))^2)/(n-1)))
+
+View(FishMuscles_BothSeasons_MeansSd)
+
+Muscle_Seasons<- FishMuscles_BothSeasons_MeansSd %>% ggplot(aes(D13C_mean, D15N_mean, color= Site)) + 
+  geom_point(aes(color = Site)) + 
+  geom_text(aes(label=Species), hjust=1.25, vjust = 1) +
+  labs(title = "Muscle results from Summer and Fall") +
+  theme_bw()+
+  geom_errorbar(aes(ymin = D15N_mean - D15N_SD, ymax = D15N_mean+ D15N_SD))+
+  geom_errorbarh(aes(xmin = D13C_mean - D13C_SD, xmax = D13C_mean + D13C_SD)) + 
+  facet_wrap(~factor(Season, levels=c("Summer", "Fall")))
+Muscle_Seasons
+```
+
+2. For organisms represented across most sloughs, a plot of all data differentiated by slough (aggregating seasons). Include a mean with SDS overlaying. Same species.
+
+3. For the lower trophic level stuff, it would be good to roughly visualize approximate overlap among groups, via ordination or just plain visualizing.
+
+4. Next step (I think) would be to visualize the food web by each slough , showing the means only of the primary food web constituents (from step 3). Include both summer and fall means for the main species of fish, differentiating with  some kind of symbol, or in separate plots.
+
+## Big Inverts 
+```{r}
+LargeMacroinvert_IsotopeAndMetaData_040422 <- read_excel("Data/LargeMacroinvert_IsotopeAndMetaData_040422.xlsx")
+
+LargeMacroinvert_IsotopeAndMetaData_040422$`D13CVPDB(permill)`<- as.numeric(LargeMacroinvert_IsotopeAndMetaData_040422$`D13CVPDB(permill)`)
+
+LargeMacroinvert_IsotopeAndMetaData_040422$`D15NAir(permill)`<- as.numeric(LargeMacroinvert_IsotopeAndMetaData_040422$`D15NAir(permill)`)
+
+LargeMacroinvert_IsotopeAndMetaData_040422$`D34SVCDT(permill)`<- as.numeric(LargeMacroinvert_IsotopeAndMetaData_040422$`D34SVCDT(permill)`)
+
+View(LargeMacroinvert_IsotopeAndMetaData_040422)
+#Introduce Season column
+LargeMacroinvert_IsotopeAndMetaData_040422$Collection_Date<-mdy(LargeMacroinvert_IsotopeAndMetaData_040422$Collection_Date)
+
+str(LargeMacroinvert_IsotopeAndMetaData_040422$Collection_Date)
+
+LargeMacroinvert_IsotopeAndMetaData_040422$Month<- format(LargeMacroinvert_IsotopeAndMetaData_040422$Collection_Date, format = "%m")
+unique(LargeMacroinvert_IsotopeAndMetaData_040422$Month)
+
+LargeMacroinvert_IsotopeAndMetaData_040422$Season[LargeMacroinvert_IsotopeAndMetaData_040422$Month %in% "06"]<-"Summer"
+LargeMacroinvert_IsotopeAndMetaData_040422$Season[LargeMacroinvert_IsotopeAndMetaData_040422$Month %in% "07"]<-"Summer"
+LargeMacroinvert_IsotopeAndMetaData_040422$Season[LargeMacroinvert_IsotopeAndMetaData_040422$Month %in% "08"]<-"Fall"
+LargeMacroinvert_IsotopeAndMetaData_040422$Season[LargeMacroinvert_IsotopeAndMetaData_040422$Month %in% "09"]<-"Fall"
+View(LargeMacroinvert_IsotopeAndMetaData_040422)
+
+
+BigInvertsSummer<-subset(LargeMacroinvert_IsotopeAndMetaData_040422, Season == "Summer")
+BigInvertsFall<-subset(LargeMacroinvert_IsotopeAndMetaData_040422, Season == "Fall")
+
+BigInvertsBothSeasons<- inner_join(BigInvertsFall, BigInvertsSummer, by= "Species")
+
+unique(BigInvertsBothSeasons$Species)
+#Okay, if I did this right, these are the species we caught both seasons: "Corbicula" "Exopalaemon"       "Harris mud crab"    "Maeotias" "Red swamp crayfish"
+#Now filter out just these  species from big invert data
+
+unique(LargeMacroinvert_IsotopeAndMetaData_040422$Species)
+#Looks like we already have all the species. cool.
+
+#Okay, now I want to get the average and sd of C and N values for these inverts.
+View(FishLiverData_SpeciesBothSeasons)
+
+FishLivers_BothSeasons_MeansSd<-FishLiverData_SpeciesBothSeasons%>% 
+  group_by(Species, Site, Season, `Age Class`) %>% 
+  summarize(n=n(),
+            D13C_mean = sum(`D13CVPDB(permill)`/n, na.rm=TRUE), 
+            D13C_SD = sqrt(sum((`D13CVPDB(permill)`- (D13C_mean))^2)/(n-1)),
+            D15N_mean = sum(`D15NAir(permill)`/n, na.rm=TRUE),
+            D15N_SD = sqrt(sum((`D15NAir(permill)`- (D15N_mean))^2)/(n-1)))
+
+View(FishLivers_BothSeasons_MeansSd)
+
+#plot!
+# The palette with black:
+cbbPalette <- c("#000000", "#E69F00", "#56B4E9", "#009E73", "#CC79A7")
+
+Liver_Seasons<- FishLivers_BothSeasons_MeansSd %>% ggplot(aes(D13C_mean, D15N_mean, color= Site)) + 
+  geom_point(aes(color = Site)) + 
+  geom_text(aes(label=Species), hjust=1.25, vjust = 1) +
+  labs(title = "Liver results from Summer and Fall") +
+  theme_bw()+
+  geom_errorbar(aes(ymin = D15N_mean - D15N_SD, ymax = D15N_mean+ D15N_SD))+
+  geom_errorbarh(aes(xmin = D13C_mean - D13C_SD, xmax = D13C_mean + D13C_SD)) + 
+  facet_wrap(~factor(Season, levels=c("Summer", "Fall")))
+Liver_Seasons
 ```
