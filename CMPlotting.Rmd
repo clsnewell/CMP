@@ -510,7 +510,37 @@ Zoops_Seasons<- Zoops_BothSeasons_MeansSd %>% ggplot(aes(D13C_mean, D15N_mean, c
   facet_wrap(~factor(Season, levels=c("Summer", "Fall")))
 Zoops_Seasons
 ```
-# MEGA PLOT
+## MEGA PLOT
+```{r}
+#Bind rows
+AvgData_BothSeasons_Livers<-rbind(Zoops_BothSeasons_MeansSd, POMBA_BothSeasons_MeanSd, Plants_BothSeasons_MeanSd, SmallInverts_BothSeasons_MeansSd, BigInverts_BothSeasons_MeansSd, FishLivers_BothSeasons_MeansSd)
+#Need to rename SB site to FM
+AvgData_BothSeasons_Livers$Site[AvgData_BothSeasons_Livers$Site == "SB"] <-"FM"
+
+Avg_Seasons_Livers<- AvgData_BothSeasons_Livers %>% ggplot(aes(D13C_mean, D15N_mean, color= Season)) + 
+  geom_point(aes(color = Season, shape = Site)) + 
+  geom_text(aes(label=Species)) +
+  labs(title = "All from Summer and Fall - Fish livers") +
+  theme_bw()+
+  geom_errorbar(aes(ymin = D15N_mean - D15N_SD, ymax = D15N_mean+ D15N_SD))+
+  geom_errorbarh(aes(xmin = D13C_mean - D13C_SD, xmax = D13C_mean + D13C_SD)) #+ 
+  #facet_wrap(~factor(Season, levels=c("Summer", "Fall")))
+Avg_Seasons_Livers
+
+AvgData_BothSeasons_Muscles<-rbind(Zoops_BothSeasons_MeansSd, POMBA_BothSeasons_MeanSd, Plants_BothSeasons_MeanSd, SmallInverts_BothSeasons_MeansSd, BigInverts_BothSeasons_MeansSd, FishMuscles_BothSeasons_MeansSd)
+
+Avg_Seasons_Muscles<- AvgData_BothSeasons_Muscles %>% ggplot(aes(D13C_mean, D15N_mean, color= Site)) + 
+  geom_point(aes(color = Site)) + 
+  geom_text(aes(label=Species)) +
+  labs(title = "All from Summer and Fall - fish muscles") +
+  theme_bw()+
+  geom_errorbar(aes(ymin = D15N_mean - D15N_SD, ymax = D15N_mean+ D15N_SD))+
+  geom_errorbarh(aes(xmin = D13C_mean - D13C_SD, xmax = D13C_mean + D13C_SD)) + 
+  facet_wrap(~factor(Season, levels=c("Summer", "Fall")))
+Avg_Seasons_Muscles
+
+
+```
 2. For organisms represented across most sloughs, a plot of all data differentiated by slough (aggregating seasons). Include a mean with SDS overlaying. Same species.
 
 3. For the lower trophic level stuff, it would be good to roughly visualize approximate overlap among groups, via ordination or just plain visualizing.
