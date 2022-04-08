@@ -382,9 +382,57 @@ PlantIsotopeAndMetadata$Class[PlantIsotopeAndMetadata$SpeciesCode %in% c("LEMNA"
 
 PlantIsotopeAndMetadata$Class[PlantIsotopeAndMetadata$SpeciesCode %in% "DET"]<- "Det"
 
-
 #SAVE IT
 write.csv(PlantIsotopeAndMetadata, "Data/PlantIsotopeAndMetaData_040422.csv")
+
+#Need a column with species info
+PlantIsotopeAndMetaData_040422$Species[PlantIsotopeAndMetaData_040422$SpeciesCode %in% "SAGO"]<- "SAGO"
+
+PlantIsotopeAndMetaData_040422$Species[PlantIsotopeAndMetaData_040422$SpeciesCode %in% "MYSP"]<- "Myriophyllum spicatum"
+
+PlantIsotopeAndMetaData_040422$Species[PlantIsotopeAndMetaData_040422$SpeciesCode %in% "FILA"]<- "Filamentous algae"
+
+PlantIsotopeAndMetaData_040422$Species[PlantIsotopeAndMetaData_040422$SpeciesCode %in% "PHAU"]<- "Phragmites australis"
+
+PlantIsotopeAndMetaData_040422$Species[PlantIsotopeAndMetaData_040422$SpeciesCode %in% "TYAN"]<- "Typha angustifolia"
+
+PlantIsotopeAndMetaData_040422$Species[PlantIsotopeAndMetaData_040422$SpeciesCode %in% "SCAC"]<- "Schoenoplectus acutusa"
+
+PlantIsotopeAndMetaData_040422$Species[PlantIsotopeAndMetaData_040422$SpeciesCode %in% "SCAM"]<- "Schoenoplectus americanus"
+
+PlantIsotopeAndMetaData_040422$Species[PlantIsotopeAndMetaData_040422$SpeciesCode %in% "SCCA"]<- "Schoenoplectus californicus"
+
+PlantIsotopeAndMetaData_040422$Species[PlantIsotopeAndMetaData_040422$SpeciesCode %in% "ARSU"]<- "Sarcocornia/Salicornia pacifica" #ARsU is outdated...
+
+PlantIsotopeAndMetaData_040422$Species[PlantIsotopeAndMetaData_040422$SpeciesCode %in% "SAPA"]<- "Sarcocornia/Salicornia pacifica"
+
+PlantIsotopeAndMetaData_040422$Species[PlantIsotopeAndMetaData_040422$SpeciesCode %in% "CASE"]<- "Calystegia sepium"
+
+PlantIsotopeAndMetaData_040422$Species[PlantIsotopeAndMetaData_040422$SpeciesCode %in% "JACA"]<- "Jaumea carnosa"
+
+PlantIsotopeAndMetaData_040422$Species[PlantIsotopeAndMetaData_040422$SpeciesCode %in% "LELA"]<- "Lepidium latifolium"
+
+PlantIsotopeAndMetaData_040422$Species[PlantIsotopeAndMetaData_040422$SpeciesCode %in% "ROCA"]<- "Rosa californica"
+
+PlantIsotopeAndMetaData_040422$Species[PlantIsotopeAndMetaData_040422$SpeciesCode %in% "LAJE"]<- "Lathyrus jepsonii jepsonii"
+
+PlantIsotopeAndMetaData_040422$Species[PlantIsotopeAndMetaData_040422$SpeciesCode %in% "JUBA"]<- "Juncus balticus"
+
+PlantIsotopeAndMetaData_040422$Species[PlantIsotopeAndMetaData_040422$SpeciesCode %in% "LOCO"]<- "Lotus corniculatus"
+
+PlantIsotopeAndMetaData_040422$Species[PlantIsotopeAndMetaData_040422$SpeciesCode %in% "PLOD"]<- "Pluchea odorata"
+
+PlantIsotopeAndMetaData_040422$Species[PlantIsotopeAndMetaData_040422$SpeciesCode %in% "LEMNA"]<- "Lemna sp"
+
+PlantIsotopeAndMetaData_040422$Species[PlantIsotopeAndMetaData_040422$SpeciesCode %in% "AZFI"]<- "Azolla"
+
+
+PlantIsotopeAndMetaData_040422$Species[PlantIsotopeAndMetaData_040422$SpeciesCode %in% "DET"]<- "Det"
+
+unique(PlantIsotopeAndMetaData_040422$Species)
+
+#SAVE IT
+write.csv(PlantIsotopeAndMetaData_040422, "Data/PlantIsotopeAndMetaData_040822.csv")
 ```
 
 ## Now zoops
