@@ -11,6 +11,11 @@ editor_options:
 library(readxl)
 library(tidyverse)
 library(lubridate)
+library("viridis")
+library(RColorBrewer)
+library(ggpubr)
+library(cowplot)
+library("ggsci")
 ```
 
 # Plot Fish Data
@@ -440,7 +445,46 @@ POM_BA_IsotopeAndMetaData_040522$`D13CVPDB(permill)`<- as.numeric(POM_BA_Isotope
 POM_BA_IsotopeAndMetaData_040522$`D15NAir(permill)`<- as.numeric(POM_BA_IsotopeAndMetaData_040522$`D15NAir(permill)`)
 
 POM_BA_IsotopeAndMetaData_040522$`D34SVCDT(permill)`<- as.numeric(POM_BA_IsotopeAndMetaData_040522$`D34SVCDT(permill)`)
-  
+
+#Lets look at how far off the samples with warnings are from the samples without warnings
+POM_BA_IsotopeAndMetaData_040522$Sp
+
+POM_BA_IsotopeAndMetaData_040522<-POM_BA_IsotopeAndMetaData_040522[!(POM_BA_IsotopeAndMetaData_040522$Site=="NA" | POM_BA_IsotopeAndMetaData_040522$Site=="SD or SM"),]
+
+Carbon_OutlierPlot_POM<- POM_BA_IsotopeAndMetaData_040522 %>% filter(`Sample Type` == "POM") %>%  ggplot(aes(x = Site, y=`D13CVPDB(permill)`)) + geom_boxplot(aes(color=C_Comment))+theme_bw() + labs(title = "POM Carbon Outlier Check from Summer and Fall")+facet_wrap(~Season)
+
+Carbon_OutlierPlot_POM
+
+Nitrogen_OutlierPlot_POM<- POM_BA_IsotopeAndMetaData_040522 %>% filter(`Sample Type` == "POM") %>%  ggplot(aes(x = Site, y=`D15NAir(permill)`)) + geom_boxplot(aes(color=NComment))+theme_bw() + labs(title = "POM Nitrogen Outlier Check from Summer and Fall")+facet_wrap(~Season)
+
+Nitrogen_OutlierPlot_POM
+
+Carbon_OutlierPlot_BA<- POM_BA_IsotopeAndMetaData_040522 %>% filter(`Sample Type` == "Benthic") %>%  ggplot(aes(x = Site, y=`D13CVPDB(permill)`)) + geom_boxplot(aes(color=C_Comment))+theme_bw() + labs(title = "Benthic Alge Carbon Outlier Check from Summer and Fall")+facet_wrap(~Season)
+
+Carbon_OutlierPlot_BA
+
+Nitrogen_OutlierPlot_BA<- POM_BA_IsotopeAndMetaData_040522 %>% filter(`Sample Type` == "Benthic") %>%  ggplot(aes(x = Site, y=`D15NAir(permill)`)) + geom_boxplot(aes(color=NComment))+theme_bw() + labs(title = "Benthic Algae Nitrogen Outlier Check from Summer and Fall")+facet_wrap(~Season)
+
+Nitrogen_OutlierPlot_BA
+```
+
+Outlier anaylsis results: I plotted boxplots of POM and BA data by site and season to look for N and C outliers and color coded to see which data belonged to flagged rows. 
+For POM Carbon, there were outliers BUT they all belonged to rows with no comments from the SIF lab. No action needed.
+
+For POM Nitrogen, there were some outliers belonging to "Precision decreases for samples containing less than 20 mu grams of N." Remove those belonging to that comment group which fell outside the range of the no comment group. 
+
+For BA Carbon, all of the samples belonging to "Contained more carbon than the largest reference" was an outlier. Also true for the comments "Mass 44 & 45 saturated, totals underestimated" and "Mass 45 saturated; estimated value used." Remove them. 
+
+For BA Nitrogen, any with the comment, "Contained more nitrogen than largest reference" was an outlier. Remove them. 
+
+```{r}
+unique(POM_BA_IsotopeAndMetaData_040522$NComment)
+BA_OutliersRemoved<-POM_BA_IsotopeAndMetaData_040522 %>% filter(`Sample Type`=="Benthic") %>% subset(NComment!="Contained more nitrogen than largest reference")
+unique(BA_OutliersRemoved$C_Comment) #Cool, deleting the problematic N comments also deleted the problematic C comments.
+
+POM_BA_IsotopeAndMetaData_040522 %>% filter(`Sample Type` =="POM") %>% filter(NComment == "NA") %>% filter(Site == "SD", Season== "Summer") %>%  summary(`D13CVPDB(permill)`)
+
+View(POMBA_OutliersRemoved)  
 POMBA_BothSeasons_MeansSd<-POM_BA_IsotopeAndMetaData_040522%>% 
   group_by(Species, Site, Season) %>% 
   summarize(n=n(),
@@ -511,6 +555,7 @@ Zoops_Seasons<- Zoops_BothSeasons_MeansSd %>% ggplot(aes(D13C_mean, D15N_mean, c
 Zoops_Seasons
 ```
 ## MEGA PLOT
+###Livers
 ```{r}
 #Bind rows
 AvgData_BothSeasons_Livers<-rbind(Zoops_BothSeasons_MeansSd, POMBA_BothSeasons_MeanSd, Plants_BothSeasons_MeanSd, SmallInverts_BothSeasons_MeansSd, BigInverts_BothSeasons_MeansSd, FishLivers_BothSeasons_MeansSd)
@@ -532,11 +577,15 @@ AvgData_BothSeasons_Livers$Class[AvgData_BothSeasons_Livers$Species %in% "DET"]<
 
 AvgData_BothSeasons_Livers$Class[AvgData_BothSeasons_Livers$Species %in% c("SCP", "SG", "YFG", "SKG")]<- "Sculpin/Goby"
 
-AvgData_BothSeasons_Livers$Class[AvgData_BothSeasons_Livers$Species %in% c("ST", "TP", "SB")]<- "Fish"
+AvgData_BothSeasons_Livers$Class[AvgData_BothSeasons_Livers$Species %in% "ST"]<- "ST"
+
+AvgData_BothSeasons_Livers$Class[AvgData_BothSeasons_Livers$Species %in% "TP"]<- "TP"
+
+AvgData_BothSeasons_Livers$Class[AvgData_BothSeasons_Livers$Species %in% "SB"]<- "SB"
 
 AvgData_BothSeasons_Livers$Class[AvgData_BothSeasons_Livers$Species %in% c("Americorophium spinicorne", "Eogammarus confervicolus", "Gammarus daiberi")]<- "Scud"
 
-AvgData_BothSeasons_Livers$Class[AvgData_BothSeasons_Livers$Species %in% "Red swamp crayfish"]<- "RSC"
+AvgData_BothSeasons_Livers$Class[AvgData_BothSeasons_Livers$Species %in% c("Red swamp crayfish")]<- "Red swamp crayfish"
 
 AvgData_BothSeasons_Livers$Class[AvgData_BothSeasons_Livers$Species %in% "Harris mud crab"]<- "HMC"
 
@@ -554,7 +603,6 @@ AvgData_BothSeasons_Livers$Class[AvgData_BothSeasons_Livers$Species %in% "POM"]<
 
 AvgData_BothSeasons_Livers$Class[AvgData_BothSeasons_Livers$Species %in% "Det"]<- "Det"
 
-
 AvgData_BothSeasons_Livers$Class[AvgData_BothSeasons_Livers$Species %in% "Benthic"]<- "Benthic Algae"
 
 AvgData_BothSeasons_Livers$Class[AvgData_BothSeasons_Livers$Species %in% c("P. forbesi", "A. sinensis", "200-500 um", "100-500 um" ,">500 um")]<- "Zoop"
@@ -567,46 +615,179 @@ AvgData_BothSeasons_Livers$D13C_SD<-as.numeric(AvgData_BothSeasons_Livers$D13C_S
 
 View(AvgData_BothSeasons_Livers)
 
-unique(AvgData_BothSeasons_Livers$Species)
-
 unique(AvgData_BothSeasons_Livers$Class)
-AvgData_BothSeasons_Livers$Class<- factor(AvgData_BothSeasons_Livers$Class, levels = c("Fish", "Sculpin/Goby", "RSC", "HMC", "EXO", "Corbicula", "Maeotias", "Isopod", "Scud", "Crab Zoea", "Zoop", "Terrestrial", "EV", "Floating Veg", "SAV", "POM", "Benthic Algae", "Det")) #Changing level order 
+
+View(AvgData_BothSeasons_Livers)
+AvgData_BothSeasons_Livers$Class<- factor(AvgData_BothSeasons_Livers$Class, levels = c("SB", "ST", "TP", "Sculpin/Goby", "Red swamp crayfish", "HMC", "Maeotias", "EXO", "Corbicula",  "Isopod", "Scud", "Crab Zoea", "Zoop", "Terrestrial", "EV", "Floating Veg", "SAV", "POM", "Benthic Algae", "Det")) #Changing level order 
+
+Avg_BothSeasons_Livers<- AvgData_BothSeasons_Livers  %>%  ggplot(aes(D13C_mean, D15N_mean, color= Class)) + scale_shape_manual(values=rep(0:6, 7))+
+  geom_point(aes(color = Class, shape = Class)) +
+  scale_color_viridis_d()+
+  labs(title = "All from Both Seasons - Fish livers") +
+  theme_bw()+
+  geom_errorbar(aes(ymin = D15N_mean - D15N_SD, ymax = D15N_mean+ D15N_SD))+
+  geom_errorbarh(aes(xmin = D13C_mean - D13C_SD, xmax = D13C_mean + D13C_SD)) +facet_wrap(~factor(Season, levels=c("Summer", "Fall"))) #+ 
+ # facet_wrap(~factor(Site))  theme(legend.position="none") + scale_color_viridis_d() +
+
+Avg_BothSeasons_Livers
 
 #Gotta split the seasons up. Too much data!
 AvgData_Summer_Livers<-AvgData_BothSeasons_Livers %>% filter(Season %in% "Summer")
-
-Avg_Summer_Livers<- AvgData_Summer_Livers %>% ggplot(aes(D13C_mean, D15N_mean, color= Class)) + 
-  geom_point(aes(color = Class)) +
+unique(AvgData_Summer_Livers$Species)
+#filter(!(Species %in% c("Crab Zoea", "Gnorimosphaeroma insulare"))) + scale_color_brewer(palette = "Paired")
+Avg_Summer_Livers<- AvgData_Summer_Livers  %>%  ggplot(aes(D13C_mean, D15N_mean, color= Class)) + scale_shape_manual(values=rep(0:6, 7))+
+  geom_point(aes(color = Class, shape = Class)) +
+  scale_color_viridis_d()+
   labs(title = "All from Summer - Fish livers") +
   theme_bw()+
   geom_errorbar(aes(ymin = D15N_mean - D15N_SD, ymax = D15N_mean+ D15N_SD))+
-  geom_errorbarh(aes(xmin = D13C_mean - D13C_SD, xmax = D13C_mean + D13C_SD)) + 
-  facet_wrap(~factor(Site))
+  geom_errorbarh(aes(xmin = D13C_mean - D13C_SD, xmax = D13C_mean + D13C_SD)) #+facet_wrap(~Site) #+ 
+ # facet_wrap(~factor(Site))  theme(legend.position="none") + scale_color_viridis_d() +
+
 Avg_Summer_Livers
 
+#color_legend <-
+ # AvgData_Summer_Livers %>%
+  #ggplot(aes(D13C_mean, D15N_mean, color= Class)) + geom_point(aes(color = Class))
+#legend <- cowplot::get_legend(color_legend)
+#legend
+#grid.newpage()
+#grid.draw(legend)
+
+#Shape_legend <-
+ # AvgData_Summer_Livers %>%
+  #ggplot(aes(D13C_mean, D15N_mean)) + geom_point(aes(shape = Species))+scale_shape_manual(values=rep(15:20, 7))
+
+#grid.newpage()
+#grid.draw(color_legend)
+  
+#plot_grid(
+ # Avg_Summer_Livers
+  #, plot_grid(
+   # get_legend(color_legend)
+    #, get_legend(Shape_legend)
+    #, nrow = 1
+#  )
+ # , nrow = 2
+  #, rel_heights = c(8,2)
+#)
+
 AvgData_Fall_Livers<-AvgData_BothSeasons_Livers %>% filter(Season %in% "Fall")
+
+Avg_Fall_Livers<- AvgData_Fall_Livers  %>%  ggplot(aes(D13C_mean, D15N_mean, color= Class)) + scale_shape_manual(values=rep(0:6, 7))+
+  geom_point(aes(color = Class, shape = Class)) +
+  scale_color_viridis_d()+
+  labs(title = "All from Fall - Fish livers") +
+  theme_bw()+
+  geom_errorbar(aes(ymin = D15N_mean - D15N_SD, ymax = D15N_mean+ D15N_SD))+
+  geom_errorbarh(aes(xmin = D13C_mean - D13C_SD, xmax = D13C_mean + D13C_SD)) #+ facet_wrap(~Site)
+Avg_Fall_Livers
 
 Avg_Fall_Livers<- AvgData_Fall_Livers %>% ggplot(aes(D13C_mean, D15N_mean, color= Class)) + 
   geom_point(aes(color = Class)) +
   labs(title = "All from Fall - Fish livers") +
   theme_bw()+
   geom_errorbar(aes(ymin = D15N_mean - D15N_SD, ymax = D15N_mean+ D15N_SD))+
-  geom_errorbarh(aes(xmin = D13C_mean - D13C_SD, xmax = D13C_mean + D13C_SD)) + 
-  facet_wrap(~factor(Site))
+  geom_errorbarh(aes(xmin = D13C_mean - D13C_SD, xmax = D13C_mean + D13C_SD)) #+ 
+  #facet_wrap(~factor(Site))
 Avg_Fall_Livers
+```
 
+### Muscles
+```{r}
 AvgData_BothSeasons_Muscles<-rbind(Zoops_BothSeasons_MeansSd, POMBA_BothSeasons_MeanSd, Plants_BothSeasons_MeanSd, SmallInverts_BothSeasons_MeansSd, BigInverts_BothSeasons_MeansSd, FishMuscles_BothSeasons_MeansSd)
 
-Avg_Seasons_Muscles<- AvgData_BothSeasons_Muscles %>% ggplot(aes(D13C_mean, D15N_mean, color= Site)) + 
-  geom_point(aes(color = Site)) + 
-  geom_text(aes(label=Species)) +
-  labs(title = "All from Summer and Fall - fish muscles") +
+#Need to rename SB site to FM
+unique(AvgData_BothSeasons_Muscles$Site)
+AvgData_BothSeasons_Muscles$Site[AvgData_BothSeasons_Muscles$Site == "SB"] <-"FM"
+
+AvgData_BothSeasons_Muscles$Class<-AvgData_BothSeasons_Muscles$`Age Class`
+
+AvgData_BothSeasons_Muscles$Class[AvgData_BothSeasons_Muscles$Species %in% c("SAGO", "Myriophyllum spicatum", "Filamentous algae")]<- "SAV"
+
+AvgData_BothSeasons_Muscles$Class[AvgData_BothSeasons_Muscles$Species %in% c("Phragmites australis", "Typha angustifolia", "Schoenoplectus acutusa", "Schoenoplectus americanus", "Schoenoplectus californicus")]<- "EV"
+
+AvgData_BothSeasons_Muscles$Class[AvgData_BothSeasons_Muscles$Species %in% c("Sarcocornia/Salicornia pacifica", "Calystegia sepium", "Jaumea carnosa", "Lepidium latifolium", "Rosa californica", "Lathyrus jepsonii jepsonii", "Juncus balticus", "Lotus corniculatu", "Pluchea odorata")]<- "Terrestrial"
+
+AvgData_BothSeasons_Muscles$Class[AvgData_BothSeasons_Muscles$Species %in% c("Lemna sp", "Azolla")]<- "Floating Veg"
+
+AvgData_BothSeasons_Muscles$Class[AvgData_BothSeasons_Muscles$Species %in% "DET"]<- "Det"
+
+AvgData_BothSeasons_Muscles$Class[AvgData_BothSeasons_Muscles$Species %in% c("SCP", "SG", "YFG", "SKG")]<- "Sculpin/Goby"
+
+AvgData_BothSeasons_Muscles$Class[AvgData_BothSeasons_Muscles$Species %in% c("SB")]<- "SB"
+
+AvgData_BothSeasons_Muscles$Class[AvgData_BothSeasons_Muscles$Species %in% c("TP")]<- "TP"
+
+AvgData_BothSeasons_Muscles$Class[AvgData_BothSeasons_Muscles$Species %in% c("ST")]<- "ST"
+
+AvgData_BothSeasons_Muscles$Class[AvgData_BothSeasons_Muscles$Species %in% c("Americorophium spinicorne", "Eogammarus confervicolus", "Gammarus daiberi")]<- "Scud"
+
+AvgData_BothSeasons_Muscles$Class[AvgData_BothSeasons_Muscles$Species %in% "Red swamp crayfish"]<- "Red swamp crayfish"
+
+AvgData_BothSeasons_Muscles$Class[AvgData_BothSeasons_Muscles$Species %in% "Harris mud crab"]<- "HMC"
+
+AvgData_BothSeasons_Muscles$Class[AvgData_BothSeasons_Muscles$Species %in% "Maeotias"]<- "Maeotias"
+
+AvgData_BothSeasons_Muscles$Class[AvgData_BothSeasons_Muscles$Species %in% "Exopalaemon"]<- "EXO"
+
+AvgData_BothSeasons_Muscles$Class[AvgData_BothSeasons_Muscles$Species %in% "Corbicula"]<- "Corbicula"
+
+AvgData_BothSeasons_Muscles$Class[AvgData_BothSeasons_Muscles$Species %in% "Gnorimosphaeroma insulare"]<- "Isopod"
+
+AvgData_BothSeasons_Muscles$Class[AvgData_BothSeasons_Muscles$Species %in% "Crab Zoea"]<- "Crab Zoea"
+
+AvgData_BothSeasons_Muscles$Class[AvgData_BothSeasons_Muscles$Species %in% "POM"]<- "POM"
+
+AvgData_BothSeasons_Muscles$Class[AvgData_BothSeasons_Muscles$Species %in% "Det"]<- "Det"
+
+AvgData_BothSeasons_Muscles$Class[AvgData_BothSeasons_Muscles$Species %in% "Benthic"]<- "Benthic Algae"
+
+AvgData_BothSeasons_Muscles$Class[AvgData_BothSeasons_Muscles$Species %in% c("P. forbesi", "A. sinensis", "200-500 um", "100-500 um" ,">500 um")]<- "Zoop"
+
+AvgData_BothSeasons_Muscles$D15N_SD[AvgData_BothSeasons_Muscles$D15N_SD %in% c("NaN", "NA")]<- "0"
+AvgData_BothSeasons_Muscles$D15N_SD<-as.numeric(AvgData_BothSeasons_Muscles$D15N_SD)
+
+AvgData_BothSeasons_Muscles$D13C_SD[AvgData_BothSeasons_Muscles$D13C_SD %in% c("NaN", "NA")]<- "0"
+AvgData_BothSeasons_Muscles$D13C_SD<-as.numeric(AvgData_BothSeasons_Muscles$D13C_SD)
+
+View(AvgData_BothSeasons_Muscles)
+
+unique(AvgData_BothSeasons_Muscles$Class)
+
+unique(AvgData_BothSeasons_Muscles$Class)
+AvgData_BothSeasons_Muscles$Class<- factor(AvgData_BothSeasons_Muscles$Class, levels = c("SB", "ST", "TP", "Sculpin/Goby", "Red swamp crayfish", "HMC", "Maeotias", "EXO", "Corbicula",  "Isopod", "Scud", "Crab Zoea", "Zoop", "Terrestrial", "EV", "Floating Veg", "SAV", "POM", "Benthic Algae", "Det")) #Changing level order 
+
+AvgData_Summer_Muscles<- AvgData_BothSeasons_Muscles %>% filter(Season %in% "Summer")
+
+Avg_Summer_Muscles<- AvgData_Summer_Muscles  %>%  ggplot(aes(D13C_mean, D15N_mean, color= Class)) + scale_shape_manual(values=rep(0:6, 7))+
+  geom_point(aes(color = Class, shape = Class)) +
+  scale_color_viridis_d()+
+  labs(title = "All from Summer - Fish muscles") +
   theme_bw()+
   geom_errorbar(aes(ymin = D15N_mean - D15N_SD, ymax = D15N_mean+ D15N_SD))+
-  geom_errorbarh(aes(xmin = D13C_mean - D13C_SD, xmax = D13C_mean + D13C_SD)) + 
-  facet_wrap(~factor(Season, levels=c("Summer", "Fall")))
-Avg_Seasons_Muscles
+  geom_errorbarh(aes(xmin = D13C_mean - D13C_SD, xmax = D13C_mean + D13C_SD)) +facet_wrap(~Site) 
+Avg_Summer_Muscles
 
+AvgData_Fall_Muscles<- AvgData_BothSeasons_Muscles %>% filter(Season %in% "Fall")
+
+Avg_Fall_Muscles<- AvgData_Fall_Muscles  %>%  ggplot(aes(D13C_mean, D15N_mean, color= Class)) + scale_shape_manual(values=rep(0:6, 7))+
+  geom_point(aes(color = Class, shape = Class)) +
+  scale_color_viridis_d()+
+  labs(title = "All from Fall - Fish muscles") +
+  theme_bw()+
+  geom_errorbar(aes(ymin = D15N_mean - D15N_SD, ymax = D15N_mean+ D15N_SD))+
+  geom_errorbarh(aes(xmin = D13C_mean - D13C_SD, xmax = D13C_mean + D13C_SD)) +facet_wrap(~Site) 
+Avg_Fall_Muscles
+
+Avg_Muscles<- AvgData_BothSeasons_Muscles  %>%  ggplot(aes(D13C_mean, D15N_mean, color= Class)) + scale_shape_manual(values=rep(0:6, 7))+
+  geom_point(aes(color = Class, shape = Class)) +
+  scale_color_viridis_d()+
+  labs(title = "All from both seasons - Fish muscles") +
+  theme_bw()+
+  geom_errorbar(aes(ymin = D15N_mean - D15N_SD, ymax = D15N_mean+ D15N_SD))+
+  geom_errorbarh(aes(xmin = D13C_mean - D13C_SD, xmax = D13C_mean + D13C_SD)) +facet_wrap(~factor(Season, levels=c("Summer", "Fall")) )
+Avg_Muscles
 
 ```
 2. For organisms represented across most sloughs, a plot of all data differentiated by slough (aggregating seasons). Include a mean with SDS overlaying. Same species.
