@@ -17,9 +17,12 @@ library(ggpubr)
 library(ggsci)
 #library(Rmisc)
 library(tidyverse)
-
+standard_error <- function(x) sd(x) / sqrt(length(x)) # Create own function
 ```
 
+```{r}
+#Standard_ErrorTheme<- 
+```
 # Plot Fish Data
 
 ##Liver
@@ -150,14 +153,13 @@ POM_BA_IsotopeAndMetaData %>% ggplot(aes(x=`D13CVPDB(permill)`, y= `D15NAir(perm
 ```
 
 
-# 1. For organisms captured in both summer and fall, a plot of all data, differentiated by season by color ( if you want to include sites use symbols). Include a mean with SDs overlaying the data points. Main sp for which we have data: SB, ST, TP, SCP, SG, YFG
+# 1. For organisms captured in both summer and fall, a plot of all data, differentiated by season by color ( if you want to include sites use symbols). Include a mean with standard error overlaying the data points. Main sp for which we have data: SB, ST, TP, SCP, SG, YFG
 
 Which species were captured in both summer and fall?
 ## Fish Livers Caught Both Seasons
 ```{r}
 #I'm going to filter the data for species that were captured in both summer and fall.
 #Use all Zoops, POM, BA. BUT I need to determine which inverts, fish, and plants were sampled both seasons...
-FishMuscleData_040722 <- read_excel("Data/FishMuscleData_040722.xlsx")
 
 FishLiverData_040722 <- read_excel("Data/FishLiverData_040722.xlsx")
 
@@ -166,8 +168,11 @@ FishLiversFall<-subset(FishLiverData_040722, Season == "Fall")
 
 FishLiversBothSeasons<- inner_join(FishLiversFall, FishLiversSummer, by= "Species")
 
+unique(FishLiversSummer$Species)
+unique(FishLiversFall$Species)
 unique(FishLiversBothSeasons$Species)
-#Okay, if I did this right, these are the species we caught both seasons: "SB"  "ST"  "YFG" "SG"  "SCP" "SKG" "TP"  "BC"
+#Okay, if I did this right, these are the species we caught both seasons: "SB"  "ST"  "YFG" "SG"  "SCP" "SKG" "TP". NOTE These are just generally caught both seasons. Not necessarily caught both seasons at all sites.
+
 #Now filter out just these fish species from liver data
 
 unique(FishLiverData_040722$Species)
@@ -186,21 +191,28 @@ FishLivers_BothSeasons_MeansSd<-FishLiverData_SpeciesBothSeasons%>%
             alpha = 0.05,
             D13C_mean = sum(`D13CVPDB(permill)`/n, na.rm=TRUE), 
             D13C_SD = sqrt(sum((`D13CVPDB(permill)`- (D13C_mean))^2)/(n-1)),
+            D13C_StdError= standard_error(`D13CVPDB(permill)`),
             D13C_UCI = D13C_mean+qt(1-alpha/2, (n-1))*D13C_SD/sqrt(n),
             D13C_LCI= D13C_mean-qt(1-alpha/2, (n-1))*D13C_SD/sqrt(n),
             D15N_mean = sum(`D15NAir(permill)`/n, na.rm=TRUE),
             D15N_SD = sqrt(sum((`D15NAir(permill)`- (D15N_mean))^2)/(n-1)),
+            D15N_StdError= standard_error(`D15NAir(permill)`),
             D15N_UCI = D15N_mean+qt(1-alpha/2, (n-1))*D15N_SD/sqrt(n),
             D15N_LCI = D15N_mean-qt(1-alpha/2, (n-1))*D15N_SD/sqrt(n))
 
-View(FishLivers_BothSeasons_MeansSd)
-FishLivers_BothSeasons_MeansSd
+FishLivers_BothSeasons_MeansSd$D13C_StdError[is.nan(FishLivers_BothSeasons_MeansSd$D13C_StdError)]<-0
+
+FishLivers_BothSeasons_MeansSd$D13C_StdError[is.na(FishLivers_BothSeasons_MeansSd$D13C_StdError)]<-0
 
 FishLivers_BothSeasons_MeansSd$D13C_SD[is.nan(FishLivers_BothSeasons_MeansSd$D13C_SD)]<-0
 
 FishLivers_BothSeasons_MeansSd$D13C_UCI[is.nan(FishLivers_BothSeasons_MeansSd$D13C_UCI)]<-0
 
 FishLivers_BothSeasons_MeansSd$D13C_LCI[is.nan(FishLivers_BothSeasons_MeansSd$D13C_LCI)]<-0
+
+FishLivers_BothSeasons_MeansSd$D15N_StdError[is.nan(FishLivers_BothSeasons_MeansSd$D15N_StdError)]<-0
+
+FishLivers_BothSeasons_MeansSd$D15N_StdError[is.na(FishLivers_BothSeasons_MeansSd$D15N_StdError)]<-0
 
 FishLivers_BothSeasons_MeansSd$D15N_SD[is.nan(FishLivers_BothSeasons_MeansSd$D15N_SD)]<-0
 
@@ -213,14 +225,15 @@ FishLivers_BothSeasons_MeansSd$D15N_LCI[is.nan(FishLivers_BothSeasons_MeansSd$D1
 cbbPalette <- c("#000000", "#E69F00", "#56B4E9", "#009E73", "#CC79A7")
 
 Liver_Seasons<- FishLivers_BothSeasons_MeansSd %>% ggplot(aes(D13C_mean, D15N_mean, color= Site)) + 
-  geom_point(aes(color = Site, shape=Species)) + 
+  geom_point(aes(color = Site, shape=Species), size=3) + 
   scale_shape_manual(values=rep(0:6, 1))+
+  #scale_size_manual(values=c(10))+
   #geom_text(aes(label=Species), hjust=1.25, vjust = 1) +
-  labs(title = "Liver Means And 95% CI's from Summer and Fall") +
+  labs(title = "Liver Means And Standard Error from Summer and Fall") +
   theme_bw()+ 
-  coord_cartesian(ylim=c(10, 23))+
-  geom_errorbar(aes(ymin = D15N_LCI, ymax = D15N_UCI))+
-  geom_errorbarh(aes(xmin = D13C_LCI, xmax = D13C_UCI)) + 
+  #coord_cartesian(ylim=c(10, 23))+
+  geom_errorbar(aes(ymin = D15N_mean-D15N_StdError, ymax = D15N_mean+D15N_StdError))+
+  geom_errorbarh(aes(xmin = D13C_mean-D13C_StdError, xmax = D13C_mean+D13C_StdError)) + 
   facet_wrap(~factor(Season, levels=c("Summer", "Fall")))
 Liver_Seasons
 ```
@@ -228,6 +241,8 @@ Liver_Seasons
 ## Fish Muscles
 ```{r}
 #Now do the same for muscle.
+FishMuscleData_040722 <- read_excel("Data/FishMuscleData_040722.xlsx")
+
 FishMuscle_Summer<-subset(FishMuscleData_040722, Season == "Summer")
 FishMusclesFall<-subset(FishMuscleData_040722, Season == "Fall")
 
@@ -243,7 +258,7 @@ unique(FishMuscleData_040722$Species)
 FishMuscleData_SpeciesBothSeasons<- FishMuscleData_040722 %>% filter(Species %in% c("SCP", "ST",  "TP",  "SB",  "YFG", "SKG", "SG"))
 
 #Okay, now I want to get the average and sd of C and N values for these fish livers.
-View(FishMuscleData_SpeciesBothSeasons)
+#View(FishMuscleData_SpeciesBothSeasons)
 
 FishMuscleData_SpeciesBothSeasons$`D13CVPDB(permill)`<- as.numeric(FishMuscleData_SpeciesBothSeasons$`D13CVPDB(permill)`)
 
@@ -265,21 +280,28 @@ FishMuscles_BothSeasons_MeansSd<-FishMuscleData_SpeciesBothSeasons%>%
             alpha = 0.05,
             D13C_mean = sum(`D13CVPDB(permill)`/n, na.rm=TRUE), 
             D13C_SD = sqrt(sum((`D13CVPDB(permill)`- (D13C_mean))^2)/(n-1)),
+            D13C_StdError= standard_error(`D13CVPDB(permill)`),
             D13C_UCI = D13C_mean+qt(1-alpha/2, (n-1))*D13C_SD/sqrt(n),
             D13C_LCI= D13C_mean-qt(1-alpha/2, (n-1))*D13C_SD/sqrt(n),
             D15N_mean = sum(`D15NAir(permill)`/n, na.rm=TRUE),
             D15N_SD = sqrt(sum((`D15NAir(permill)`- (D15N_mean))^2)/(n-1)),
+            D15N_StdError= standard_error(`D15NAir(permill)`),
             D15N_UCI = D15N_mean+qt(1-alpha/2, (n-1))*D15N_SD/sqrt(n),
             D15N_LCI = D15N_mean-qt(1-alpha/2, (n-1))*D15N_SD/sqrt(n))
 
-View(FishMuscles_BothSeasons_MeansSd)
-FishMuscles_BothSeasons_MeansSd
+FishMuscles_BothSeasons_MeansSd$D13C_StdError[is.nan(FishMuscles_BothSeasons_MeansSd$D13C_StdError)]<-0
+
+FishMuscles_BothSeasons_MeansSd$D13C_StdError[is.na(FishMuscles_BothSeasons_MeansSd$D13C_StdError)]<-0
 
 FishMuscles_BothSeasons_MeansSd$D13C_SD[is.nan(FishMuscles_BothSeasons_MeansSd$D13C_SD)]<-0
 
 FishMuscles_BothSeasons_MeansSd$D13C_UCI[is.nan(FishMuscles_BothSeasons_MeansSd$D13C_UCI)]<-0
 
 FishMuscles_BothSeasons_MeansSd$D13C_LCI[is.nan(FishMuscles_BothSeasons_MeansSd$D13C_LCI)]<-0
+
+FishMuscles_BothSeasons_MeansSd$D15N_StdError[is.nan(FishMuscles_BothSeasons_MeansSd$D15N_StdError)]<-0
+
+FishMuscles_BothSeasons_MeansSd$D15N_StdError[is.na(FishMuscles_BothSeasons_MeansSd$D15N_StdError)]<-0
 
 FishMuscles_BothSeasons_MeansSd$D15N_SD[is.nan(FishMuscles_BothSeasons_MeansSd$D15N_SD)]<-0
 
@@ -288,19 +310,19 @@ FishMuscles_BothSeasons_MeansSd$D15N_UCI[is.nan(FishMuscles_BothSeasons_MeansSd$
 FishMuscles_BothSeasons_MeansSd$D15N_LCI[is.nan(FishMuscles_BothSeasons_MeansSd$D15N_LCI)]<-0
 
 Muscle_Seasons<- FishMuscles_BothSeasons_MeansSd %>% ggplot(aes(D13C_mean, D15N_mean, color= Site)) + 
-  geom_point(aes(color = Site, shape=Species)) + 
+  geom_point(aes(color = Site, shape=Species), size=3) + 
   scale_shape_manual(values=rep(0:6, 1))+
   #geom_text(aes(label=Species), hjust=1.25, vjust = 1) +
-  labs(title = "Fish Muscle Means And 95% CI's from Summer and Fall") +
+  labs(title = "Fish Muscle Means And Standard Error from Summer and Fall") +
   theme_bw()+
-  coord_cartesian(ylim=c(10, 23),  xlim=c(-31, -18))+
-  geom_errorbar(aes(ymin = D15N_LCI, ymax = D15N_UCI))+
-  geom_errorbarh(aes(xmin = D13C_LCI, xmax = D13C_UCI)) + 
+  #coord_cartesian(ylim=c(10, 23),  xlim=c(-31, -18))+
+  geom_errorbar(aes(ymin = D15N_mean-D15N_StdError, ymax = D15N_mean+D15N_StdError))+
+  geom_errorbarh(aes(xmin = D13C_mean-D13C_StdError, xmax = D13C_mean+D13C_StdError)) +
   facet_wrap(~factor(Season, levels=c("Summer", "Fall")))
 Muscle_Seasons 
 
-max(FishMuscles_BothSeasons_MeansSd$D13C_UCI)
-min(FishMuscles_BothSeasons_MeansSd$D13C_LCI)
+#max(FishMuscles_BothSeasons_MeansSd$D13C_UCI)
+#min(FishMuscles_BothSeasons_MeansSd$D13C_LCI)
 ```
 
 
@@ -317,6 +339,7 @@ LargeMacroinvert_IsotopeAndMetaData_040822$`D15NAir(permill)`<- as.numeric(Large
 LargeMacroinvert_IsotopeAndMetaData_040822$`D34SVCDT(permill)`<- as.numeric(LargeMacroinvert_IsotopeAndMetaData_040822$`D34SVCDT(permill)`)
 
 View(LargeMacroinvert_IsotopeAndMetaData_040822)
+
 #Introduce Season column
 LargeMacroinvert_IsotopeAndMetaData_040822$Collection_Date<-mdy(LargeMacroinvert_IsotopeAndMetaData_040822$Collection_Date)
 
@@ -347,21 +370,27 @@ unique(LargeMacroinvert_IsotopeAndMetaData_040822$Species)
 #Okay, now I want to get the average and sd of C and N values for these inverts.
 View(LargeMacroinvert_IsotopeAndMetaData_040822)
 
+unique(BigInvertsBothSeasons$C_Comment.y)
+#Already removed all outliers manually in excel (samples which the combustion column failed)
+
 BigInverts_BothSeasons_MeansSd<-LargeMacroinvert_IsotopeAndMetaData_040822%>% 
   group_by(Species, Site, Season) %>% 
   summarize(n=n(),
             alpha = 0.05,
             D13C_mean = sum(`D13CVPDB(permill)`/n, na.rm=TRUE), 
             D13C_SD = sqrt(sum((`D13CVPDB(permill)`- (D13C_mean))^2)/(n-1)),
+            D13C_StdError= standard_error(`D13CVPDB(permill)`),
             D13C_UCI = D13C_mean+qt(1-alpha/2, (n-1))*D13C_SD/sqrt(n),
             D13C_LCI= D13C_mean-qt(1-alpha/2, (n-1))*D13C_SD/sqrt(n),
             D15N_mean = sum(`D15NAir(permill)`/n, na.rm=TRUE),
             D15N_SD = sqrt(sum((`D15NAir(permill)`- (D15N_mean))^2)/(n-1)),
+            D15N_StdError= standard_error(`D15NAir(permill)`),
             D15N_UCI = D15N_mean+qt(1-alpha/2, (n-1))*D15N_SD/sqrt(n),
             D15N_LCI = D15N_mean-qt(1-alpha/2, (n-1))*D15N_SD/sqrt(n))
 
-View(BigInverts_BothSeasons_MeansSd)
-BigInverts_BothSeasons_MeansSd
+BigInverts_BothSeasons_MeansSd$D13C_StdError[is.nan(BigInverts_BothSeasons_MeansSd$D13C_StdError)]<-0
+
+BigInverts_BothSeasons_MeansSd$D13C_StdError[is.na(BigInverts_BothSeasons_MeansSd$D13C_StdError)]<-0
 
 BigInverts_BothSeasons_MeansSd$D13C_SD[is.nan(BigInverts_BothSeasons_MeansSd$D13C_SD)]<-0
 
@@ -369,21 +398,28 @@ BigInverts_BothSeasons_MeansSd$D13C_UCI[is.nan(BigInverts_BothSeasons_MeansSd$D1
 
 BigInverts_BothSeasons_MeansSd$D13C_LCI[is.nan(BigInverts_BothSeasons_MeansSd$D13C_LCI)]<-0
 
+BigInverts_BothSeasons_MeansSd$D15N_StdError[is.nan(BigInverts_BothSeasons_MeansSd$D15N_StdError)]<-0
+
+BigInverts_BothSeasons_MeansSd$D15N_StdError[is.na(BigInverts_BothSeasons_MeansSd$D15N_StdError)]<-0
+
 BigInverts_BothSeasons_MeansSd$D15N_SD[is.nan(BigInverts_BothSeasons_MeansSd$D15N_SD)]<-0
 
 BigInverts_BothSeasons_MeansSd$D15N_UCI[is.nan(BigInverts_BothSeasons_MeansSd$D15N_UCI)]<-0
 
 BigInverts_BothSeasons_MeansSd$D15N_LCI[is.nan(BigInverts_BothSeasons_MeansSd$D15N_LCI)]<-0
 
+BigInverts_BothSeasons_MeansSd$Site[BigInverts_BothSeasons_MeansSd$Site %in% "SB"]<-"FM"
+
+
 BigInverts_Seasons<- BigInverts_BothSeasons_MeansSd %>% ggplot(aes(D13C_mean, D15N_mean, color= Site)) + 
-  geom_point(aes(color = Site, shape=Species)) + 
-  scale_shape_manual(values=rep(0:6, 1))+
+  geom_point(aes(color = Site, shape=Species), size=3) + 
+  #scale_shape_manual(values=rep(0:6, 1))+
   #geom_text(aes(label=Species), hjust=1.25, vjust = 1) +
-  labs(title = "Big Inverts Means And 95% CI's from Summer and Fall") +
+  labs(title = "Big Inverts Means And Standard Error from Summer and Fall") +
   theme_bw()+
-  coord_cartesian(xlim=c(-35, -20))+
-  geom_errorbar(aes(ymin = D15N_LCI, ymax = D15N_UCI))+
-  geom_errorbarh(aes(xmin = D13C_LCI, xmax = D13C_UCI)) + 
+  #coord_cartesian(xlim=c(-35, -20))+
+  geom_errorbar(aes(ymin = D15N_mean-D15N_StdError, ymax = D15N_mean+D15N_StdError))+
+  geom_errorbarh(aes(xmin = D13C_mean-D13C_StdError, xmax = D13C_mean+D13C_StdError)) +
   facet_wrap(~factor(Season, levels=c("Summer", "Fall")))
 BigInverts_Seasons
 ```
@@ -418,7 +454,7 @@ unique(SmallInvertsBothSeasons$Species)
 SmallInverts_SpeciesBothSeasons<- SmallMacroinvert_IsotopeAndMetaData_040422 %>% filter(Species %in% c("Americorophium spinicorne", "Crab Zoea", "Eogammarus confervicolus", "Gammarus daiberi", "Gnorimosphaeroma insulare"))
 unique(SmallInverts_SpeciesBothSeasons$C_Comment) #No warnings, all data should be okay.
 #Just kidding the isopods are weird. Do calculation independently later to see where it went wrong.
-View(SmallInverts_SpeciesBothSeasons)
+#View(SmallInverts_SpeciesBothSeasons)
 
 #Okay, now I want to get the average and sd of C and N values for these inverts.
 SmallInverts_BothSeasons_MeansSd<-SmallInverts_SpeciesBothSeasons%>% 
@@ -427,18 +463,28 @@ SmallInverts_BothSeasons_MeansSd<-SmallInverts_SpeciesBothSeasons%>%
             alpha = 0.05,
             D13C_mean = sum(`D13CVPDB(permill)`/n, na.rm=TRUE), 
             D13C_SD = sqrt(sum((`D13CVPDB(permill)`- (D13C_mean))^2)/(n-1)),
+            D13C_StdError= standard_error(`D13CVPDB(permill)`),
             D13C_UCI = D13C_mean+qt(1-alpha/2, (n-1))*D13C_SD/sqrt(n),
             D13C_LCI= D13C_mean-qt(1-alpha/2, (n-1))*D13C_SD/sqrt(n),
             D15N_mean = sum(`D15NAir(permill)`/n, na.rm=TRUE),
             D15N_SD = sqrt(sum((`D15NAir(permill)`- (D15N_mean))^2)/(n-1)),
+            D15N_StdError= standard_error(`D15NAir(permill)`),
             D15N_UCI = D15N_mean+qt(1-alpha/2, (n-1))*D15N_SD/sqrt(n),
             D15N_LCI = D15N_mean-qt(1-alpha/2, (n-1))*D15N_SD/sqrt(n))
+
+SmallInverts_BothSeasons_MeansSd$D13C_StdError[is.nan(SmallInverts_BothSeasons_MeansSd$D13C_StdError)]<-0
+
+SmallInverts_BothSeasons_MeansSd$D13C_StdError[is.na(SmallInverts_BothSeasons_MeansSd$D13C_StdError)]<-0
 
 SmallInverts_BothSeasons_MeansSd$D13C_SD[is.nan(SmallInverts_BothSeasons_MeansSd$D13C_SD)]<-0
 
 SmallInverts_BothSeasons_MeansSd$D13C_UCI[is.nan(SmallInverts_BothSeasons_MeansSd$D13C_UCI)]<-0
 
 SmallInverts_BothSeasons_MeansSd$D13C_LCI[is.nan(SmallInverts_BothSeasons_MeansSd$D13C_LCI)]<-0
+
+SmallInverts_BothSeasons_MeansSd$D15N_StdError[is.nan(SmallInverts_BothSeasons_MeansSd$D15N_StdError)]<-0
+
+SmallInverts_BothSeasons_MeansSd$D15N_StdError[is.na(SmallInverts_BothSeasons_MeansSd$D15N_StdError)]<-0
 
 SmallInverts_BothSeasons_MeansSd$D15N_SD[is.nan(SmallInverts_BothSeasons_MeansSd$D15N_SD)]<-0
 
@@ -447,19 +493,16 @@ SmallInverts_BothSeasons_MeansSd$D15N_UCI[is.nan(SmallInverts_BothSeasons_MeansS
 SmallInverts_BothSeasons_MeansSd$D15N_LCI[is.nan(SmallInverts_BothSeasons_MeansSd$D15N_LCI)]<-0
 
 SmallInverts_Seasons<- SmallInverts_BothSeasons_MeansSd %>% ggplot(aes(D13C_mean, D15N_mean, color= Site)) + 
-  geom_point(aes(color = Site, shape=Species)) + 
-  scale_shape_manual(values=rep(0:6, 1))+
-  labs(title = "Small Invert Means And 95% CI's from Summer and Fall") +
+  geom_point(aes(color = Site, shape=Species), size=3) + 
+  #scale_shape_manual(values=rep(0:6, 1))+
+  labs(title = "Small Invert Means And Standard Error from Summer and Fall") +
   theme_bw()+
-  coord_cartesian(xlim=c(-45, -10))+
-  geom_errorbar(aes(ymin = D15N_LCI, ymax = D15N_UCI))+
-  geom_errorbarh(aes(xmin = D13C_LCI, xmax = D13C_UCI)) + 
+  geom_errorbar(aes(ymin = D15N_mean-D15N_StdError, ymax = D15N_mean+D15N_StdError))+
+  geom_errorbarh(aes(xmin = D13C_mean-D13C_StdError, xmax = D13C_mean+D13C_StdError)) +
   facet_wrap(~factor(Season, levels=c("Summer", "Fall")))
 SmallInverts_Seasons 
 View(SmallInverts_BothSeasons_MeansSd)
-#For some reason, the isopods have a huge CI even though their values don't have that much spread... Not sure why that is, need to look closer at what is going on there.
 ```
-
 
 ## Plants
 ```{r}
@@ -488,6 +531,8 @@ Plants_SpeciesBothSeasons$`D15NAir(permill)`<- as.numeric(Plants_SpeciesBothSeas
 
 Plants_SpeciesBothSeasons$`D34SVCDT(permill)`<- as.numeric(Plants_SpeciesBothSeasons$`D34SVCDT(permill)`)
 
+#NEED TO STILL LOOK AT OUTLIERS AND THE EFFECTS OF TAP WATER VS DI!
+
 #Okay, now I want to get the average and sd of C and N values for these inverts.
 
 Plants_BothSeasons_MeansSd<-Plants_SpeciesBothSeasons%>% 
@@ -496,18 +541,28 @@ Plants_BothSeasons_MeansSd<-Plants_SpeciesBothSeasons%>%
             alpha = 0.05,
             D13C_mean = sum(`D13CVPDB(permill)`/n, na.rm=TRUE), 
             D13C_SD = sqrt(sum((`D13CVPDB(permill)`- (D13C_mean))^2)/(n-1)),
+            D13C_StdError= standard_error(`D13CVPDB(permill)`),
             D13C_UCI = D13C_mean+qt(1-alpha/2, (n-1))*D13C_SD/sqrt(n),
             D13C_LCI= D13C_mean-qt(1-alpha/2, (n-1))*D13C_SD/sqrt(n),
             D15N_mean = sum(`D15NAir(permill)`/n, na.rm=TRUE),
             D15N_SD = sqrt(sum((`D15NAir(permill)`- (D15N_mean))^2)/(n-1)),
+            D15N_StdError= standard_error(`D15NAir(permill)`),
             D15N_UCI = D15N_mean+qt(1-alpha/2, (n-1))*D15N_SD/sqrt(n),
             D15N_LCI = D15N_mean-qt(1-alpha/2, (n-1))*D15N_SD/sqrt(n))
+
+Plants_BothSeasons_MeansSd$D13C_StdError[is.nan(Plants_BothSeasons_MeansSd$D13C_StdError)]<-0
+
+Plants_BothSeasons_MeansSd$D13C_StdError[is.na(Plants_BothSeasons_MeansSd$D13C_StdError)]<-0
 
 Plants_BothSeasons_MeansSd$D13C_SD[is.nan(Plants_BothSeasons_MeansSd$D13C_SD)]<-0
 
 Plants_BothSeasons_MeansSd$D13C_UCI[is.nan(Plants_BothSeasons_MeansSd$D13C_UCI)]<-0
 
 Plants_BothSeasons_MeansSd$D13C_LCI[is.nan(Plants_BothSeasons_MeansSd$D13C_LCI)]<-0
+
+Plants_BothSeasons_MeansSd$D15N_StdError[is.nan(Plants_BothSeasons_MeansSd$D15N_StdError)]<-0
+
+Plants_BothSeasons_MeansSd$D15N_StdError[is.na(Plants_BothSeasons_MeansSd$D15N_StdError)]<-0
 
 Plants_BothSeasons_MeansSd$D15N_SD[is.nan(Plants_BothSeasons_MeansSd$D15N_SD)]<-0
 
@@ -520,13 +575,13 @@ Plants_BothSeasons_MeanSd<-Plants_BothSeasons_MeansSd[!(Plants_BothSeasons_Means
 unique(Plants_BothSeasons_MeanSd$Site)
 
 Plants_Seasons<- Plants_BothSeasons_MeanSd %>% ggplot(aes(D13C_mean, D15N_mean, color= Site)) + 
-  geom_point(aes(color = Site, shape=Species)) + 
+  geom_point(aes(color = Site, shape=Species), size=3) + 
   scale_shape_manual(values=rep(0:13, 1))+
-  labs(title = "Plant Means And 95% CI's from Summer and Fall") +
+  labs(title = "Plant Means And Standard Error from Summer and Fall") +
   theme_bw()+
   #coord_cartesian(xlim=c(-45, -10))+
-  geom_errorbar(aes(ymin = D15N_LCI, ymax = D15N_UCI))+
-  geom_errorbarh(aes(xmin = D13C_LCI, xmax = D13C_UCI)) + 
+  geom_errorbar(aes(ymin = D15N_mean-D15N_StdError, ymax = D15N_mean+D15N_StdError))+
+  geom_errorbarh(aes(xmin = D13C_mean-D13C_StdError, xmax = D13C_mean+D13C_StdError)) +
   facet_wrap(~factor(Season, levels=c("Summer", "Fall")))
 Plants_Seasons 
 ```
@@ -587,21 +642,17 @@ For BA Carbon, all of the samples belonging to "Contained more carbon than the l
 For BA Nitrogen, any with the comment, "Contained more nitrogen than largest reference" was an outlier. Remove them. 
 
 ```{r}
-unique(POM_BA_IsotopeAndMetaData_040522$NComment)
-BA_OutliersRemoved<-POM_BA_IsotopeAndMetaData_040522 %>% filter(`Sample Type`=="Benthic") %>% subset(NComment!="Contained more nitrogen than largest reference")
-unique(BA_OutliersRemoved$C_Comment) #Cool, deleting the problematic N comments also deleted the problematic C comments.
+#unique(POM_BA_IsotopeAndMetaData_040522$NComment)
+#BA_OutliersRemoved<-POM_BA_IsotopeAndMetaData_040522 %>% filter(`Sample Type`=="Benthic") %>% subset(NComment!="Contained more nitrogen than largest reference")
+#unique(BA_OutliersRemoved$C_Comment) #Cool, deleting the problematic N comments also deleted the problematic C comments.
 
 POM_BA_IsotopeAndMetaData_040522 %>% filter(`Sample Type` =="POM") %>% filter(NComment == "NA") %>% filter(Site == "SD", Season== "Summer") %>%  summary(`D15NAir(permill)`)
 
 #I used the min and max of the pom samples for each site and season to determine which rows to remove of POM that were flagged by SIF. These samples have issues with nitrogen values.
 
-POM_OutliersRemoved<- POM_BA_IsotopeAndMetaData_040522[!POM_BA_IsotopeAndMetaData_040522$CarolinesLabel %in% c("CMP-POM-110-CN", "CMP-POM-135-CN", "CMP-POM-36-CN", "CMP-POM-150-CN", "CMP-POM-150rep-CN", "CMP-POM-151-CN", "CMP-POM-93-CN", "CMP-POM-94-CN", "CMP-POM-156-CN", "CMP-POM-146-CN", "CMP-POM-159-CN", "CMP-POM-170-CN", "CMP-POM-171-CN"),]
+POMBA_OutliersRemoved<- POM_BA_IsotopeAndMetaData_040522[!POM_BA_IsotopeAndMetaData_040522$CarolinesLabel %in% c("CMP-POM-110-CN", "CMP-POM-135-CN", "CMP-POM-36-CN", "CMP-POM-150-CN", "CMP-POM-150rep-CN", "CMP-POM-151-CN", "CMP-POM-93-CN", "CMP-POM-94-CN", "CMP-POM-156-CN", "CMP-POM-146-CN", "CMP-POM-159-CN", "CMP-POM-170-CN", "CMP-POM-171-CN", "CMP-BA-51-CN", "CMP-BA-52-CN", "CMP-BA-192-CN"),]
 
 unique(POM_OutliersRemoved$CarolinesLabel)
-#POM_OutliersRemoved<- POM_BA_IsotopeAndMetaData_040522 %>% filter(`Sample Type` =="POM") %>% filter(!NComment == "NA") %>% filter(Site == "SD", Season== "Summer") %>%  subset(`D15NAir(permill)`>5.508|`D15NAir(permill)`<7.639)
-#range(POM_OutliersRemoved$`D15NAir(permill)`)
-
-#POM_OutliersRemoved_SD_Summer<- POM_BA_IsotopeAndMetaData_040522 %>% filter(`Sample Type`=="POM") %>% filter(!NComment == "NA") %>% filter(Site == "SD", Season== "Summer") %>% [with(POM_BA_IsotopeAndMetaData_040522, !((X >= 61701 & X <= 61721) | (X >= 61901 & X <= 61929))), ]
 
 View(POMBA_OutliersRemoved)  
 ```
@@ -609,52 +660,53 @@ View(POMBA_OutliersRemoved)
 ```{r}
 #Okay, now I want to get the average and sd of C and N values for these inverts.
 
-POMBA_BothSeasons_MeansSd<-Plants_SpeciesBothSeasons%>% 
-  group_by(Species, Site, Season) %>% 
+POMBA_BothSeasons_MeansSd<-POMBA_OutliersRemoved%>% 
+  group_by(`Sample Type`, Site, Season) %>% 
   summarize(n=n(),
             alpha = 0.05,
             D13C_mean = sum(`D13CVPDB(permill)`/n, na.rm=TRUE), 
             D13C_SD = sqrt(sum((`D13CVPDB(permill)`- (D13C_mean))^2)/(n-1)),
+            D13C_StdError= standard_error(`D13CVPDB(permill)`),
             D13C_UCI = D13C_mean+qt(1-alpha/2, (n-1))*D13C_SD/sqrt(n),
             D13C_LCI= D13C_mean-qt(1-alpha/2, (n-1))*D13C_SD/sqrt(n),
             D15N_mean = sum(`D15NAir(permill)`/n, na.rm=TRUE),
             D15N_SD = sqrt(sum((`D15NAir(permill)`- (D15N_mean))^2)/(n-1)),
+            D15N_StdError= standard_error(`D15NAir(permill)`),
             D15N_UCI = D15N_mean+qt(1-alpha/2, (n-1))*D15N_SD/sqrt(n),
             D15N_LCI = D15N_mean-qt(1-alpha/2, (n-1))*D15N_SD/sqrt(n))
 
-Plants_BothSeasons_MeansSd$D13C_SD[is.nan(Plants_BothSeasons_MeansSd$D13C_SD)]<-0
+POMBA_BothSeasons_MeansSd$D13C_StdError[is.nan(POMBA_BothSeasons_MeansSd$D13C_StdError)]<-0
 
-Plants_BothSeasons_MeansSd$D13C_UCI[is.nan(Plants_BothSeasons_MeansSd$D13C_UCI)]<-0
+POMBA_BothSeasons_MeansSd$D13C_StdError[is.na(POMBA_BothSeasons_MeansSd$D13C_StdError)]<-0
 
-Plants_BothSeasons_MeansSd$D13C_LCI[is.nan(Plants_BothSeasons_MeansSd$D13C_LCI)]<-0
+POMBA_BothSeasons_MeansSd$D13C_SD[is.nan(POMBA_BothSeasons_MeansSd$D13C_SD)]<-0
 
-Plants_BothSeasons_MeansSd$D15N_SD[is.nan(Plants_BothSeasons_MeansSd$D15N_SD)]<-0
+POMBA_BothSeasons_MeansSd$D13C_UCI[is.nan(POMBA_BothSeasons_MeansSd$D13C_UCI)]<-0
 
-Plants_BothSeasons_MeansSd$D15N_UCI[is.nan(Plants_BothSeasons_MeansSd$D15N_UCI)]<-0
+POMBA_BothSeasons_MeansSd$D13C_LCI[is.nan(POMBA_BothSeasons_MeansSd$D13C_LCI)]<-0
 
-Plants_BothSeasons_MeansSd$D15N_LCI[is.nan(Plants_BothSeasons_MeansSd$D15N_LCI)]<-0
+POMBA_BothSeasons_MeansSd$D15N_StdError[is.nan(POMBA_BothSeasons_MeansSd$D15N_StdError)]<-0
 
-<-POM_BA_IsotopeAndMetaData_040522%>% 
-  group_by(Species, Site, Season) %>% 
-  summarize(n=n(),
-            D13C_mean = sum(`D13CVPDB(permill)`/n, na.rm=TRUE), 
-            D13C_SD = sqrt(sum((`D13CVPDB(permill)`- (D13C_mean))^2)/(n-1)),
-            D15N_mean = sum(`D15NAir(permill)`/n, na.rm=TRUE),
-            D15N_SD = sqrt(sum((`D15NAir(permill)`- (D15N_mean))^2)/(n-1)))
+POMBA_BothSeasons_MeansSd$D15N_StdError[is.na(POMBA_BothSeasons_MeansSd$D15N_StdError)]<-0
+
+POMBA_BothSeasons_MeansSd$D15N_SD[is.nan(POMBA_BothSeasons_MeansSd$D15N_SD)]<-0
+
+POMBA_BothSeasons_MeansSd$D15N_UCI[is.nan(POMBA_BothSeasons_MeansSd$D15N_UCI)]<-0
+
+POMBA_BothSeasons_MeansSd$D15N_LCI[is.nan(POMBA_BothSeasons_MeansSd$D15N_LCI)]<-0
+
 #Remove Sites NA, SD or SM
 unique(POMBA_BothSeasons_MeansSd$Site)
-POMBA_BothSeasons_MeanSd<-POMBA_BothSeasons_MeansSd[!(POMBA_BothSeasons_MeansSd$Site=="NA" | POMBA_BothSeasons_MeansSd$Site=="SD or SM"),]
-unique(POMBA_BothSeasons_MeanSd$Site)
-
-POMBA_Seasons<- POMBA_BothSeasons_MeanSd %>% ggplot(aes(D13C_mean, D15N_mean, color= Site)) + 
-  geom_point(aes(color = Site)) + 
-  geom_text(aes(label=Species)) +
-  labs(title = "POM and BA from Summer and Fall") +
+#POMBA_BothSeasons_MeanSd<-POMBA_BothSeasons_MeansSd[!(POMBA_BothSeasons_MeansSd$Site=="NA" | POMBA_BothSeasons_MeansSd$Site=="SD or SM"),]
+#unique(POMBA_BothSeasons_MeanSd$Site)
+POMBA_Seasons<- POMBA_BothSeasons_MeansSd %>% ggplot(aes(D13C_mean, D15N_mean, color= Site)) + 
+  geom_point(aes(color = Site, shape=`Sample Type`), size=3) + 
+  labs(title = "POM and BA Means And Standard Error from Summer and Fall") +
   theme_bw()+
-  geom_errorbar(aes(ymin = D15N_mean - D15N_SD, ymax = D15N_mean+ D15N_SD))+
-  geom_errorbarh(aes(xmin = D13C_mean - D13C_SD, xmax = D13C_mean + D13C_SD)) + 
+  geom_errorbar(aes(ymin = D15N_mean-D15N_StdError, ymax = D15N_mean+D15N_StdError))+
+  geom_errorbarh(aes(xmin = D13C_mean-D13C_StdError, xmax = D13C_mean+D13C_StdError)) +
   facet_wrap(~factor(Season, levels=c("Summer", "Fall")))
-POMBA_Seasons
+POMBA_Seasons 
 ```
 ## Zoops
 ```{r}
@@ -674,6 +726,9 @@ unique(ZoopIsotopeAndMetaData_040722_edited$Species)
 
 Zoops_SpeciesBothSeasons<- ZoopIsotopeAndMetaData_040722_edited %>% filter(Species %in% c( ">500 um", "200-500 um", "A. sinensis", "P. forbesi", "100-500 um"))
 
+#Lets look for outliers
+unique(Zoops_SpeciesBothSeasons$NComment) #Looks like an okay sample. Gonna leave it.
+
 #Okay, now I want to get the average and sd of C and N values for these fish livers.
 View(Zoops_SpeciesBothSeasons)
 
@@ -682,28 +737,172 @@ Zoops_SpeciesBothSeasons$`D13CVPDB(permill)`<- as.numeric(Zoops_SpeciesBothSeaso
 Zoops_SpeciesBothSeasons$`D15NAir(permill)`<- as.numeric(Zoops_SpeciesBothSeasons$`D15NAir(permill)`)
 
 Zoops_SpeciesBothSeasons$`D34SVCDT(permill)`<- as.numeric(Zoops_SpeciesBothSeasons$`D34SVCDT(permill)`)
-  
+
 Zoops_BothSeasons_MeansSd<-Zoops_SpeciesBothSeasons%>% 
   group_by(Species, Site, Season) %>% 
   summarize(n=n(),
+            alpha = 0.05,
             D13C_mean = sum(`D13CVPDB(permill)`/n, na.rm=TRUE), 
             D13C_SD = sqrt(sum((`D13CVPDB(permill)`- (D13C_mean))^2)/(n-1)),
+            D13C_StdError= standard_error(`D13CVPDB(permill)`),
+            D13C_UCI = D13C_mean+qt(1-alpha/2, (n-1))*D13C_SD/sqrt(n),
+            D13C_LCI= D13C_mean-qt(1-alpha/2, (n-1))*D13C_SD/sqrt(n),
             D15N_mean = sum(`D15NAir(permill)`/n, na.rm=TRUE),
-            D15N_SD = sqrt(sum((`D15NAir(permill)`- (D15N_mean))^2)/(n-1)))
+            D15N_SD = sqrt(sum((`D15NAir(permill)`- (D15N_mean))^2)/(n-1)),
+            D15N_StdError= standard_error(`D15NAir(permill)`),
+            D15N_UCI = D15N_mean+qt(1-alpha/2, (n-1))*D15N_SD/sqrt(n),
+            D15N_LCI = D15N_mean-qt(1-alpha/2, (n-1))*D15N_SD/sqrt(n))
 
-View(Zoops_BothSeasons_MeansSd)
+Zoops_BothSeasons_MeansSd$D13C_StdError[is.nan(Zoops_BothSeasons_MeansSd$D13C_StdError)]<-0
+
+Zoops_BothSeasons_MeansSd$D13C_StdError[is.na(Zoops_BothSeasons_MeansSd$D13C_StdError)]<-0
+
+Zoops_BothSeasons_MeansSd$D13C_SD[is.nan(Zoops_BothSeasons_MeansSd$D13C_SD)]<-0
+
+Zoops_BothSeasons_MeansSd$D13C_UCI[is.nan(Zoops_BothSeasons_MeansSd$D13C_UCI)]<-0
+
+Zoops_BothSeasons_MeansSd$D13C_LCI[is.nan(Zoops_BothSeasons_MeansSd$D13C_LCI)]<-0
+
+Zoops_BothSeasons_MeansSd$D15N_StdError[is.nan(Zoops_BothSeasons_MeansSd$D15N_StdError)]<-0
+
+Zoops_BothSeasons_MeansSd$D15N_StdError[is.na(Zoops_BothSeasons_MeansSd$D15N_StdError)]<-0
+
+Zoops_BothSeasons_MeansSd$D15N_SD[is.nan(Zoops_BothSeasons_MeansSd$D15N_SD)]<-0
+
+Zoops_BothSeasons_MeansSd$D15N_UCI[is.nan(Zoops_BothSeasons_MeansSd$D15N_UCI)]<-0
+
+Zoops_BothSeasons_MeansSd$D15N_LCI[is.nan(Zoops_BothSeasons_MeansSd$D15N_LCI)]<-0
+
 
 Zoops_Seasons<- Zoops_BothSeasons_MeansSd %>% ggplot(aes(D13C_mean, D15N_mean, color= Site)) + 
-  geom_point(aes(color = Site)) + 
-  geom_text(aes(label=Species)) +
-  labs(title = "Zoops from Summer and Fall") +
+  geom_point(aes(color = Site, shape=Species), size=3) + 
+ # scale_shape_manual(values=rep(0:13, 1))+
+  labs(title = "Zoop Means And Standard Error from Summer and Fall") +
   theme_bw()+
-  geom_errorbar(aes(ymin = D15N_mean - D15N_SD, ymax = D15N_mean+ D15N_SD))+
-  geom_errorbarh(aes(xmin = D13C_mean - D13C_SD, xmax = D13C_mean + D13C_SD)) + 
+  coord_cartesian(ylim=c(10, 15),  xlim=c(-35, -25))+
+  geom_errorbar(aes(ymin = D15N_mean-D15N_StdError, ymax = D15N_mean+D15N_StdError))+
+  geom_errorbarh(aes(xmin = D13C_mean-D13C_StdError, xmax = D13C_mean+D13C_StdError)) +
   facet_wrap(~factor(Season, levels=c("Summer", "Fall")))
 Zoops_Seasons
 ```
 ## MEGA PLOT
+```{r}
+#Make columns match
+Zoop_SpeciesBothSeason<- Zoops_SpeciesBothSeasons[,c("Species", "Site", "Season", "D13CVPDB(permill)", "D15NAir(permill)", "SampleID")]
+Zoop_SpeciesBothSeason<-Zoop_SpeciesBothSeason %>% 
+  rename(SpecimenID = SampleID)
+
+POMBA_SpeciesBothSeason<- POMBA_OutliersRemoved[,c("Sample Type", "Site", "Season", "D13CVPDB(permill)", "D15NAir(permill)", "CarolinesLabel")]
+POMBA_SpeciesBothSeason<-POMBA_SpeciesBothSeason %>% 
+  rename(SpecimenID = CarolinesLabel, Species=`Sample Type`)
+
+Plant_SpeciesBothSeason<- Plants_SpeciesBothSeasons[,c("Species", "Site", "Season", "D13CVPDB(permill)", "D15NAir(permill)", "Sample_ID")]
+Plant_SpeciesBothSeason<-Plant_SpeciesBothSeason %>% 
+  rename(SpecimenID = Sample_ID)
+Plant_SpeciesBothSeason<-Plant_SpeciesBothSeason[!(Plant_SpeciesBothSeason$Season=="NA"),]
+
+SmallInvert_SpeciesBothSeason<- SmallInverts_SpeciesBothSeasons[,c("Species", "Site", "Season", "D13CVPDB(permill)", "D15NAir(permill)", "SampleID")]
+SmallInvert_SpeciesBothSeason<-SmallInvert_SpeciesBothSeason %>% 
+  rename(SpecimenID = SampleID)
+
+LargeInvert_SpeciesBothSeason<- LargeMacroinvert_IsotopeAndMetaData_040822[,c("Species", "Site", "Season", "D13CVPDB(permill)", "D15NAir(permill)", "SpecimenID")]
+
+FishMuscle_SpeciesBothSeason<- FishMuscleData_SpeciesBothSeasons[,c("Species", "Site", "Season", "D13CVPDB(permill)", "D15NAir(permill)", "FishSpecimenID")]
+FishMuscle_SpeciesBothSeason<-FishMuscle_SpeciesBothSeason %>% 
+  rename(SpecimenID = FishSpecimenID)
+
+FishLiver_SpeciesBothSeason<- FishLiverData_SpeciesBothSeasons[,c("Species", "Site", "Season", "D13CVPDB(permill)", "D15NAir(permill)", "FishSpecimenID")]
+FishLiver_SpeciesBothSeason<-FishLiver_SpeciesBothSeason %>% 
+  rename(SpecimenID = FishSpecimenID)
+
+#Bind rows
+AllData<-rbind(Zoop_SpeciesBothSeason, POMBA_SpeciesBothSeason, Plant_SpeciesBothSeason, SmallInvert_SpeciesBothSeason, LargeInvert_SpeciesBothSeason, FishMuscle_SpeciesBothSeason, FishLiver_SpeciesBothSeason)
+
+AllData$Site[AllData$Site %in% "SB"]<-"FM"
+
+
+AllData_BothSeasons_MeansSd<-AllData%>% 
+  group_by(Site, Season) %>% 
+  summarize(n=n(),
+            alpha = 0.05,
+            D13C_mean = sum(`D13CVPDB(permill)`/n, na.rm=TRUE), 
+            D13C_SD = sqrt(sum((`D13CVPDB(permill)`- (D13C_mean))^2)/(n-1)),
+            D13C_UCI = D13C_mean+qt(1-alpha/2, (n-1))*D13C_SD/sqrt(n),
+            D13C_LCI= D13C_mean-qt(1-alpha/2, (n-1))*D13C_SD/sqrt(n),
+            D15N_mean = sum(`D15NAir(permill)`/n, na.rm=TRUE),
+            D15N_SD = sqrt(sum((`D15NAir(permill)`- (D15N_mean))^2)/(n-1)),
+            D15N_UCI = D15N_mean+qt(1-alpha/2, (n-1))*D15N_SD/sqrt(n),
+            D15N_LCI = D15N_mean-qt(1-alpha/2, (n-1))*D15N_SD/sqrt(n))
+
+AllData_BothSeasons_MeansSd$D13C_SD[is.nan(AllData_BothSeasons_MeansSd$D13C_SD)]<-0
+
+AllData_BothSeasons_MeansSd$D13C_UCI[is.nan(AllData_BothSeasons_MeansSd$D13C_UCI)]<-0
+
+AllData_BothSeasons_MeansSd$D13C_LCI[is.nan(AllData_BothSeasons_MeansSd$D13C_LCI)]<-0
+
+AllData_BothSeasons_MeansSd$D15N_SD[is.nan(AllData_BothSeasons_MeansSd$D15N_SD)]<-0
+
+AllData_BothSeasons_MeansSd$D15N_UCI[is.nan(AllData_BothSeasons_MeansSd$D15N_UCI)]<-0
+
+AllData_BothSeasons_MeansSd$D15N_LCI[is.nan(AllData_BothSeasons_MeansSd$D15N_LCI)]<-0
+
+AllData_Seasons<- AllData_BothSeasons_MeansSd %>% ggplot(aes(D13C_mean, D15N_mean, color= Site)) + 
+  geom_point(aes(color = Site)) + 
+  labs(title = "All data Means And 95% CI's from Summer and Fall") +
+  theme_bw()+
+  #coord_cartesian(ylim=c(10, 15),  xlim=c(-35, -25))+
+  geom_errorbar(aes(ymin = D15N_LCI, ymax = D15N_UCI))+
+  geom_errorbarh(aes(xmin = D13C_LCI, xmax = D13C_UCI)) + 
+  facet_wrap(~factor(Season, levels=c("Summer", "Fall")))
+AllData_Seasons
+
+AllData_FM<-subset(AllData, Site == "FM")
+AllData_HL<-subset(AllData, Site == "HL")
+AllData_PT<-subset(AllData, Site == "PT")
+AllData_SD<-subset(AllData, Site == "SD")
+unique(AllData_SD$Species)
+
+AllDataAcrossSites<- inner_join(AllData_FM, AllData_HL, by= "Species") %>% inner_join(AllData_PT, AllData_SD, by= "Species")
+unique(AllDataAcrossSites$Species)
+#okay now filter out just those species.
+AllData_SpeciesBothSeasonsAllSites<- AllData %>% filter(Species %in% c( ">500 um", "A. sinensis", "P. forbesi", "Benthic", "POM", "Schoenoplectus acutusa", "Myriophyllum spicatum", "Det", "Eogammarus confervicolus",  "Gammarus daiberi", "Gnorimosphaeroma insulare", "Corbicula", "Exopalaemon", "Harris mud crab", "Maeotias", "SCP", "ST", "SB", "YFG","SG"))
+
+AllData_BothSeasons_AllSites_MeansSd<-AllData_SpeciesBothSeasonsAllSites%>% 
+  group_by(Site, Season) %>% 
+  summarize(n=n(),
+            alpha = 0.05,
+            D13C_mean = sum(`D13CVPDB(permill)`/n, na.rm=TRUE), 
+            D13C_SD = sqrt(sum((`D13CVPDB(permill)`- (D13C_mean))^2)/(n-1)),
+            D13C_UCI = D13C_mean+qt(1-alpha/2, (n-1))*D13C_SD/sqrt(n),
+            D13C_LCI= D13C_mean-qt(1-alpha/2, (n-1))*D13C_SD/sqrt(n),
+            D15N_mean = sum(`D15NAir(permill)`/n, na.rm=TRUE),
+            D15N_SD = sqrt(sum((`D15NAir(permill)`- (D15N_mean))^2)/(n-1)),
+            D15N_UCI = D15N_mean+qt(1-alpha/2, (n-1))*D15N_SD/sqrt(n),
+            D15N_LCI = D15N_mean-qt(1-alpha/2, (n-1))*D15N_SD/sqrt(n))
+
+AllData_BothSeasons_AllSites_MeansSd$D13C_SD[is.nan(AllData_BothSeasons_AllSites_MeansSd$D13C_SD)]<-0
+
+AllData_BothSeasons_AllSites_MeansSd$D13C_UCI[is.nan(AllData_BothSeasons_AllSites_MeansSd$D13C_UCI)]<-0
+
+AllData_BothSeasons_AllSites_MeansSd$D13C_LCI[is.nan(AllData_BothSeasons_AllSites_MeansSd$D13C_LCI)]<-0
+
+AllData_BothSeasons_AllSites_MeansSd$D15N_SD[is.nan(AllData_BothSeasons_AllSites_MeansSd$D15N_SD)]<-0
+
+AllData_BothSeasons_AllSites_MeansSd$D15N_UCI[is.nan(AllData_BothSeasons_AllSites_MeansSd$D15N_UCI)]<-0
+
+AllData_BothSeasons_AllSites_MeansSd$D15N_LCI[is.nan(AllData_BothSeasons_AllSites_MeansSd$D15N_LCI)]<-0
+
+AllData_SeasonsAndSites<- AllData_BothSeasons_AllSites_MeansSd %>% ggplot(aes(D13C_mean, D15N_mean, color= Site)) + 
+  geom_point(aes(color = Site)) + 
+  labs(title = "All Species Caught All Sites and Seasons Means And 95% CI's from Summer and Fall") +
+  theme_bw()+
+  #coord_cartesian(ylim=c(10, 15),  xlim=c(-35, -25))+
+  geom_errorbar(aes(ymin = D15N_LCI, ymax = D15N_UCI))+
+  geom_errorbarh(aes(xmin = D13C_LCI, xmax = D13C_UCI)) + 
+  facet_wrap(~factor(Season, levels=c("Summer", "Fall")))
+AllData_SeasonsAndSites
+```
+
 ###Livers
 ```{r}
 #Bind rows
