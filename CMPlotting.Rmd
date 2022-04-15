@@ -1143,3 +1143,674 @@ Avg_Muscles
 3. For the lower trophic level stuff, it would be good to roughly visualize approximate overlap among groups, via ordination or just plain visualizing.
 
 4. Next step (I think) would be to visualize the food web by each slough , showing the means only of the primary food web constituents (from step 3). Include both summer and fall means for the main species of fish, differentiating with  some kind of symbol, or in separate plots.
+# 2. For organisms caught in summer, species that were caught in every site? Then do for fall. Trying to understand spatial differences.
+## Fish muscle
+```{r}
+#Now do the same for muscle.
+FishMuscleData_040722 <- read_excel("Data/FishMuscleData_040722.xlsx")
+
+FishMuscle_Summer<-filter(FishMuscleData_040722, Season == "Summer")
+
+FishMuscle_Summer_FM<-subset(FishMuscle_Summer, Site == "FM")
+FishMuscle_Summer_HL<-subset(FishMuscle_Summer, Site == "HL")
+FishMuscle_Summer_PT<-subset(FishMuscle_Summer, Site == "PT")
+FishMuscle_Summer_SD<-subset(FishMuscle_Summer, Site == "SD")
+
+unique(FishMuscle_Summer_FM$Species)
+unique(FishMuscle_Summer_HL$Species)
+unique(FishMuscle_Summer_PT$Species)
+unique(FishMuscle_Summer_SD$Species)
+
+FishMuscle_SummerSpecies<-filter(FishMuscle_Summer, Species %in% c("SB", "SCP", "ST", "YFG"))
+
+#Okay, now I want to get the average and standard error of C and N values for these fish muscles
+FishMuscle_SummerSpecies$`D13CVPDB(permill)`<- as.numeric(FishMuscle_SummerSpecies$`D13CVPDB(permill)`)
+
+FishMuscle_SummerSpecies$`D15NAir(permill)`<- as.numeric(FishMuscle_SummerSpecies$`D15NAir(permill)`)
+
+FishMuscle_SummerSpecies$`D34SVCDT(permill)`<- as.numeric(FishMuscle_SummerSpecies$`D34SVCDT(permill)`)
+
+#Checking for outliers.
+unique(FishMuscle_SummerSpecies$NComment)
+unique(FishMuscle_SummerSpecies$C_Comment)
+#ST from PT may have been mixed up with a YFG but the values for ST seem within reason.
+#The YFG has a really low N value compared to the others. So it may be incorrect. So it is possible they actually did get mixed up.. Just remove them all? 
+FishMuscles_Summer_MeansSE<-FishMuscle_SummerSpecies%>% 
+  group_by(Species, Site, Season, `Age Class`) %>% 
+  summarize(n=n(),
+            alpha = 0.05,
+            D13C_mean = sum(`D13CVPDB(permill)`/n, na.rm=TRUE), 
+            D13C_SD = sqrt(sum((`D13CVPDB(permill)`- (D13C_mean))^2)/(n-1)),
+            D13C_StdError= standard_error(`D13CVPDB(permill)`),
+            D13C_UCI = D13C_mean+qt(1-alpha/2, (n-1))*D13C_SD/sqrt(n),
+            D13C_LCI= D13C_mean-qt(1-alpha/2, (n-1))*D13C_SD/sqrt(n),
+            D15N_mean = sum(`D15NAir(permill)`/n, na.rm=TRUE),
+            D15N_SD = sqrt(sum((`D15NAir(permill)`- (D15N_mean))^2)/(n-1)),
+            D15N_StdError= standard_error(`D15NAir(permill)`),
+            D15N_UCI = D15N_mean+qt(1-alpha/2, (n-1))*D15N_SD/sqrt(n),
+            D15N_LCI = D15N_mean-qt(1-alpha/2, (n-1))*D15N_SD/sqrt(n))
+
+FishMuscles_Summer_MeansSE$D13C_StdError[is.nan(FishMuscles_Summer_MeansSE$D13C_StdError)]<-0
+
+FishMuscles_Summer_MeansSE$D13C_StdError[is.na(FishMuscles_Summer_MeansSE$D13C_StdError)]<-0
+
+FishMuscles_Summer_MeansSE$D13C_SD[is.nan(FishMuscles_Summer_MeansSE$D13C_SD)]<-0
+
+FishMuscles_Summer_MeansSE$D13C_UCI[is.nan(FishMuscles_Summer_MeansSE$D13C_UCI)]<-0
+
+FishMuscles_Summer_MeansSE$D13C_LCI[is.nan(FishMuscles_Summer_MeansSE$D13C_LCI)]<-0
+
+FishMuscles_Summer_MeansSE$D15N_StdError[is.nan(FishMuscles_Summer_MeansSE$D15N_StdError)]<-0
+
+FishMuscles_Summer_MeansSE$D15N_StdError[is.na(FishMuscles_Summer_MeansSE$D15N_StdError)]<-0
+
+FishMuscles_Summer_MeansSE$D15N_SD[is.nan(FishMuscles_Summer_MeansSE$D15N_SD)]<-0
+
+FishMuscles_Summer_MeansSE$D15N_UCI[is.nan(FishMuscles_Summer_MeansSE$D15N_UCI)]<-0
+
+FishMuscles_Summer_MeansSE$D15N_LCI[is.nan(FishMuscles_Summer_MeansSE$D15N_LCI)]<-0
+
+Muscle_Summer<- FishMuscles_Summer_MeansSE %>% ggplot(aes(D13C_mean, D15N_mean, color= Site)) + 
+  geom_point(aes(color = Site, shape=Species), size=3) + 
+  labs(title = "Fish Muscle Means And Standard Error from Summer") +
+  theme_bw()+
+  geom_errorbar(aes(ymin = D15N_mean-D15N_StdError, ymax = D15N_mean+D15N_StdError))+
+  geom_errorbarh(aes(xmin = D13C_mean-D13C_StdError, xmax = D13C_mean+D13C_StdError))
+  #facet_wrap(~factor(Season, levels=c("Summer", "Fall")))
+Muscle_Summer
+
+Muscle_Summer_SiteWrap<- FishMuscles_Summer_MeansSE %>% ggplot(aes(D13C_mean, D15N_mean, color= Species)) + 
+  geom_point(aes(color = Species, shape=`Age Class`), size=3) + 
+  labs(title = "Fish Muscle Means And Standard Error from Summer") +
+  theme_bw()+
+  geom_errorbar(aes(ymin = D15N_mean-D15N_StdError, ymax = D15N_mean+D15N_StdError))+
+  geom_errorbarh(aes(xmin = D13C_mean-D13C_StdError, xmax = D13C_mean+D13C_StdError))+
+  facet_wrap(~Site)
+Muscle_Summer_SiteWrap
+
+Muscle_Summer_SpeciesWrap<- FishMuscles_Summer_MeansSE %>% ggplot(aes(D13C_mean, D15N_mean, color= Site)) + 
+  geom_point(aes(color = Site, shape=`Age Class`), size=3) + 
+  labs(title = "Fish Muscle Means And Standard Error from Summer") +
+  theme_bw()+
+  geom_errorbar(aes(ymin = D15N_mean-D15N_StdError, ymax = D15N_mean+D15N_StdError))+
+  geom_errorbarh(aes(xmin = D13C_mean-D13C_StdError, xmax = D13C_mean+D13C_StdError))+
+  facet_wrap(~Species)
+Muscle_Summer_SpeciesWrap
+```
+
+## Fish Liver
+```{r}
+FishLiverData_040722 <- read_excel("Data/FishLiverData_040722.xlsx")
+
+FishLiver_Summer<-filter(FishLiverData_040722, Season == "Summer")
+
+FishLiver_Summer_FM<-subset(FishLiver_Summer, Site == "FM")
+FishLiver_Summer_HL<-subset(FishLiver_Summer, Site == "HL")
+FishLiver_Summer_PT<-subset(FishLiver_Summer, Site == "PT")
+FishLiver_Summer_SD<-subset(FishLiver_Summer, Site == "SD")
+
+unique(FishLiver_Summer_FM$Species)
+unique(FishLiver_Summer_HL$Species)
+unique(FishLiver_Summer_PT$Species)
+unique(FishLiver_Summer_SD$Species)
+
+FishLiver_SummerSpecies<-filter(FishLiver_Summer, Species %in% c("SB", "SCP", "ST"))
+
+#Okay, now I want to get the average and standard error of C and N values for these fish muscles
+FishLiver_SummerSpecies$`D13CVPDB(permill)`<- as.numeric(FishLiver_SummerSpecies$`D13CVPDB(permill)`)
+
+FishLiver_SummerSpecies$`D15NAir(permill)`<- as.numeric(FishLiver_SummerSpecies$`D15NAir(permill)`)
+
+FishLiver_SummerSpecies$`D34SVCDT(permill)`<- as.numeric(FishLiver_SummerSpecies$`D34SVCDT(permill)`)
+
+#Checking for outliers.
+unique(FishLiver_SummerSpecies$NComment)
+unique(FishLiver_SummerSpecies$C_Comment)
+#ST from PT may have been mixed up with a YFG but the values for ST seem within reason.
+#The YFG has a really low N value compared to the others. So it may be incorrect. So it is possible they actually did get mixed up.. Just remove them all? 
+FishLivers_Summer_MeansSE<-FishLiver_SummerSpecies%>% 
+  group_by(Species, Site, Season, `Age Class`) %>% 
+  summarize(n=n(),
+            alpha = 0.05,
+            D13C_mean = sum(`D13CVPDB(permill)`/n, na.rm=TRUE), 
+            D13C_SD = sqrt(sum((`D13CVPDB(permill)`- (D13C_mean))^2)/(n-1)),
+            D13C_StdError= standard_error(`D13CVPDB(permill)`),
+            D13C_UCI = D13C_mean+qt(1-alpha/2, (n-1))*D13C_SD/sqrt(n),
+            D13C_LCI= D13C_mean-qt(1-alpha/2, (n-1))*D13C_SD/sqrt(n),
+            D15N_mean = sum(`D15NAir(permill)`/n, na.rm=TRUE),
+            D15N_SD = sqrt(sum((`D15NAir(permill)`- (D15N_mean))^2)/(n-1)),
+            D15N_StdError= standard_error(`D15NAir(permill)`),
+            D15N_UCI = D15N_mean+qt(1-alpha/2, (n-1))*D15N_SD/sqrt(n),
+            D15N_LCI = D15N_mean-qt(1-alpha/2, (n-1))*D15N_SD/sqrt(n))
+
+FishLivers_Summer_MeansSE$D13C_StdError[is.nan(FishLivers_Summer_MeansSE$D13C_StdError)]<-0
+
+FishLivers_Summer_MeansSE$D13C_StdError[is.na(FishLivers_Summer_MeansSE$D13C_StdError)]<-0
+
+FishLivers_Summer_MeansSE$D13C_SD[is.nan(FishLivers_Summer_MeansSE$D13C_SD)]<-0
+
+FishLivers_Summer_MeansSE$D13C_UCI[is.nan(FishLivers_Summer_MeansSE$D13C_UCI)]<-0
+
+FishLivers_Summer_MeansSE$D13C_LCI[is.nan(FishLivers_Summer_MeansSE$D13C_LCI)]<-0
+
+FishLivers_Summer_MeansSE$D15N_StdError[is.nan(FishLivers_Summer_MeansSE$D15N_StdError)]<-0
+
+FishLivers_Summer_MeansSE$D15N_StdError[is.na(FishLivers_Summer_MeansSE$D15N_StdError)]<-0
+
+FishLivers_Summer_MeansSE$D15N_SD[is.nan(FishLivers_Summer_MeansSE$D15N_SD)]<-0
+
+FishLivers_Summer_MeansSE$D15N_UCI[is.nan(FishLivers_Summer_MeansSE$D15N_UCI)]<-0
+
+FishLivers_Summer_MeansSE$D15N_LCI[is.nan(FishLivers_Summer_MeansSE$D15N_LCI)]<-0
+
+Liver_Summer<- FishLivers_Summer_MeansSE %>% ggplot(aes(D13C_mean, D15N_mean, color= Site)) + 
+  geom_point(aes(color = Site, shape=Species), size=3) + 
+  labs(title = "Fish Liver Means And Standard Error from Summer") +
+  theme_bw()+
+  geom_errorbar(aes(ymin = D15N_mean-D15N_StdError, ymax = D15N_mean+D15N_StdError))+
+  geom_errorbarh(aes(xmin = D13C_mean-D13C_StdError, xmax = D13C_mean+D13C_StdError))
+Liver_Summer
+
+Liver_Summer_SiteWrap<- FishLivers_Summer_MeansSE %>% ggplot(aes(D13C_mean, D15N_mean, color= Species)) + 
+  geom_point(aes(color = Species, shape=`Age Class`), size=3) + 
+  labs(title = "Fish Liver Means And Standard Error from Summer") +
+  theme_bw()+
+  geom_errorbar(aes(ymin = D15N_mean-D15N_StdError, ymax = D15N_mean+D15N_StdError))+
+  geom_errorbarh(aes(xmin = D13C_mean-D13C_StdError, xmax = D13C_mean+D13C_StdError))+
+  facet_wrap(~Site)
+Liver_Summer_SiteWrap
+
+Liver_Summer_SpeciesWrap<- FishLivers_Summer_MeansSE %>% ggplot(aes(D13C_mean, D15N_mean, color= Site)) + 
+  geom_point(aes(color = Site, shape=`Age Class`), size=3) + 
+  labs(title = "Fish Liver Means And Standard Error from Summer") +
+  theme_bw()+
+  geom_errorbar(aes(ymin = D15N_mean-D15N_StdError, ymax = D15N_mean+D15N_StdError))+
+  geom_errorbarh(aes(xmin = D13C_mean-D13C_StdError, xmax = D13C_mean+D13C_StdError))+
+  facet_wrap(~Species)
+Liver_Summer_SpeciesWrap
+```
+
+## Big Inverts
+```{r}
+#Went through and manually deleted all the columns for rows which had incorrect readings due to combustion column failure. 
+
+LargeMacroinvert_IsotopeAndMetaData_040822 <- read_excel("Data/LargeMacroinvert_IsotopeAndMetaData_040822_Edited.xlsx")
+unique(LargeMacroinvert_IsotopeAndMetaData_040822$Site)
+LargeMacroinvert_IsotopeAndMetaData_040822$Site[LargeMacroinvert_IsotopeAndMetaData_040822$Site %in% "SB"]<-"FM"
+
+LargeMacroinvert_IsotopeAndMetaData_040822$`D13CVPDB(permill)`<- as.numeric(LargeMacroinvert_IsotopeAndMetaData_040822$`D13CVPDB(permill)`)
+
+LargeMacroinvert_IsotopeAndMetaData_040822$`D15NAir(permill)`<- as.numeric(LargeMacroinvert_IsotopeAndMetaData_040822$`D15NAir(permill)`)
+
+LargeMacroinvert_IsotopeAndMetaData_040822$`D34SVCDT(permill)`<- as.numeric(LargeMacroinvert_IsotopeAndMetaData_040822$`D34SVCDT(permill)`)
+
+#Introduce Season column
+LargeMacroinvert_IsotopeAndMetaData_040822$Collection_Date<-mdy(LargeMacroinvert_IsotopeAndMetaData_040822$Collection_Date)
+
+str(LargeMacroinvert_IsotopeAndMetaData_040822$Collection_Date)
+
+LargeMacroinvert_IsotopeAndMetaData_040822$Month<- format(LargeMacroinvert_IsotopeAndMetaData_040822$Collection_Date, format = "%m")
+unique(LargeMacroinvert_IsotopeAndMetaData_040822$Month)
+
+LargeMacroinvert_IsotopeAndMetaData_040822$Season[LargeMacroinvert_IsotopeAndMetaData_040822$Month %in% "06"]<-"Summer"
+LargeMacroinvert_IsotopeAndMetaData_040822$Season[LargeMacroinvert_IsotopeAndMetaData_040822$Month %in% "07"]<-"Summer"
+LargeMacroinvert_IsotopeAndMetaData_040822$Season[LargeMacroinvert_IsotopeAndMetaData_040822$Month %in% "08"]<-"Fall"
+LargeMacroinvert_IsotopeAndMetaData_040822$Season[LargeMacroinvert_IsotopeAndMetaData_040822$Month %in% "09"]<-"Fall"
+
+BigInvertsSummer<-filter(LargeMacroinvert_IsotopeAndMetaData_040822, Season %in% "Summer")
+
+BigInvertsSummer_FM<-filter(BigInvertsSummer, Site %in% "FM")
+BigInvertsSummer_HL<-filter(BigInvertsSummer, Site %in% "HL")
+BigInvertsSummer_PT<-filter(BigInvertsSummer, Site %in% "PT")
+BigInvertsSummer_SD<-filter(BigInvertsSummer, Site %in% "SD")
+
+unique(BigInvertsSummer_FM$Species)
+unique(BigInvertsSummer_HL$Species)
+unique(BigInvertsSummer_PT$Species)
+unique(BigInvertsSummer_SD$Species)
+
+BigInvertsSummer_Species<- filter(BigInvertsSummer, Species %in% c("Exopalaemon", "Harris mud crab"))
+
+#Already removed all outliers manually in excel (samples which the combustion column failed)
+
+BigInverts_Summer_MeansSd<-BigInvertsSummer_Species%>% 
+  group_by(Species, Site, Season) %>% 
+  summarize(n=n(),
+            alpha = 0.05,
+            D13C_mean = sum(`D13CVPDB(permill)`/n, na.rm=TRUE), 
+            D13C_SD = sqrt(sum((`D13CVPDB(permill)`- (D13C_mean))^2)/(n-1)),
+            D13C_StdError= standard_error(`D13CVPDB(permill)`),
+            D13C_UCI = D13C_mean+qt(1-alpha/2, (n-1))*D13C_SD/sqrt(n),
+            D13C_LCI= D13C_mean-qt(1-alpha/2, (n-1))*D13C_SD/sqrt(n),
+            D15N_mean = sum(`D15NAir(permill)`/n, na.rm=TRUE),
+            D15N_SD = sqrt(sum((`D15NAir(permill)`- (D15N_mean))^2)/(n-1)),
+            D15N_StdError= standard_error(`D15NAir(permill)`),
+            D15N_UCI = D15N_mean+qt(1-alpha/2, (n-1))*D15N_SD/sqrt(n),
+            D15N_LCI = D15N_mean-qt(1-alpha/2, (n-1))*D15N_SD/sqrt(n))
+
+
+BigInverts_Seasons<- BigInverts_Summer_MeansSd %>% ggplot(aes(D13C_mean, D15N_mean, color= Site)) + 
+  geom_point(aes(color = Site, shape=Species), size=3) + 
+  labs(title = "Big Inverts Means And Standard Error from Summer") +
+  theme_bw()+
+  geom_errorbar(aes(ymin = D15N_mean-D15N_StdError, ymax = D15N_mean+D15N_StdError))+
+  geom_errorbarh(aes(xmin = D13C_mean-D13C_StdError, xmax = D13C_mean+D13C_StdError)) 
+  #facet_wrap(~factor(Season, levels=c("Summer", "Fall")))
+BigInverts_Seasons
+```
+## Small Inverts
+```{r}
+SmallMacroinvert_IsotopeAndMetaData_040422 <- read_excel("Data/SmallMacroinvert_IsotopeAndMetaData_040422.xlsx")
+
+SmallMacroinvert_IsotopeAndMetaData_040422$`D13CVPDB(permill)`<- as.numeric(SmallMacroinvert_IsotopeAndMetaData_040422$`D13CVPDB(permill)`)
+
+SmallMacroinvert_IsotopeAndMetaData_040422$`D15NAir(permill)`<- as.numeric(SmallMacroinvert_IsotopeAndMetaData_040422$`D15NAir(permill)`)
+
+SmallMacroinvert_IsotopeAndMetaData_040422$`D34SVCDT(permill)`<- as.numeric(SmallMacroinvert_IsotopeAndMetaData_040422$`D34SVCDT(permill)`)
+
+SmallInvertsSummer<-subset(SmallMacroinvert_IsotopeAndMetaData_040422, Season == "Summer")
+unique(SmallInvertsSummer$Site)
+
+SmallInvertsSummer_FM<- filter(SmallInvertsSummer, Site %in% "FM")
+SmallInvertsSummer_HL<- filter(SmallInvertsSummer, Site %in% "HL")
+SmallInvertsSummer_PT<- filter(SmallInvertsSummer, Site %in% "PT")
+SmallInvertsSummer_SD<- filter(SmallInvertsSummer, Site %in% "SD")
+
+unique(SmallInvertsSummer_FM$Species)
+unique(SmallInvertsSummer_HL$Species)
+unique(SmallInvertsSummer_PT$Species)
+unique(SmallInvertsSummer_SD$Species)
+
+SmallInverts_SpeciesSummer<- SmallMacroinvert_IsotopeAndMetaData_040422 %>% filter(Species %in% "Mysid")
+
+unique(SmallInverts_SpeciesSummer$C_Comment) #No warnings, all data should be okay.
+#Just kidding the isopods are weird. Do calculation independently later to see where it went wrong.
+#View(SmallInverts_SpeciesBothSeasons)
+
+#Okay, now I want to get the average and sd of C and N values for these inverts.
+SmallInverts_Summer_MeansSd<-SmallInverts_SpeciesSummer%>% 
+  group_by(Species, Site, Season) %>% 
+  summarize(n=n(),
+            alpha = 0.05,
+            D13C_mean = sum(`D13CVPDB(permill)`/n, na.rm=TRUE), 
+            D13C_SD = sqrt(sum((`D13CVPDB(permill)`- (D13C_mean))^2)/(n-1)),
+            D13C_StdError= standard_error(`D13CVPDB(permill)`),
+            D13C_UCI = D13C_mean+qt(1-alpha/2, (n-1))*D13C_SD/sqrt(n),
+            D13C_LCI= D13C_mean-qt(1-alpha/2, (n-1))*D13C_SD/sqrt(n),
+            D15N_mean = sum(`D15NAir(permill)`/n, na.rm=TRUE),
+            D15N_SD = sqrt(sum((`D15NAir(permill)`- (D15N_mean))^2)/(n-1)),
+            D15N_StdError= standard_error(`D15NAir(permill)`),
+            D15N_UCI = D15N_mean+qt(1-alpha/2, (n-1))*D15N_SD/sqrt(n),
+            D15N_LCI = D15N_mean-qt(1-alpha/2, (n-1))*D15N_SD/sqrt(n))
+
+SmallInverts_Summer_MeansSd$D13C_StdError[is.nan(SmallInverts_Summer_MeansSd$D13C_StdError)]<-0
+
+SmallInverts_Summer_MeansSd$D13C_StdError[is.na(SmallInverts_Summer_MeansSd$D13C_StdError)]<-0
+
+SmallInverts_Summer_MeansSd$D13C_SD[is.nan(SmallInverts_Summer_MeansSd$D13C_SD)]<-0
+
+SmallInverts_Summer_MeansSd$D13C_UCI[is.nan(SmallInverts_Summer_MeansSd$D13C_UCI)]<-0
+
+SmallInverts_Summer_MeansSd$D13C_LCI[is.nan(SmallInverts_Summer_MeansSd$D13C_LCI)]<-0
+
+SmallInverts_Summer_MeansSd$D15N_StdError[is.nan(SmallInverts_Summer_MeansSd$D15N_StdError)]<-0
+
+SmallInverts_Summer_MeansSd$D15N_StdError[is.na(SmallInverts_Summer_MeansSd$D15N_StdError)]<-0
+
+SmallInverts_Summer_MeansSd$D15N_SD[is.nan(SmallInverts_Summer_MeansSd$D15N_SD)]<-0
+
+SmallInverts_Summer_MeansSd$D15N_UCI[is.nan(SmallInverts_Summer_MeansSd$D15N_UCI)]<-0
+
+SmallInverts_Summer_MeansSd$D15N_LCI[is.nan(SmallInverts_Summer_MeansSd$D15N_LCI)]<-0
+
+SmallInverts_Summer<- SmallInverts_Summer_MeansSd %>% ggplot(aes(D13C_mean, D15N_mean, color= Site)) + 
+  geom_point(aes(color = Site), size=3) + 
+  labs(title = "Small Invert (Mysid only) Means And Standard Error from Summer") +
+  theme_bw()+
+  geom_errorbar(aes(ymin = D15N_mean-D15N_StdError, ymax = D15N_mean+D15N_StdError))+
+  geom_errorbarh(aes(xmin = D13C_mean-D13C_StdError, xmax = D13C_mean+D13C_StdError))
+SmallInverts_Summer 
+```
+## Zoops
+```{r}
+ZoopIsotopeAndMetaData_040722_edited <- read_excel("Data/ZoopIsotopeAndMetaData_040722_edited.xlsx")
+ZoopIsotopeAndMetaData_040722_edited$Species<-ZoopIsotopeAndMetaData_040722_edited$ZoopSpecies
+Zoops_Summer<-filter(ZoopIsotopeAndMetaData_040722_edited, Season %in% "Summer")
+
+Zoops_Summer_FM<-filter(Zoops_Summer, Site %in% "FM")
+Zoops_Summer_HL<-filter(Zoops_Summer, Site %in% "HL")
+Zoops_Summer_PT<-filter(Zoops_Summer, Site %in% "PT")
+Zoops_Summer_SD<-filter(Zoops_Summer, Site %in% "SD")
+#Now filter out just these  species 
+
+unique(Zoops_Summer_FM$Species)
+unique(Zoops_Summer_HL$Species)
+unique(Zoops_Summer_PT$Species)
+unique(Zoops_Summer_SD$Species)
+
+Zoops_SpeciesSummer<- Zoops_Summer %>% filter(Species %in% c( ">500 um", "A. sinensis", "P. forbesi"))
+
+#Lets look for outliers
+unique(Zoops_SpeciesSummer$NComment) #Looks like an okay sample. Gonna leave it.
+
+#Okay, now I want to get the average and sd of C and N values for these fish livers.
+View(Zoops_SpeciesBothSeasons)
+
+Zoops_SpeciesSummer$`D13CVPDB(permill)`<- as.numeric(Zoops_SpeciesSummer$`D13CVPDB(permill)`)
+
+Zoops_SpeciesSummer$`D15NAir(permill)`<- as.numeric(Zoops_SpeciesSummer$`D15NAir(permill)`)
+
+Zoops_SpeciesSummer$`D34SVCDT(permill)`<- as.numeric(Zoops_SpeciesSummer$`D34SVCDT(permill)`)
+
+Zoops_Summer_MeansSd<-Zoops_SpeciesSummer%>% 
+  group_by(Species, Site, Season) %>% 
+  summarize(n=n(),
+            alpha = 0.05,
+            D13C_mean = sum(`D13CVPDB(permill)`/n, na.rm=TRUE), 
+            D13C_SD = sqrt(sum((`D13CVPDB(permill)`- (D13C_mean))^2)/(n-1)),
+            D13C_StdError= standard_error(`D13CVPDB(permill)`),
+            D13C_UCI = D13C_mean+qt(1-alpha/2, (n-1))*D13C_SD/sqrt(n),
+            D13C_LCI= D13C_mean-qt(1-alpha/2, (n-1))*D13C_SD/sqrt(n),
+            D15N_mean = sum(`D15NAir(permill)`/n, na.rm=TRUE),
+            D15N_SD = sqrt(sum((`D15NAir(permill)`- (D15N_mean))^2)/(n-1)),
+            D15N_StdError= standard_error(`D15NAir(permill)`),
+            D15N_UCI = D15N_mean+qt(1-alpha/2, (n-1))*D15N_SD/sqrt(n),
+            D15N_LCI = D15N_mean-qt(1-alpha/2, (n-1))*D15N_SD/sqrt(n))
+
+Zoops_Summer_MeansSd$D13C_StdError[is.nan(Zoops_Summer_MeansSd$D13C_StdError)]<-0
+
+Zoops_Summer_MeansSd$D13C_StdError[is.na(Zoops_Summer_MeansSd$D13C_StdError)]<-0
+
+Zoops_Summer_MeansSd$D13C_SD[is.nan(Zoops_Summer_MeansSd$D13C_SD)]<-0
+
+Zoops_Summer_MeansSd$D13C_UCI[is.nan(Zoops_Summer_MeansSd$D13C_UCI)]<-0
+
+Zoops_Summer_MeansSd$D13C_LCI[is.nan(Zoops_Summer_MeansSd$D13C_LCI)]<-0
+
+Zoops_Summer_MeansSd$D15N_StdError[is.nan(Zoops_Summer_MeansSd$D15N_StdError)]<-0
+
+Zoops_Summer_MeansSd$D15N_StdError[is.na(Zoops_Summer_MeansSd$D15N_StdError)]<-0
+
+Zoops_Summer_MeansSd$D15N_SD[is.nan(Zoops_Summer_MeansSd$D15N_SD)]<-0
+
+Zoops_Summer_MeansSd$D15N_UCI[is.nan(Zoops_Summer_MeansSd$D15N_UCI)]<-0
+
+Zoops_Summer_MeansSd$D15N_LCI[is.nan(Zoops_Summer_MeansSd$D15N_LCI)]<-0
+
+
+Zoops_Summer_Plot<- Zoops_Summer_MeansSd %>% ggplot(aes(D13C_mean, D15N_mean, color= Site)) + 
+  geom_point(aes(color = Site, shape=Species), size=3) + 
+  labs(title = "Zoop Means And Standard Error from Summer") +
+  theme_bw()+
+  coord_cartesian(ylim=c(10, 15),  xlim=c(-35, -25))+
+  geom_errorbar(aes(ymin = D15N_mean-D15N_StdError, ymax = D15N_mean+D15N_StdError))+
+  geom_errorbarh(aes(xmin = D13C_mean-D13C_StdError, xmax = D13C_mean+D13C_StdError)) 
+Zoops_Summer_Plot
+
+Zoops_Summer_SpeciesWrap<- Zoops_Summer_MeansSd %>% ggplot(aes(D13C_mean, D15N_mean, color= Site)) + 
+  geom_point(aes(color = Site), size=3) + 
+  labs(title = "Zoop Means And Standard Error from Summer") +
+  theme_bw()+
+  coord_cartesian(ylim=c(10, 15),  xlim=c(-35, -25))+
+  geom_errorbar(aes(ymin = D15N_mean-D15N_StdError, ymax = D15N_mean+D15N_StdError))+
+  geom_errorbarh(aes(xmin = D13C_mean-D13C_StdError, xmax = D13C_mean+D13C_StdError))+
+  facet_wrap(~Species)
+Zoops_Summer_SpeciesWrap
+```
+## Plants
+```{r}
+PlantIsotopeAndMetaData_040822 <- read_excel("Data/PlantIsotopeAndMetaData_040822.xlsx")
+Plants_Summer<-filter(PlantIsotopeAndMetaData_040822, Season %in% "Summer")
+Plants_Summer_FM<-filter(Plants_Summer, Site %in% "FM")
+Plants_Summer_HL<-filter(Plants_Summer, Site %in% "HL")
+Plants_Summer_PT<-filter(Plants_Summer, Site %in% "PT")
+Plants_Summer_SD<-filter(Plants_Summer, Site %in% "SD")
+
+unique(Plants_Summer_FM$Species)
+unique(Plants_Summer_HL$Species)
+unique(Plants_Summer_PT$Species)
+unique(Plants_Summer_SD$Species)
+
+
+Plants_SpeciesSummer<- Plants_Summer %>% filter(Species %in% "Schoenoplectus acutusa")
+
+#Okay, now I want to get the average and sd of C and N values for these fish livers.
+
+Plants_SpeciesSummer$`D13CVPDB(permill)`<- as.numeric(Plants_SpeciesSummer$`D13CVPDB(permill)`)
+
+Plants_SpeciesSummer$`D15NAir(permill)`<- as.numeric(Plants_SpeciesSummer$`D15NAir(permill)`)
+
+Plants_SpeciesSummer$`D34SVCDT(permill)`<- as.numeric(Plants_SpeciesSummer$`D34SVCDT(permill)`)
+
+#NEED TO STILL LOOK AT OUTLIERS AND THE EFFECTS OF TAP WATER VS DI!
+
+#Okay, now I want to get the average and sd of C and N values for these inverts.
+
+Plants_Summer_MeansSd<-Plants_SpeciesSummer%>% 
+  group_by(Species, Site, Season) %>% 
+  summarize(n=n(),
+            alpha = 0.05,
+            D13C_mean = sum(`D13CVPDB(permill)`/n, na.rm=TRUE), 
+            D13C_SD = sqrt(sum((`D13CVPDB(permill)`- (D13C_mean))^2)/(n-1)),
+            D13C_StdError= standard_error(`D13CVPDB(permill)`),
+            D13C_UCI = D13C_mean+qt(1-alpha/2, (n-1))*D13C_SD/sqrt(n),
+            D13C_LCI= D13C_mean-qt(1-alpha/2, (n-1))*D13C_SD/sqrt(n),
+            D15N_mean = sum(`D15NAir(permill)`/n, na.rm=TRUE),
+            D15N_SD = sqrt(sum((`D15NAir(permill)`- (D15N_mean))^2)/(n-1)),
+            D15N_StdError= standard_error(`D15NAir(permill)`),
+            D15N_UCI = D15N_mean+qt(1-alpha/2, (n-1))*D15N_SD/sqrt(n),
+            D15N_LCI = D15N_mean-qt(1-alpha/2, (n-1))*D15N_SD/sqrt(n))
+
+
+unique(Plants_SpeciesSummer$Site)
+
+Plants_Summer_Plot<- Plants_Summer_MeansSd %>% ggplot(aes(D13C_mean, D15N_mean, color= Site)) + 
+  geom_point(aes(color = Site), size=3) + 
+  scale_shape_manual(values=rep(0:13, 1))+
+  labs(title = "Plant (Schoenoplectus acutusa) Means And Standard Error from Summer") +
+  theme_bw()+
+  geom_errorbar(aes(ymin = D15N_mean-D15N_StdError, ymax = D15N_mean+D15N_StdError))+
+  geom_errorbarh(aes(xmin = D13C_mean-D13C_StdError, xmax = D13C_mean+D13C_StdError)) #+
+  #facet_wrap(~factor(Season, levels=c("Summer", "Fall")))
+Plants_Summer_Plot 
+```
+## POM/BA
+```{r}
+POM_BA_IsotopeAndMetaData_040522 <- read_excel("Data/POM_BA_IsotopeAndMetaData_040522.xlsx")
+View(POM_BA_IsotopeAndMetaData_040522)
+str(POM_BA_IsotopeAndMetaData_040522$Date)
+#Introduce Season column
+POM_BA_IsotopeAndMetaData_040522$Month<- format(POM_BA_IsotopeAndMetaData_040522$Date, format = "%m")
+unique(POM_BA_IsotopeAndMetaData_040522$Month)
+
+POM_BA_IsotopeAndMetaData_040522$Season[POM_BA_IsotopeAndMetaData_040522$Month %in% "06"]<-"Summer"
+POM_BA_IsotopeAndMetaData_040522$Season[POM_BA_IsotopeAndMetaData_040522$Month %in% "07"]<-"Summer"
+POM_BA_IsotopeAndMetaData_040522$Season[POM_BA_IsotopeAndMetaData_040522$Month %in% "08"]<-"Fall"
+POM_BA_IsotopeAndMetaData_040522$Season[POM_BA_IsotopeAndMetaData_040522$Month %in% "09"]<-"Fall"
+View(POM_BA_IsotopeAndMetaData_040522)
+
+#Okay, now I want to get the average and sd of C and N values for POM and BA by site and season.
+
+POM_BA_IsotopeAndMetaData_040522$`D13CVPDB(permill)`<- as.numeric(POM_BA_IsotopeAndMetaData_040522$`D13CVPDB(permill)`)
+
+POM_BA_IsotopeAndMetaData_040522$`D15NAir(permill)`<- as.numeric(POM_BA_IsotopeAndMetaData_040522$`D15NAir(permill)`)
+
+POM_BA_IsotopeAndMetaData_040522$`D34SVCDT(permill)`<- as.numeric(POM_BA_IsotopeAndMetaData_040522$`D34SVCDT(permill)`)
+```
+
+```{r}
+#Lets look at how far off the samples with warnings are from the samples without warnings
+POM_BA_IsotopeAndMetaData_040522<-POM_BA_IsotopeAndMetaData_040522[!(POM_BA_IsotopeAndMetaData_040522$Site=="NA" | POM_BA_IsotopeAndMetaData_040522$Site=="SD or SM"),]
+
+Carbon_OutlierPlot_POM<- POM_BA_IsotopeAndMetaData_040522 %>% filter(`Sample Type` == "POM") %>%  ggplot(aes(x = Site, y=`D13CVPDB(permill)`)) + geom_boxplot(aes(color=C_Comment))+theme_bw() + labs(title = "POM Carbon Outlier Check from Summer and Fall")+facet_wrap(~Season)
+
+Carbon_OutlierPlot_POM
+
+Nitrogen_OutlierPlot_POM<- POM_BA_IsotopeAndMetaData_040522 %>% filter(`Sample Type` == "POM") %>%  ggplot(aes(x = Site, y=`D15NAir(permill)`)) + geom_boxplot(aes(color=NComment))+theme_bw() + labs(title = "POM Nitrogen Outlier Check from Summer and Fall")+facet_wrap(~Season)
+
+Nitrogen_OutlierPlot_POM
+
+Carbon_OutlierPlot_BA<- POM_BA_IsotopeAndMetaData_040522 %>% filter(`Sample Type` == "Benthic") %>%  ggplot(aes(x = Site, y=`D13CVPDB(permill)`)) + geom_boxplot(aes(color=C_Comment))+theme_bw() + labs(title = "Benthic Alge Carbon Outlier Check from Summer and Fall")+facet_wrap(~Season)
+
+Carbon_OutlierPlot_BA
+
+Nitrogen_OutlierPlot_BA<- POM_BA_IsotopeAndMetaData_040522 %>% filter(`Sample Type` == "Benthic") %>%  ggplot(aes(x = Site, y=`D15NAir(permill)`)) + geom_boxplot(aes(color=NComment))+theme_bw() + labs(title = "Benthic Algae Nitrogen Outlier Check from Summer and Fall")+facet_wrap(~Season)
+
+Nitrogen_OutlierPlot_BA
+```
+
+Outlier anaylsis results: I plotted boxplots of POM and BA data by site and season to look for N and C outliers and color coded to see which data belonged to flagged rows. 
+For POM Carbon, there were outliers BUT they all belonged to rows with no comments from the SIF lab. No action needed.
+
+For POM Nitrogen, there were some outliers belonging to "Precision decreases for samples containing less than 20 mu grams of N." Remove those belonging to that comment group which fell outside the range of the no comment group.
+List: CMP-POM-110-CN, CMP-POM-135-CN, CMP-POM-36-CN, CMP-POM-150-CN, CMP-POM-150rep-CN, CMP-POM-151-CN, CMP-POM-93-CN, CMP-POM-94-CN, CMP-POM-156-CN, CMP-POM-146-CN, CMP-POM-159-CN, CMP-POM-170-CN, CMP-POM-171-CN.
+
+For BA Carbon, all of the samples belonging to "Contained more carbon than the largest reference" was an outlier. Also true for the comments "Mass 44 & 45 saturated, totals underestimated" and "Mass 45 saturated; estimated value used." Remove them. 
+
+For BA Nitrogen, any with the comment, "Contained more nitrogen than largest reference" was an outlier. Remove them. 
+
+```{r}
+#unique(POM_BA_IsotopeAndMetaData_040522$NComment)
+#BA_OutliersRemoved<-POM_BA_IsotopeAndMetaData_040522 %>% filter(`Sample Type`=="Benthic") %>% subset(NComment!="Contained more nitrogen than largest reference")
+#unique(BA_OutliersRemoved$C_Comment) #Cool, deleting the problematic N comments also deleted the problematic C comments.
+
+POM_BA_IsotopeAndMetaData_040522 %>% filter(`Sample Type` =="POM") %>% filter(NComment == "NA") %>% filter(Site == "SD", Season== "Summer") %>%  summary(`D15NAir(permill)`)
+
+#I used the min and max of the pom samples for each site and season to determine which rows to remove of POM that were flagged by SIF. These samples have issues with nitrogen values.
+
+POMBA_OutliersRemoved<- POM_BA_IsotopeAndMetaData_040522[!POM_BA_IsotopeAndMetaData_040522$CarolinesLabel %in% c("CMP-POM-110-CN", "CMP-POM-135-CN", "CMP-POM-36-CN", "CMP-POM-150-CN", "CMP-POM-150rep-CN", "CMP-POM-151-CN", "CMP-POM-93-CN", "CMP-POM-94-CN", "CMP-POM-156-CN", "CMP-POM-146-CN", "CMP-POM-159-CN", "CMP-POM-170-CN", "CMP-POM-171-CN", "CMP-BA-51-CN", "CMP-BA-52-CN", "CMP-BA-192-CN"),]
+
+unique(POM_OutliersRemoved$CarolinesLabel)
+
+View(POMBA_OutliersRemoved)  
+```
+
+```{r}
+#Okay, now I want to get the average and sd of C and N values for these inverts.
+
+POMBA_BothSeasons_MeansSd<-POMBA_OutliersRemoved%>% 
+  group_by(`Sample Type`, Site, Season) %>% 
+  summarize(n=n(),
+            alpha = 0.05,
+            D13C_mean = sum(`D13CVPDB(permill)`/n, na.rm=TRUE), 
+            D13C_SD = sqrt(sum((`D13CVPDB(permill)`- (D13C_mean))^2)/(n-1)),
+            D13C_StdError= standard_error(`D13CVPDB(permill)`),
+            D13C_UCI = D13C_mean+qt(1-alpha/2, (n-1))*D13C_SD/sqrt(n),
+            D13C_LCI= D13C_mean-qt(1-alpha/2, (n-1))*D13C_SD/sqrt(n),
+            D15N_mean = sum(`D15NAir(permill)`/n, na.rm=TRUE),
+            D15N_SD = sqrt(sum((`D15NAir(permill)`- (D15N_mean))^2)/(n-1)),
+            D15N_StdError= standard_error(`D15NAir(permill)`),
+            D15N_UCI = D15N_mean+qt(1-alpha/2, (n-1))*D15N_SD/sqrt(n),
+            D15N_LCI = D15N_mean-qt(1-alpha/2, (n-1))*D15N_SD/sqrt(n))
+
+POMBA_BothSeasons_MeansSd$D13C_StdError[is.nan(POMBA_BothSeasons_MeansSd$D13C_StdError)]<-0
+
+POMBA_BothSeasons_MeansSd$D13C_StdError[is.na(POMBA_BothSeasons_MeansSd$D13C_StdError)]<-0
+
+POMBA_BothSeasons_MeansSd$D13C_SD[is.nan(POMBA_BothSeasons_MeansSd$D13C_SD)]<-0
+
+POMBA_BothSeasons_MeansSd$D13C_UCI[is.nan(POMBA_BothSeasons_MeansSd$D13C_UCI)]<-0
+
+POMBA_BothSeasons_MeansSd$D13C_LCI[is.nan(POMBA_BothSeasons_MeansSd$D13C_LCI)]<-0
+
+POMBA_BothSeasons_MeansSd$D15N_StdError[is.nan(POMBA_BothSeasons_MeansSd$D15N_StdError)]<-0
+
+POMBA_BothSeasons_MeansSd$D15N_StdError[is.na(POMBA_BothSeasons_MeansSd$D15N_StdError)]<-0
+
+POMBA_BothSeasons_MeansSd$D15N_SD[is.nan(POMBA_BothSeasons_MeansSd$D15N_SD)]<-0
+
+POMBA_BothSeasons_MeansSd$D15N_UCI[is.nan(POMBA_BothSeasons_MeansSd$D15N_UCI)]<-0
+
+POMBA_BothSeasons_MeansSd$D15N_LCI[is.nan(POMBA_BothSeasons_MeansSd$D15N_LCI)]<-0
+
+#Remove Sites NA, 'SD or SM'
+unique(POMBA_BothSeasons_MeansSd$Site)
+#POMBA_BothSeasons_MeanSd<-POMBA_BothSeasons_MeansSd[!(POMBA_BothSeasons_MeansSd$Site=="NA" | POMBA_BothSeasons_MeansSd$Site=="SD or SM"),]
+#unique(POMBA_BothSeasons_MeanSd$Site)
+POMBA_Summer<- POMBA_BothSeasons_MeansSd %>% filter(Season %in% "Summer") %>% ggplot(aes(D13C_mean, D15N_mean, color= Site)) + 
+  geom_point(aes(color = Site, shape=`Sample Type`), size=3) + 
+  labs(title = "POM and BA Means And Standard Error from Summer") +
+  theme_bw()+
+  geom_errorbar(aes(ymin = D15N_mean-D15N_StdError, ymax = D15N_mean+D15N_StdError))+
+  geom_errorbarh(aes(xmin = D13C_mean-D13C_StdError, xmax = D13C_mean+D13C_StdError))# +
+  #facet_wrap(~factor(Season, levels=c("Summer", "Fall")))
+POMBA_Summer 
+
+POMBA_Summ<-POMBA_BothSeasons_MeansSd %>% filter(Season %in% "Summer")
+```
+
+## Spatial Differences Summer
+```{r}
+POMBA_Summ<-rename(POMBA_Summ, Species=`Sample Type`)
+
+SummerSpatial_NoFish<-rbind(BigInverts_Summer_MeansSd, SmallInverts_Summer_MeansSd, Zoops_Summer_MeansSd, Plants_Summer_MeansSd,POMBA_Summ)
+
+SummerSpatial_NoFish$Species<- factor(SummerSpatial_NoFish$Species, levels = c("Exopalaemon", "Harris mud crab", "Mysid", ">500 um", "A. sinensis", "P. forbesi", "Schoenoplectus acutusa", "Benthic", "POM")) #Changing level order 
+
+SummerSpatial_NoFish_Plot1<-SummerSpatial_NoFish %>% ggplot(aes(D13C_mean, D15N_mean, color= Site)) + 
+  geom_point(aes(color = Site, shape=Species), size=3) + 
+  scale_shape_manual(values=rep(0:9, 1))+
+  labs(title = "No fish Means And Standard Error from Summer") +
+  theme_bw()+
+  geom_errorbar(aes(ymin = D15N_mean-D15N_StdError, ymax = D15N_mean+D15N_StdError))+
+  geom_errorbarh(aes(xmin = D13C_mean-D13C_StdError, xmax = D13C_mean+D13C_StdError))
+  #facet_wrap(~factor(Season, levels=c("Summer", "Fall")))
+SummerSpatial_NoFish_Plot1
+
+SummerSpatial_NoFish_Plot2<-SummerSpatial_NoFish %>% ggplot(aes(D13C_mean, D15N_mean, color= Species)) + 
+  geom_point(aes(color = Species), size=3) + 
+  labs(title = "No fish Means And Standard Error from Summer") +
+  theme_bw()+
+  geom_errorbar(aes(ymin = D15N_mean-D15N_StdError, ymax = D15N_mean+D15N_StdError))+
+  geom_errorbarh(aes(xmin = D13C_mean-D13C_StdError, xmax = D13C_mean+D13C_StdError))+
+  facet_wrap(~Site)
+SummerSpatial_NoFish_Plot2
+
+SummerSpatial_FishLiver<-rbind(FishLivers_Summer_MeansSE, BigInverts_Summer_MeansSd, SmallInverts_Summer_MeansSd, Zoops_Summer_MeansSd, Plants_Summer_MeansSd,POMBA_Summ)
+unique(SummerSpatial_FishLiver$Species)
+
+SummerSpatial_FishLiver$Species<- factor(SummerSpatial_FishLiver$Species, levels = c("SB", "ST", "SCP", "Exopalaemon", "Harris mud crab", "Mysid", ">500 um", "A. sinensis", "P. forbesi", "Schoenoplectus acutusa", "Benthic", "POM")) #Changing level order 
+
+SummerSpatial_FishLiver_Plot1<-SummerSpatial_FishLiver %>% ggplot(aes(D13C_mean, D15N_mean, color= Site)) + 
+  geom_point(aes(color = Site, shape=Species), size=3) + 
+  scale_shape_manual(values=rep(0:11, 1))+
+  labs(title = "With Fish Liver Means And Standard Error from Summer") +
+  theme_bw()+
+  geom_errorbar(aes(ymin = D15N_mean-D15N_StdError, ymax = D15N_mean+D15N_StdError))+
+  geom_errorbarh(aes(xmin = D13C_mean-D13C_StdError, xmax = D13C_mean+D13C_StdError))
+  #facet_wrap(~factor(Season, levels=c("Summer", "Fall")))
+SummerSpatial_FishLiver_Plot1
+
+SummerSpatial_FishLiver_Plot2<-SummerSpatial_FishLiver %>% ggplot(aes(D13C_mean, D15N_mean, color= Species)) + 
+  geom_point(aes(color = Species), size=3) + 
+  labs(title = "With Fish Liver Means And Standard Error from Summer") +
+  theme_bw()+
+  geom_errorbar(aes(ymin = D15N_mean-D15N_StdError, ymax = D15N_mean+D15N_StdError))+
+  geom_errorbarh(aes(xmin = D13C_mean-D13C_StdError, xmax = D13C_mean+D13C_StdError))+
+  facet_wrap(~Site)
+SummerSpatial_FishLiver_Plot2
+
+SummerSpatial_FishMuscle<-rbind(FishMuscles_Summer_MeansSE, BigInverts_Summer_MeansSd, SmallInverts_Summer_MeansSd, Zoops_Summer_MeansSd, Plants_Summer_MeansSd,POMBA_Summ)
+unique(SummerSpatial_FishMuscle$Species)
+
+SummerSpatial_FishMuscle$Species<- factor(SummerSpatial_FishMuscle$Species, levels = c("SB", "ST", "SCP", "YFG", "Exopalaemon", "Harris mud crab", "Mysid", ">500 um", "A. sinensis", "P. forbesi", "Schoenoplectus acutusa", "Benthic", "POM")) #Changing level order 
+
+SummerSpatial_FishMuscle_Plot1<-SummerSpatial_FishMuscle %>% ggplot(aes(D13C_mean, D15N_mean, color= Site)) + 
+  geom_point(aes(color = Site, shape=Species), size=3) + 
+  scale_shape_manual(values=rep(0:12, 1))+
+  labs(title = "With Fish Muscle Means And Standard Error from Summer") +
+  theme_bw()+
+  geom_errorbar(aes(ymin = D15N_mean-D15N_StdError, ymax = D15N_mean+D15N_StdError))+
+  geom_errorbarh(aes(xmin = D13C_mean-D13C_StdError, xmax = D13C_mean+D13C_StdError))
+  #facet_wrap(~factor(Season, levels=c("Summer", "Fall")))
+SummerSpatial_FishMuscle_Plot1
+
+SummerSpatial_FishMuscle_Plot2<-SummerSpatial_FishMuscle %>% ggplot(aes(D13C_mean, D15N_mean, color= Species)) + 
+  geom_point(aes(color = Species), size=3) + 
+  labs(title = "With Fish Muscle Means And Standard Error from Summer") +
+  theme_bw()+
+  geom_errorbar(aes(ymin = D15N_mean-D15N_StdError, ymax = D15N_mean+D15N_StdError))+
+  geom_errorbarh(aes(xmin = D13C_mean-D13C_StdError, xmax = D13C_mean+D13C_StdError))+
+  facet_wrap(~Site)
+SummerSpatial_FishMuscle_Plot2
+```
