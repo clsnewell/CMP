@@ -176,7 +176,7 @@ POMVol4: CMP-POM-192-CN
 
 ###S
 ```{r}
-#CMPatty (data not back yet)
+CMPatty_S <- read_excel("Data/SIF-S/DataOnly/CMPatty_S.xlsx", col_types = c("text", "numeric", "numeric", "text", "numeric", "text", "text", "text", "numeric", "numeric"))
 
 CMPBuffPants_S <- read_excel("Data/SIF-S/DataOnly/CMPBuffPants_S.xlsx", col_types = c("text", "numeric", "numeric", "text", "text", "text", "text", "numeric", "numeric", "numeric"))
 glimpse(CMPBuffPants_S)
@@ -203,23 +203,23 @@ glimpse(CMPLiverLaughLov_S)
 CMPLiverOfMine_S <- read_excel("Data/SIF-S/DataOnly/CMPLiverOfMine_S.xlsx", col_types = c("text", "numeric", "numeric", "text", "text", "text", "text", "numeric", "numeric", "numeric"))
 glimpse(CMPLiverOfMine_S)
 
-#CMPluchea
+CMPlucheae_S <- read_excel("Data/SIF-S/DataOnly/CMPlucheae_S.xlsx", col_types = c("text", "numeric", "numeric", "text", "numeric", "text", "text", "text", "numeric", "numeric"))
 
 #CMPMudBugs
 
-#CMPMuscleMeat
+CMPMuscleMeat_S <- read_excel("Data/SIF-S/DataOnly/CMPMuscleMeat_S.xlsx", col_types = c("text", "numeric", "numeric", "text", "numeric", "text", "text", "text", "numeric", "numeric"))
 
 CMPNotFood_S <- read_excel("Data/SIF-S/DataOnly/CMPNotFood_S.xlsx", col_types = c("text", "numeric", "numeric", "text", "numeric", "text", "text", "text", "numeric", "numeric"))
 glimpse(CMPNotFood_S)
 
-#CMPoaceae
+CMPoaceae_S <- read_excel("Data/SIF-S/DataOnly/CMPoaceae_S.xlsx", col_types = c("text", "numeric", "numeric", "text", "numeric", "text", "text", "text", "numeric", "numeric"))
 
 #CMPSampler
 
 CMPSchwarzeneger_S <- read_excel("Data/SIF-S/DataOnly/CMPSchwarzeneger_S.xlsx", col_types = c("text", "numeric", "numeric", "text", "text", "text", "text", "numeric", "numeric", "numeric"))
 glimpse(CMPSchwarzeneger_S)
 
-#CMPScud
+CMPScuds_S <- read_excel("Data/SIF-S/DataOnly/CMPScuds_S.xlsx", col_types = c("text", "numeric", "numeric", "text", "numeric", "text", "text", "text", "numeric", "numeric"))
 
 CMPTunaOfTheFarm_S <- read_excel("Data/SIF-S/DataOnly/CMPTunaOfTheFarm_S.xlsx", col_types = c("text", "numeric", "numeric", "text", "numeric", "text", "text", "text", "numeric", "numeric"))
 glimpse(CMPTunaOfTheFarm_S)
@@ -243,17 +243,25 @@ CMPBuffPants: CMP_FISH_379M_S, CMP_FISH_382M_S
 # Merge dataframes
 I will address flagging the warning messages of the data after I have merged everything together.
 ```{r}
-RawIsotopeData<-bind_rows(CMPandemic_CN, CMPeas_CN, CMPFish4Ever_CN, CMPFishRFriends_CN, CMPflanzen_CN, CMPhragmites_CN, CMPKrabby_CN, CMPLeftovers_CN, CMPLiverLaVida_CN, CMPLiverLetDie_CN, CMPLiverPool_CN, CMPLiverRoast_CN, CMPLiverWorst_CN, CMPMuscleBob_CN, CMPMuscleStuffin_CN, CMPMysteryMeat_CN, CMPSilenceOThLab_CN, CMPSkrimp_CN, CMPSkrimp2_CN, CMPSmallFry_CN, CMPTheGovernatorCN, CMPVeryStable_CN, CMPZoopSoup_CN, PomVol1_CN, PomVol2_CN, PomVol3_CN, PomVol4_CN, PomVol5_CN, CMPBuffPants_S, CMPChoppedLiver_S, CMPeace_S, CMPeachment_S, CMPLiverItUp_S, CMPLiverLaughLov_S, CMPLiverOfMine_S, CMPNotFood_S,  CMPSchwarzeneger_S, CMPTunaOfTheFarm_S, CMPISeeDeadCMPeople_S)
+RawIsotopeData<-bind_rows(CMPandemic_CN, CMPeas_CN, CMPFish4Ever_CN, CMPFishRFriends_CN, CMPflanzen_CN, CMPhragmites_CN, CMPKrabby_CN, CMPLeftovers_CN, CMPLiverLaVida_CN, CMPLiverLetDie_CN, CMPLiverPool_CN, CMPLiverRoast_CN, CMPLiverWorst_CN, CMPMuscleBob_CN, CMPMuscleStuffin_CN, CMPMysteryMeat_CN, CMPSilenceOThLab_CN, CMPSkrimp_CN, CMPSkrimp2_CN, CMPSmallFry_CN, CMPTheGovernator_CN, CMPVeryStable_CN, CMPZoopSoup_CN, PomVol1_CN, PomVol2_CN, PomVol3_CN, PomVol4_CN, PomVol5_CN, CMPatty_S, CMPBuffPants_S, CMPChoppedLiver_S, CMPeace_S, CMPeachment_S, CMPlucheae_S, CMPLiverItUp_S, CMPLiverLaughLov_S, CMPLiverOfMine_S, CMPMuscleMeat_S, CMPoaceae_S, CMPNotFood_S,  CMPSchwarzeneger_S, CMPScuds_S, CMPTunaOfTheFarm_S, CMPISeeDeadCMPeople_S)
 View(RawIsotopeData)
 
-write.csv(RawIsotopeData, "Data/RawIsotopeData_03302022.csv")
+write.csv(RawIsotopeData, "Data/RawIsotopeData_04252022.csv")
 
 Raw_CN<- bind_rows(CMPandemic_CN, CMPeas_CN, CMPFish4Ever_CN, CMPFishRFriends_CN, CMPflanzen_CN, CMPhragmites_CN, CMPKrabby_CN, CMPLeftovers_CN, CMPLiverLaVida_CN, CMPLiverLetDie_CN, CMPLiverPool_CN, CMPLiverRoast_CN, CMPLiverWorst_CN, CMPMuscleBob_CN, CMPMuscleStuffin_CN, CMPMysteryMeat_CN, CMPSilenceOThLab_CN, CMPSkrimp_CN, CMPSkrimp2_CN, CMPSmallFry_CN, CMPTheGovernator_CN, CMPVeryStable_CN, CMPZoopSoup_CN, PomVol1_CN, PomVol2_CN, PomVol3_CN, PomVol4_CN, PomVol5_CN)
 write.csv(Raw_CN, "Data/Raw_CN_04072022.csv")
 
 
-Raw_S<- bind_rows(CMPBuffPants_S, CMPChoppedLiver_S, CMPeace_S, CMPeachment_S, CMPLiverItUp_S, CMPLiverLaughLov_S, CMPLiverOfMine_S, CMPNotFood_S,  CMPSchwarzeneger_S, CMPTunaOfTheFarm_S, CMPISeeDeadCMPeople_S)
-write.csv(Raw_S, "Data/Raw_S_04072022.csv")
+Raw_S<- bind_rows(CMPatty_S, CMPBuffPants_S, CMPChoppedLiver_S, CMPeace_S, CMPeachment_S, CMPlucheae_S, CMPLiverItUp_S, CMPLiverLaughLov_S, CMPLiverOfMine_S, CMPMuscleMeat_S, CMPoaceae_S, CMPNotFood_S,  CMPSchwarzeneger_S, CMPScuds_S, CMPTunaOfTheFarm_S, CMPISeeDeadCMPeople_S)
+write.csv(Raw_S, "Data/Raw_S_04252022.csv")
+
+#Manually added taxon columns, so read-in the excel versions of the raw data with taxon columns
+RawIsotopeData_04252022 <- read_excel("Data/RawIsotopeData_04252022.xlsx")
+
+Raw_S_04252022<- read_excel("Data/Raw_S_04252022.xlsx")
+
+Raw_CN_04072022 <- read_excel("Data/Raw_CN_04072022.xlsx")
+
 ```
 
 # Now I want to attach sample information (species ID, site, etc) to this table.
@@ -262,13 +270,10 @@ write.csv(Raw_S, "Data/Raw_S_04072022.csv")
 ```{r}
 #okay so I forgot I have to do each taxonomic group separately because of the different naming techniques...
 #So let's pull all the rows of fish out first and foremost
-Raw_CN_04072022 <- read_excel("Data/Raw_CN_04072022.xlsx")
 
-Raw_S_04072022 <- read_excel("Data/Raw_S_04072022.xlsx")
+FishIsotopeData_CN<- Raw_CN_04072022 %>% filter(Taxon == "FISH")
 
-FishIsotopeData_CN<- Raw_CN_04072022 %>% filter(TAXON == "FISH")
-
-FishIsotopeData_S<- Raw_S_04072022 %>% filter(TAXON == "FISH")
+FishIsotopeData_S<- Raw_S_04252022 %>% filter(Taxon == "FISH")
 
 
 FishIsotopeData_CN$Fish_Number<- regmatches(FishIsotopeData_CN$SampleID, gregexpr("[[:digit:]]+", FishIsotopeData_CN$SampleID)) #makes a list.
@@ -340,15 +345,16 @@ View(FishMuscleData)
 
 #Save!
 
-write.csv(FishMuscleData, "Data/FishMuscleData_040722.csv")
+write.csv(FishMuscleData, "Data/FishMuscleData_042522.csv")
 
-write.csv(FishLiverData, "Data/FishLiverData_040722.csv")
+write.csv(FishLiverData, "Data/FishLiverData_042522.csv")
 ```
 
 ## Let's do plants next.
 ```{r}
-str(RawIsotopeData_03302022$Taxon)
-PlantIsotopeData<- RawIsotopeData_03302022 %>% filter(Taxon == "PLANT")
+RawIsotopeData_04252022
+str(RawIsotopeData_04252022$Taxon)
+PlantIsotopeData<- RawIsotopeData_04252022 %>% filter(Taxon == "PLANT")
 #I can't use the quick fix from before. Gotta find another way...
 str(PlantIsotopeData$SampleID)
 writeLines(PlantIsotopeData$SampleID)
@@ -382,68 +388,65 @@ PlantIsotopeAndMetadata$Class[PlantIsotopeAndMetadata$SpeciesCode %in% c("LEMNA"
 
 PlantIsotopeAndMetadata$Class[PlantIsotopeAndMetadata$SpeciesCode %in% "DET"]<- "Det"
 
-#SAVE IT
-write.csv(PlantIsotopeAndMetadata, "Data/PlantIsotopeAndMetaData_040422.csv")
-
 #Need a column with species info
-PlantIsotopeAndMetaData_040422$Species[PlantIsotopeAndMetaData_040422$SpeciesCode %in% "SAGO"]<- "SAGO"
+PlantIsotopeAndMetadata$Species[PlantIsotopeAndMetadata$SpeciesCode %in% "SAGO"]<- "SAGO"
 
-PlantIsotopeAndMetaData_040422$Species[PlantIsotopeAndMetaData_040422$SpeciesCode %in% "MYSP"]<- "Myriophyllum spicatum"
+PlantIsotopeAndMetadata$Species[PlantIsotopeAndMetadata$SpeciesCode %in% "MYSP"]<- "Myriophyllum spicatum"
 
-PlantIsotopeAndMetaData_040422$Species[PlantIsotopeAndMetaData_040422$SpeciesCode %in% "FILA"]<- "Filamentous algae"
+PlantIsotopeAndMetadata$Species[PlantIsotopeAndMetadata$SpeciesCode %in% "FILA"]<- "Filamentous algae"
 
-PlantIsotopeAndMetaData_040422$Species[PlantIsotopeAndMetaData_040422$SpeciesCode %in% "PHAU"]<- "Phragmites australis"
+PlantIsotopeAndMetadata$Species[PlantIsotopeAndMetadata$SpeciesCode %in% "PHAU"]<- "Phragmites australis"
 
-PlantIsotopeAndMetaData_040422$Species[PlantIsotopeAndMetaData_040422$SpeciesCode %in% "TYAN"]<- "Typha angustifolia"
+PlantIsotopeAndMetadata$Species[PlantIsotopeAndMetadata$SpeciesCode %in% "TYAN"]<- "Typha angustifolia"
 
-PlantIsotopeAndMetaData_040422$Species[PlantIsotopeAndMetaData_040422$SpeciesCode %in% "SCAC"]<- "Schoenoplectus acutusa"
+PlantIsotopeAndMetadata$Species[PlantIsotopeAndMetadata$SpeciesCode %in% "SCAC"]<- "Schoenoplectus acutusa"
 
-PlantIsotopeAndMetaData_040422$Species[PlantIsotopeAndMetaData_040422$SpeciesCode %in% "SCAM"]<- "Schoenoplectus americanus"
+PlantIsotopeAndMetadata$Species[PlantIsotopeAndMetadata$SpeciesCode %in% "SCAM"]<- "Schoenoplectus americanus"
 
-PlantIsotopeAndMetaData_040422$Species[PlantIsotopeAndMetaData_040422$SpeciesCode %in% "SCCA"]<- "Schoenoplectus californicus"
+PlantIsotopeAndMetadata$Species[PlantIsotopeAndMetadata$SpeciesCode %in% "SCCA"]<- "Schoenoplectus californicus"
 
-PlantIsotopeAndMetaData_040422$Species[PlantIsotopeAndMetaData_040422$SpeciesCode %in% "ARSU"]<- "Sarcocornia/Salicornia pacifica" #ARsU is outdated...
+PlantIsotopeAndMetadata$Species[PlantIsotopeAndMetadata$SpeciesCode %in% "ARSU"]<- "Sarcocornia/Salicornia pacifica" #ARsU is outdated...
 
-PlantIsotopeAndMetaData_040422$Species[PlantIsotopeAndMetaData_040422$SpeciesCode %in% "SAPA"]<- "Sarcocornia/Salicornia pacifica"
+PlantIsotopeAndMetadata$Species[PlantIsotopeAndMetadata$SpeciesCode %in% "SAPA"]<- "Sarcocornia/Salicornia pacifica"
 
-PlantIsotopeAndMetaData_040422$Species[PlantIsotopeAndMetaData_040422$SpeciesCode %in% "CASE"]<- "Calystegia sepium"
+PlantIsotopeAndMetadata$Species[PlantIsotopeAndMetadata$SpeciesCode %in% "CASE"]<- "Calystegia sepium"
 
-PlantIsotopeAndMetaData_040422$Species[PlantIsotopeAndMetaData_040422$SpeciesCode %in% "JACA"]<- "Jaumea carnosa"
+PlantIsotopeAndMetadata$Species[PlantIsotopeAndMetadata$SpeciesCode %in% "JACA"]<- "Jaumea carnosa"
 
-PlantIsotopeAndMetaData_040422$Species[PlantIsotopeAndMetaData_040422$SpeciesCode %in% "LELA"]<- "Lepidium latifolium"
+PlantIsotopeAndMetadata$Species[PlantIsotopeAndMetadata$SpeciesCode %in% "LELA"]<- "Lepidium latifolium"
 
-PlantIsotopeAndMetaData_040422$Species[PlantIsotopeAndMetaData_040422$SpeciesCode %in% "ROCA"]<- "Rosa californica"
+PlantIsotopeAndMetadata$Species[PlantIsotopeAndMetadata$SpeciesCode %in% "ROCA"]<- "Rosa californica"
 
-PlantIsotopeAndMetaData_040422$Species[PlantIsotopeAndMetaData_040422$SpeciesCode %in% "LAJE"]<- "Lathyrus jepsonii jepsonii"
+PlantIsotopeAndMetadata$Species[PlantIsotopeAndMetadata$SpeciesCode %in% "LAJE"]<- "Lathyrus jepsonii jepsonii"
 
-PlantIsotopeAndMetaData_040422$Species[PlantIsotopeAndMetaData_040422$SpeciesCode %in% "JUBA"]<- "Juncus balticus"
+PlantIsotopeAndMetadata$Species[PlantIsotopeAndMetadata$SpeciesCode %in% "JUBA"]<- "Juncus balticus"
 
-PlantIsotopeAndMetaData_040422$Species[PlantIsotopeAndMetaData_040422$SpeciesCode %in% "LOCO"]<- "Lotus corniculatus"
+PlantIsotopeAndMetadata$Species[PlantIsotopeAndMetadata$SpeciesCode %in% "LOCO"]<- "Lotus corniculatus"
 
-PlantIsotopeAndMetaData_040422$Species[PlantIsotopeAndMetaData_040422$SpeciesCode %in% "PLOD"]<- "Pluchea odorata"
+PlantIsotopeAndMetadata$Species[PlantIsotopeAndMetadata$SpeciesCode %in% "PLOD"]<- "Pluchea odorata"
 
-PlantIsotopeAndMetaData_040422$Species[PlantIsotopeAndMetaData_040422$SpeciesCode %in% "LEMNA"]<- "Lemna sp"
+PlantIsotopeAndMetadata$Species[PlantIsotopeAndMetadata$SpeciesCode %in% "LEMNA"]<- "Lemna sp"
 
-PlantIsotopeAndMetaData_040422$Species[PlantIsotopeAndMetaData_040422$SpeciesCode %in% "AZFI"]<- "Azolla"
+PlantIsotopeAndMetadata$Species[PlantIsotopeAndMetadata$SpeciesCode %in% "AZFI"]<- "Azolla"
 
 
-PlantIsotopeAndMetaData_040422$Species[PlantIsotopeAndMetaData_040422$SpeciesCode %in% "DET"]<- "Det"
+PlantIsotopeAndMetadata$Species[PlantIsotopeAndMetadata$SpeciesCode %in% "DET"]<- "Det"
 
-unique(PlantIsotopeAndMetaData_040422$Species)
+unique(PlantIsotopeAndMetadata$Species)
 
 #SAVE IT
-write.csv(PlantIsotopeAndMetaData_040422, "Data/PlantIsotopeAndMetaData_040822.csv")
+write.csv(PlantIsotopeAndMetadata, "Data/PlantIsotopeAndMetaData_042522.csv")
 ```
 
 ## Now zoops
 ```{r}
-ZoopIsotopeData<- RawIsotopeData_03302022 %>% filter(Taxon == "ZOOP")
+ZoopIsotopeData<- RawIsotopeData_04252022 %>% filter(Taxon == "ZOOP")
 
 ZoopIsotopeData_Vials<- separate(ZoopIsotopeData, col=SampleID, into=c('Project', 'Zooplankton', 'Vial', 'CNorS'), sep='-') 
 
 ZoopIsotopeAndMetadata<-merge(ZoopIsotopeData_Vials, ZoopInfo, by="Vial")
 
-write.csv(ZoopIsotopeAndMetadata, "Data/ZoopIsotopeAndMetaData_040422.csv")
+write.csv(ZoopIsotopeAndMetadata, "Data/ZoopIsotopeAndMetaData_042522.csv")
 ```
 
 ## Now Pom and BA
@@ -482,8 +485,10 @@ write.csv(POM_BA_IsotopeAndMetadata, "Data/POM_BA_IsotopeAndMetaData_040522.csv"
 
 #Last but not least, inverts.
 ```{r}
-InvertIsotopeData<- RawIsotopeData_03302022 %>% filter(Taxon == "INVERT")
-InvertIsotopeData_SampleIDs<- separate(InvertIsotopeData, col=SampleID, into=c('Project', 'Invertebrate', 'SpecimenID', 'Trial'), sep='-')
+InvertIsotopeData<- RawIsotopeData_04252022 %>% filter(Taxon == "INVERT")
+InvertIsotopeData$SampleID<-gsub("_", "-", InvertIsotopeData$SampleID)
+InvertIsotopeData_SampleIDs<- separate(InvertIsotopeData, col=SampleID, into=c('Project', 'Invertebrate', 'SpecimenID', 'Trial'), sep='-') #The sulfur data has _ instead of -.
+
 View(InvertIsotopeData_SampleIDs) #NOTE: Trial column is CN or S for ones without trial numbers. 
 
 #Need to delete hyphen from sample ID in the LargeMacroinvert df
@@ -493,7 +498,7 @@ LargeMacroinvetInfo_040322$SpecimenID<-LargeMacroinvetInfo_040322$Sample_ID
 
 LargeMacroinvert_IsotopeAndMetadata<- merge(LargeMacroinvetInfo_040322, InvertIsotopeData_SampleIDs, by="SpecimenID")
 
-write.csv(LargeMacroinvert_IsotopeAndMetadata, "Data/LargeMacroinvert_IsotopeAndMetaData_040422.csv")
+write.csv(LargeMacroinvert_IsotopeAndMetadata, "Data/LargeMacroinvert_IsotopeAndMetaData_042522.csv")
 
 #Okay, now small macroinverts
 
@@ -501,5 +506,5 @@ View(CMP_SmallMacroinvertInfo_04022022)
 InvertIsotopeData_SampleIDs$SampleID_Simple<-InvertIsotopeData_SampleIDs$SpecimenID
 
 SmallMacroinvert_IsotopeAndMetadata<- merge(InvertIsotopeData_SampleIDs, CMP_SmallMacroinvertInfo_04022022, by="SampleID_Simple")
-write.csv(SmallMacroinvert_IsotopeAndMetadata, "Data/SmallMacroinvert_IsotopeAndMetaData_040422.csv")
+write.csv(SmallMacroinvert_IsotopeAndMetadata, "Data/SmallMacroinvert_IsotopeAndMetaData_042522.csv")
 ```
