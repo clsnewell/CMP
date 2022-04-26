@@ -359,6 +359,8 @@ PlantIsotopeData<- RawIsotopeData_04252022 %>% filter(Taxon == "PLANT")
 str(PlantIsotopeData$SampleID)
 writeLines(PlantIsotopeData$SampleID)
 
+PlantIsotopeData$SampleID<-gsub("_", "-", PlantIsotopeData$SampleID)
+
 PlantIsotopeData_Specimens<- separate(PlantIsotopeData, col=SampleID, into=c('Project', 'SpecimenID', 'Trial', 'CNorS'), sep='-') #PERFECT!
 #Okay now merge plant data with info data
 PlantInfo_121721$SpecimenID<-PlantInfo_121721$Sample_ID
