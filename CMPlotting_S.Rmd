@@ -1,0 +1,134 @@
+---
+title: "Plotting with Sulfur"
+author: "Caroline Newell"
+date: '2022-04-28'
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+##Load packages
+```{r}
+library(readxl)
+library(lubridate)
+library(viridis)
+library(RColorBrewer)
+library(ggpubr)
+#library(cowplot)
+library(ggsci)
+#library(Rmisc)
+library(tidyverse)
+standard_error <- function(x) sd(x) / sqrt(length(x)) # Create own function
+```
+
+#Read in data
+```{r}
+FishMuscleData_042722 <- read_excel("Data/FishMuscleData_042722.xlsx")
+FishLiverData_042722 <- read_excel("Data/FishLiverData_042722.xlsx")
+SmallMacroinvert_IsotopeAndMetaData_042722 <- read_excel("Data/SmallMacroinvert_IsotopeAndMetaData_042722.xlsx")
+LargeMacroinvert_IsotopeAndMetaData_042722 <- read_excel("Data/LargeMacroinvert_IsotopeAndMetaData_042722.xlsx")
+PlantIsotopeAndMetaData_042722 <- read_excel("Data/PlantIsotopeAndMetaData_042722.xlsx")
+ZoopIsotopeAndMetaData_042722 <- read_excel("Data/ZoopIsotopeAndMetaData_042722.xlsx")
+POM_BA_IsotopeAndMetaData_042522 <- read_excel("Data/POM_BA_IsotopeAndMetaData_042522.xlsx")
+```
+
+#Summarize info
+## Fish Muscle
+```{r}
+colnames(FishMuscleData_042722)
+FishMuscleData_042722$`D34SVCDT(permill)`<-as.numeric(FishMuscleData_042722$`D34SVCDT(permill)`)
+str(FishMuscleData_042722)
+FishMuscles_MeansSd<-FishMuscleData_042722%>% 
+  group_by(Species, Site, Season, `Age Class`) %>% 
+  summarize(n=n(),
+            alpha = 0.05,
+            D13C_mean = sum(`D13CVPDB(permill)`/n, na.rm=TRUE), 
+            D13C_SD = sqrt(sum((`D13CVPDB(permill)`- (D13C_mean))^2)/(n-1)),
+            D13C_StdError= standard_error(`D13CVPDB(permill)`),
+            D15N_mean = sum(`D15NAir(permill)`/n, na.rm=TRUE),
+            D15N_SD = sqrt(sum((`D15NAir(permill)`- (D15N_mean))^2)/(n-1)),
+            D15N_StdError= standard_error(`D15NAir(permill)`),
+            D35S_mean = sum(`D34SVCDT(permill)`/n, na.rm=TRUE),
+            D35S_SD = sqrt(sum((`D34SVCDT(permill)`- (D35S_mean))^2)/(n-1)),
+            D35S_StdError= standard_error(`D34SVCDT(permill)`)
+            )
+
+FishMuscles_MeansSd$D13C_StdError[is.nan(FishMuscles_MeansSd$D13C_StdError)]<-0
+
+FishMuscles_MeansSd$D13C_StdError[is.na(FishMuscles_MeansSd$D13C_StdError)]<-0
+
+FishMuscles_MeansSd$D13C_SD[is.nan(FishMuscles_MeansSd$D13C_SD)]<-0
+
+FishMuscles_MeansSd$D15N_StdError[is.na(FishMuscles_MeansSd$D15N_StdError)]<-0
+
+FishMuscles_MeansSd$D15N_SD[is.nan(FishMuscles_MeansSd$D15N_SD)]<-0
+
+FishMuscles_MeansSd$D35S_StdError[is.na(FishMuscles_MeansSd$D35S_StdError)]<-0
+
+FishMuscles_MeansSd$D35S_SD[is.nan(FishMuscles_MeansSd$D35S_SD)]<-0
+
+```
+
+
+###Plot S vs C
+```{r}
+FishMuscleData_SpeciesBothSeasons<- FishMuscles_MeansSd %>% filter(Species %in% c("SCP", "ST",  "TP",  "SB",  "YFG", "SKG", "SG"))
+
+FishMusclePlot<-FishMuscleData_SpeciesBothSeasons %>% ggplot(aes(D13C_mean, D35S_mean, color= Site)) + 
+  geom_point(aes(color = Site, shape=Species), size=3) + 
+  scale_shape_manual(values=rep(0:15, 1))+
+  labs(title = "Muscle Means And Standard Error Fish Caught Both Seasons") +
+  theme_bw()+ 
+  geom_errorbar(aes(ymin = D35S_mean-D35S_StdError, ymax = D35S_mean+D35S_StdError))+
+  geom_errorbarh(aes(xmin = D13C_mean-D13C_StdError, xmax = D13C_mean+D13C_StdError)) + 
+  facet_wrap(~factor(Season, levels=c("Summer", "Fall")))
+FishMusclePlot
+```
+
+## Fish Liver
+```{r}
+FishLiverData_042722$`D34SVCDT(permill)`<-as.numeric(FishLiverData_042722$`D34SVCDT(permill)`)
+str(FishLiverData_042722)
+FishLivers_MeansSd<-FishLiverData_042722%>% 
+  group_by(Species, Site, Season, `Age Class`) %>% 
+  summarize(n=n(),
+            alpha = 0.05,
+            D13C_mean = sum(`D13CVPDB(permill)`/n, na.rm=TRUE), 
+            D13C_SD = sqrt(sum((`D13CVPDB(permill)`- (D13C_mean))^2)/(n-1)),
+            D13C_StdError= standard_error(`D13CVPDB(permill)`),
+            D15N_mean = sum(`D15NAir(permill)`/n, na.rm=TRUE),
+            D15N_SD = sqrt(sum((`D15NAir(permill)`- (D15N_mean))^2)/(n-1)),
+            D15N_StdError= standard_error(`D15NAir(permill)`),
+            D35S_mean = sum(`D34SVCDT(permill)`/n, na.rm=TRUE),
+            D35S_SD = sqrt(sum((`D34SVCDT(permill)`- (D35S_mean))^2)/(n-1)),
+            D35S_StdError= standard_error(`D34SVCDT(permill)`)
+            )
+
+FishLivers_MeansSd$D13C_StdError[is.nan(FishLivers_MeansSd$D13C_StdError)]<-0
+
+FishLivers_MeansSd$D13C_StdError[is.na(FishLivers_MeansSd$D13C_StdError)]<-0
+
+FishLivers_MeansSd$D13C_SD[is.nan(FishLivers_MeansSd$D13C_SD)]<-0
+
+FishLivers_MeansSd$D15N_StdError[is.na(FishLivers_MeansSd$D15N_StdError)]<-0
+
+FishLivers_MeansSd$D15N_SD[is.nan(FishLivers_MeansSd$D15N_SD)]<-0
+
+FishLivers_MeansSd$D35S_StdError[is.na(FishLivers_MeansSd$D35S_StdError)]<-0
+
+FishLivers_MeansSd$D35S_SD[is.nan(FishLivers_MeansSd$D35S_SD)]<-0
+```
+
+###Plot S vs C
+```{r}
+FishLiverData_SpeciesBothSeasons<- FishLivers_MeansSd %>% filter(Species %in% c("SB",  "ST",  "YFG", "SG",  "SCP", "SKG", "TP"))
+
+FishLiverPlot<-FishLiverData_SpeciesBothSeasons %>% ggplot(aes(D13C_mean, D35S_mean, color= Site)) + 
+  geom_point(aes(color = Site, shape=Species), size=3) + 
+  scale_shape_manual(values=rep(0:15, 1))+
+  labs(title = "Liver Means And Standard Error Fish Caught Both Seasons") +
+  theme_bw()+ 
+  geom_errorbar(aes(ymin = D35S_mean-D35S_StdError, ymax = D35S_mean+D35S_StdError))+
+  geom_errorbarh(aes(xmin = D13C_mean-D13C_StdError, xmax = D13C_mean+D13C_StdError)) + 
+  facet_wrap(~factor(Season, levels=c("Summer", "Fall")))
+FishLiverPlot
+```
