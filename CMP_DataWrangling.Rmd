@@ -190,7 +190,10 @@ glimpse(CMPeace_S)
 CMPeachment_S <- read_excel("Data/SIF-S/DataOnly/CMPeachment_S.xlsx", col_types = c("text", "numeric", "numeric", "text", "text", "text", "text", "numeric", "numeric", "numeric"))
 glimpse(CMPeachment_S)
 
-#CMPlants (data not back yet)
+CMPISeeDeadCMPeople_S <- read_excel("Data/SIF-S/DataOnly/ISeeDeadCMPeople_S.xlsx", col_types = c("text", "numeric", "numeric", "text", "text", "text", "text", "numeric", "numeric", "numeric"))
+glimpse(CMPISeeDeadCMPeople_S)
+
+CMPlants_S <- read_excel("Data/SIF-S/DataOnly/CMPlants_S.xlsx", col_types = c("text", "numeric", "numeric", "text", "numeric", "text", "text", "text", "numeric", "numeric"))
 
 #CMPLiverGiver (data not back yet)
 
@@ -205,7 +208,7 @@ glimpse(CMPLiverOfMine_S)
 
 CMPlucheae_S <- read_excel("Data/SIF-S/DataOnly/CMPlucheae_S.xlsx", col_types = c("text", "numeric", "numeric", "text", "numeric", "text", "text", "text", "numeric", "numeric"))
 
-#CMPMudBugs
+CMPMudBugs_S <- read_excel("Data/SIF-S/DataOnly/CMPMudBugs_S.xlsx", col_types = c("text", "numeric", "numeric", "text", "numeric", "text", "text", "text", "numeric", "numeric"))
 
 CMPMuscleMeat_S <- read_excel("Data/SIF-S/DataOnly/CMPMuscleMeat_S.xlsx", col_types = c("text", "numeric", "numeric", "text", "numeric", "text", "text", "text", "numeric", "numeric"))
 
@@ -214,7 +217,7 @@ glimpse(CMPNotFood_S)
 
 CMPoaceae_S <- read_excel("Data/SIF-S/DataOnly/CMPoaceae_S.xlsx", col_types = c("text", "numeric", "numeric", "text", "numeric", "text", "text", "text", "numeric", "numeric"))
 
-#CMPSampler
+CMPSampler_S <- read_excel("Data/SIF-S/DataOnly/CMPSampler_S.xlsx", col_types = c("text", "numeric", "numeric", "text", "numeric", "text", "text", "text", "numeric", "numeric"))
 
 CMPSchwarzeneger_S <- read_excel("Data/SIF-S/DataOnly/CMPSchwarzeneger_S.xlsx", col_types = c("text", "numeric", "numeric", "text", "text", "text", "text", "numeric", "numeric", "numeric"))
 glimpse(CMPSchwarzeneger_S)
@@ -224,10 +227,7 @@ CMPScuds_S <- read_excel("Data/SIF-S/DataOnly/CMPScuds_S.xlsx", col_types = c("t
 CMPTunaOfTheFarm_S <- read_excel("Data/SIF-S/DataOnly/CMPTunaOfTheFarm_S.xlsx", col_types = c("text", "numeric", "numeric", "text", "numeric", "text", "text", "text", "numeric", "numeric"))
 glimpse(CMPTunaOfTheFarm_S)
 
-#CMPZooptopia
-
-CMPISeeDeadCMPeople_S <- read_excel("Data/SIF-S/DataOnly/ISeeDeadCMPeople_S.xlsx", col_types = c("text", "numeric", "numeric", "text", "text", "text", "text", "numeric", "numeric", "numeric"))
-glimpse(CMPISeeDeadCMPeople_S)
+CMPZootopia_S <- read_excel("Data/SIF-S/DataOnly/CMPZootopia_S.xlsx", col_types = c("text", "numeric", "numeric", "text", "numeric", "text", "text", "text", "numeric", "numeric"))
 ```
 
 Next: flag samples with bad readings
@@ -243,22 +243,41 @@ CMPBuffPants: CMP_FISH_379M_S, CMP_FISH_382M_S
 # Merge dataframes
 I will address flagging the warning messages of the data after I have merged everything together.
 ```{r}
-RawIsotopeData<-bind_rows(CMPandemic_CN, CMPeas_CN, CMPFish4Ever_CN, CMPFishRFriends_CN, CMPflanzen_CN, CMPhragmites_CN, CMPKrabby_CN, CMPLeftovers_CN, CMPLiverLaVida_CN, CMPLiverLetDie_CN, CMPLiverPool_CN, CMPLiverRoast_CN, CMPLiverWorst_CN, CMPMuscleBob_CN, CMPMuscleStuffin_CN, CMPMysteryMeat_CN, CMPSilenceOThLab_CN, CMPSkrimp_CN, CMPSkrimp2_CN, CMPSmallFry_CN, CMPTheGovernator_CN, CMPVeryStable_CN, CMPZoopSoup_CN, PomVol1_CN, PomVol2_CN, PomVol3_CN, PomVol4_CN, PomVol5_CN, CMPatty_S, CMPBuffPants_S, CMPChoppedLiver_S, CMPeace_S, CMPeachment_S, CMPlucheae_S, CMPLiverItUp_S, CMPLiverLaughLov_S, CMPLiverOfMine_S, CMPMuscleMeat_S, CMPoaceae_S, CMPNotFood_S,  CMPSchwarzeneger_S, CMPScuds_S, CMPTunaOfTheFarm_S, CMPISeeDeadCMPeople_S)
+RawIsotopeData<-bind_rows(CMPandemic_CN, CMPeas_CN, CMPFish4Ever_CN, CMPFishRFriends_CN, CMPflanzen_CN, CMPhragmites_CN, CMPKrabby_CN, CMPLeftovers_CN, CMPLiverLaVida_CN, CMPLiverLetDie_CN, CMPLiverPool_CN, CMPLiverRoast_CN, CMPLiverWorst_CN, CMPMuscleBob_CN, CMPMuscleStuffin_CN, CMPMysteryMeat_CN, CMPSilenceOThLab_CN, CMPSkrimp_CN, CMPSkrimp2_CN, CMPSmallFry_CN, CMPTheGovernator_CN, CMPVeryStable_CN, CMPZoopSoup_CN, PomVol1_CN, PomVol2_CN, PomVol3_CN, PomVol4_CN, PomVol5_CN, CMPatty_S, CMPBuffPants_S, CMPChoppedLiver_S, CMPeace_S, CMPeachment_S, CMPISeeDeadCMPeople_S, CMPlants_S, CMPlucheae_S, CMPLiverItUp_S, CMPMudBugs_S, CMPLiverLaughLov_S, CMPLiverOfMine_S, CMPMuscleMeat_S, CMPoaceae_S, CMPNotFood_S, CMPSampler_S, CMPSchwarzeneger_S, CMPScuds_S, CMPTunaOfTheFarm_S, CMPZootopia_S)
 View(RawIsotopeData)
 
-write.csv(RawIsotopeData, "Data/RawIsotopeData_04252022.csv")
+RawIsotopeData$SampleID <- gsub("_", "-", RawIsotopeData$SampleID)
+RawIsotopeData<- separate(RawIsotopeData, col=SampleID, into=c('Project', 'Taxon', 'SpecimenID', 'CNorS', 'Extra'), sep='-', remove= FALSE) #Separates column by '-' and keeps the original column.
+unique(RawIsotopeData$Taxon)
+RawIsotopeData$Taxon<- gsub('[[:digit:]]+', '', RawIsotopeData$Taxon)
+unique(RawIsotopeData$Taxon)
+RawIsotopeData$Taxon[RawIsotopeData$Taxon %in% c("Plant", "PlantT", "PlantD", "Detri")] <-"PLANT"
+RawIsotopeData$Taxon[RawIsotopeData$Taxon %in% "Zoop"] <-"ZOOP"
+RawIsotopeData$Taxon[RawIsotopeData$Taxon %in% "POM"] <-"POM/BA"
+
+write.csv(RawIsotopeData, "Data/RawIsotopeData_04272022.csv")
 
 Raw_CN<- bind_rows(CMPandemic_CN, CMPeas_CN, CMPFish4Ever_CN, CMPFishRFriends_CN, CMPflanzen_CN, CMPhragmites_CN, CMPKrabby_CN, CMPLeftovers_CN, CMPLiverLaVida_CN, CMPLiverLetDie_CN, CMPLiverPool_CN, CMPLiverRoast_CN, CMPLiverWorst_CN, CMPMuscleBob_CN, CMPMuscleStuffin_CN, CMPMysteryMeat_CN, CMPSilenceOThLab_CN, CMPSkrimp_CN, CMPSkrimp2_CN, CMPSmallFry_CN, CMPTheGovernator_CN, CMPVeryStable_CN, CMPZoopSoup_CN, PomVol1_CN, PomVol2_CN, PomVol3_CN, PomVol4_CN, PomVol5_CN)
 write.csv(Raw_CN, "Data/Raw_CN_04072022.csv")
 
 
-Raw_S<- bind_rows(CMPatty_S, CMPBuffPants_S, CMPChoppedLiver_S, CMPeace_S, CMPeachment_S, CMPlucheae_S, CMPLiverItUp_S, CMPLiverLaughLov_S, CMPLiverOfMine_S, CMPMuscleMeat_S, CMPoaceae_S, CMPNotFood_S,  CMPSchwarzeneger_S, CMPScuds_S, CMPTunaOfTheFarm_S, CMPISeeDeadCMPeople_S)
-write.csv(Raw_S, "Data/Raw_S_04252022.csv")
+Raw_S<- bind_rows(CMPatty_S, CMPBuffPants_S, CMPChoppedLiver_S, CMPeace_S, CMPeachment_S, CMPISeeDeadCMPeople_S, CMPlants_S, CMPlucheae_S, CMPLiverItUp_S, CMPMudBugs_S, CMPLiverLaughLov_S, CMPLiverOfMine_S, CMPMuscleMeat_S, CMPoaceae_S, CMPNotFood_S, CMPSampler_S, CMPSchwarzeneger_S, CMPScuds_S, CMPTunaOfTheFarm_S, CMPZootopia_S)
+#To extract taxa, I use this nifty trick below: switching all _ to - (to make it uniform across trays) and then separating by that - and assigning column names
+
+Raw_S$SampleID <- gsub("_", "-", Raw_S$SampleID)
+Raw_S<- separate(Raw_S, col=SampleID, into=c('Project', 'Taxon', 'SpecimenID', 'CNorS', 'Extra'), sep='-', remove= FALSE)
+Raw_S$Taxon<- gsub('[[:digit:]]+', '', Raw_S$Taxon)
+unique(Raw_S$Taxon)
+Raw_S$Taxon[Raw_S$Taxon %in% c("Plant", "PlantT", "PlantD", "Detri")] <-"PLANT"
+Raw_S$Taxon[Raw_S$Taxon %in% "Zoop"] <-"ZOOP"
+
+write.csv(Raw_S, "Data/Raw_S_04272022.csv")
 
 #Manually added taxon columns, so read-in the excel versions of the raw data with taxon columns
-RawIsotopeData_04252022 <- read_excel("Data/RawIsotopeData_04252022.xlsx")
+RawIsotopeData_04272022 <- read_excel("Data/RawIsotopeData_04272022.xlsx")
 
-Raw_S_04252022<- read_excel("Data/Raw_S_04252022.xlsx")
+Raw_S_04272022<- read_excel("Data/Raw_S_04272022.xlsx")
+
 
 Raw_CN_04072022 <- read_excel("Data/Raw_CN_04072022.xlsx")
 
@@ -273,7 +292,7 @@ Raw_CN_04072022 <- read_excel("Data/Raw_CN_04072022.xlsx")
 
 FishIsotopeData_CN<- Raw_CN_04072022 %>% filter(Taxon == "FISH")
 
-FishIsotopeData_S<- Raw_S_04252022 %>% filter(Taxon == "FISH")
+FishIsotopeData_S<- Raw_S_04272022 %>% filter(Taxon == "FISH")
 
 
 FishIsotopeData_CN$Fish_Number<- regmatches(FishIsotopeData_CN$SampleID, gregexpr("[[:digit:]]+", FishIsotopeData_CN$SampleID)) #makes a list.
@@ -345,16 +364,16 @@ View(FishMuscleData)
 
 #Save!
 
-write.csv(FishMuscleData, "Data/FishMuscleData_042522.csv")
+write.csv(FishMuscleData, "Data/FishMuscleData_042722.csv")
 
-write.csv(FishLiverData, "Data/FishLiverData_042522.csv")
+write.csv(FishLiverData, "Data/FishLiverData_042722.csv")
 ```
 
 ## Let's do plants next.
 ```{r}
-RawIsotopeData_04252022
-str(RawIsotopeData_04252022$Taxon)
-PlantIsotopeData<- RawIsotopeData_04252022 %>% filter(Taxon == "PLANT")
+RawIsotopeData_04272022
+
+PlantIsotopeData<- RawIsotopeData_04272022 %>% filter(Taxon == "PLANT")
 #I can't use the quick fix from before. Gotta find another way...
 str(PlantIsotopeData$SampleID)
 writeLines(PlantIsotopeData$SampleID)
@@ -373,6 +392,7 @@ View(PlantInfo_121721)
 PlantIsotopeData_PlantSpecimens<- PlantIsotopeData_Specimens %>%
     mutate(SpecimenID = str_remove_all(SpecimenID, "Plant"))
 View(PlantIsotopeData_PlantSpecimens) #HALLELUJAH
+
 
 #NOW we merge.
 PlantIsotopeAndMetadata<- merge(PlantIsotopeData_PlantSpecimens, PlantInfo_121721, by="SpecimenID")
@@ -436,8 +456,14 @@ PlantIsotopeAndMetadata$Species[PlantIsotopeAndMetadata$SpeciesCode %in% "DET"]<
 
 unique(PlantIsotopeAndMetadata$Species)
 
+PlantIsotopeAndMetadata<- PlantIsotopeAndMetadata %>% unite("SampleID", c("SpecimenID","Trial"), sep="_", remove=FALSE)
+colnames(PlantIsotopeAndMetadata)
+#Okay so each plant does not have a row for sulfur and CN together. The S and CN data is separated.
+
+PlantIsotopeAndMetadata2<- PlantIsotopeAndMetadata %>% group_by(SampleID, SpecimenID, Project, Trial, Taxon, Sample_ID, Bag_ID, SpeciesCode, Site, CollectionDate, Season, LabDate, Parts_of_plant_included_in_sample_for_drying, 'TapWaterExposure?', Notes, Initials, MaterialsGrounded, GrindingInitials, Class, Species) %>% summarize("D13CVPDB(permill)" , "TotalC(ug)", "C_Comment", "D15NAir(permill)", "TotalN(ug)", "NComment", "D15N_MeanReferenceSD_plusminus(permill)", "D15N_MeanAbsAccuracy_plusminus(permill)", "D13C_MeanReferenceSD_plusminus(permill)", "D13C_MeanAbsAccuracy_plusminus(permill)", "PlantNumber", "Treatment", "D34SVCDT(permill)", "TotalS(ug)", "S_Comment", "D34S_MeanReferenceSD_plusminus(permill)", "D34S_MeanAbsAccuracy_plusminus(permill)")
+
 #SAVE IT
-write.csv(PlantIsotopeAndMetadata, "Data/PlantIsotopeAndMetaData_042522.csv")
+write.csv(PlantIsotopeAndMetadata, "Data/PlantIsotopeAndMetaData_042722.csv")
 ```
 
 ## Now zoops
