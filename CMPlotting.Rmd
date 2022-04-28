@@ -677,8 +677,6 @@ POMBA_BothSeasons_MeansSd<-POMBA_OutliersRemoved%>%
 
 POMBA_BothSeasons_MeansSd$D13C_StdError[is.nan(POMBA_BothSeasons_MeansSd$D13C_StdError)]<-0
 
-POMBA_BothSeasons_MeansSd$D13C_StdError[is.na(POMBA_BothSeasons_MeansSd$D13C_StdError)]<-0
-
 POMBA_BothSeasons_MeansSd$D13C_SD[is.nan(POMBA_BothSeasons_MeansSd$D13C_SD)]<-0
 
 POMBA_BothSeasons_MeansSd$D13C_UCI[is.nan(POMBA_BothSeasons_MeansSd$D13C_UCI)]<-0
@@ -819,20 +817,26 @@ FishLiver_SpeciesBothSeason<-FishLiver_SpeciesBothSeason %>%
 AllData<-rbind(Zoop_SpeciesBothSeason, POMBA_SpeciesBothSeason, Plant_SpeciesBothSeason, SmallInvert_SpeciesBothSeason, LargeInvert_SpeciesBothSeason, FishMuscle_SpeciesBothSeason, FishLiver_SpeciesBothSeason)
 
 AllData$Site[AllData$Site %in% "SB"]<-"FM"
+```
 
-
+```{r}
+#summarize and plot
 AllData_BothSeasons_MeansSd<-AllData%>% 
   group_by(Site, Season) %>% 
   summarize(n=n(),
             alpha = 0.05,
             D13C_mean = sum(`D13CVPDB(permill)`/n, na.rm=TRUE), 
             D13C_SD = sqrt(sum((`D13CVPDB(permill)`- (D13C_mean))^2)/(n-1)),
+            D13C_StdError= standard_error(`D13CVPDB(permill)`),
             D13C_UCI = D13C_mean+qt(1-alpha/2, (n-1))*D13C_SD/sqrt(n),
             D13C_LCI= D13C_mean-qt(1-alpha/2, (n-1))*D13C_SD/sqrt(n),
             D15N_mean = sum(`D15NAir(permill)`/n, na.rm=TRUE),
             D15N_SD = sqrt(sum((`D15NAir(permill)`- (D15N_mean))^2)/(n-1)),
+            D15N_StdError= standard_error(`D15NAir(permill)`),
             D15N_UCI = D15N_mean+qt(1-alpha/2, (n-1))*D15N_SD/sqrt(n),
             D15N_LCI = D15N_mean-qt(1-alpha/2, (n-1))*D15N_SD/sqrt(n))
+
+AllData_BothSeasons_MeansSd$D13C_StdError[is.nan(AllData_BothSeasons_MeansSd$D13C_StdError)]<-0
 
 AllData_BothSeasons_MeansSd$D13C_SD[is.nan(AllData_BothSeasons_MeansSd$D13C_SD)]<-0
 
@@ -842,17 +846,19 @@ AllData_BothSeasons_MeansSd$D13C_LCI[is.nan(AllData_BothSeasons_MeansSd$D13C_LCI
 
 AllData_BothSeasons_MeansSd$D15N_SD[is.nan(AllData_BothSeasons_MeansSd$D15N_SD)]<-0
 
+AllData_BothSeasons_MeansSd$D15N_StdError[is.nan(AllData_BothSeasons_MeansSd$D15N_StdError)]<-0
+
 AllData_BothSeasons_MeansSd$D15N_UCI[is.nan(AllData_BothSeasons_MeansSd$D15N_UCI)]<-0
 
 AllData_BothSeasons_MeansSd$D15N_LCI[is.nan(AllData_BothSeasons_MeansSd$D15N_LCI)]<-0
 
 AllData_Seasons<- AllData_BothSeasons_MeansSd %>% ggplot(aes(D13C_mean, D15N_mean, color= Site)) + 
   geom_point(aes(color = Site)) + 
-  labs(title = "All data Means And 95% CI's from Summer and Fall") +
+  labs(title = "All data Means And Standard Error from Summer and Fall") +
   theme_bw()+
   #coord_cartesian(ylim=c(10, 15),  xlim=c(-35, -25))+
-  geom_errorbar(aes(ymin = D15N_LCI, ymax = D15N_UCI))+
-  geom_errorbarh(aes(xmin = D13C_LCI, xmax = D13C_UCI)) + 
+  geom_errorbar(aes(ymin = D15N_mean-D15N_StdError, ymax = D15N_mean+D15N_StdError))+
+  geom_errorbarh(aes(xmin = D13C_mean-D13C_StdError, xmax = D13C_mean+D13C_StdError)) + 
   facet_wrap(~factor(Season, levels=c("Summer", "Fall")))
 AllData_Seasons
 
@@ -906,7 +912,7 @@ AllData_SeasonsAndSites
 ###Livers
 ```{r}
 #Bind rows
-AvgData_BothSeasons_Livers<-rbind(Zoops_BothSeasons_MeansSd, POMBA_BothSeasons_MeanSd, Plants_BothSeasons_MeanSd, SmallInverts_BothSeasons_MeansSd, BigInverts_BothSeasons_MeansSd, FishLivers_BothSeasons_MeansSd)
+AvgData_BothSeasons_Livers<-rbind(Zoops_BothSeasons_MeansSd, POMBA_BothSeasons_MeansSd, Plants_BothSeasons_MeanSd, SmallInverts_BothSeasons_MeansSd, BigInverts_BothSeasons_MeansSd, FishLivers_BothSeasons_MeansSd)
 View(AvgData_BothSeasons_Livers)
 #Need to rename SB site to FM
 AvgData_BothSeasons_Livers$Site[AvgData_BothSeasons_Livers$Site == "SB"] <-"FM"
@@ -968,13 +974,13 @@ unique(AvgData_BothSeasons_Livers$Class)
 View(AvgData_BothSeasons_Livers)
 AvgData_BothSeasons_Livers$Class<- factor(AvgData_BothSeasons_Livers$Class, levels = c("SB", "ST", "TP", "Sculpin/Goby", "Red swamp crayfish", "HMC", "Maeotias", "EXO", "Corbicula",  "Isopod", "Scud", "Crab Zoea", "Zoop", "Terrestrial", "EV", "Floating Veg", "SAV", "POM", "Benthic Algae", "Det")) #Changing level order 
 
-Avg_BothSeasons_Livers<- AvgData_BothSeasons_Livers  %>%  ggplot(aes(D13C_mean, D15N_mean, color= Class)) + scale_shape_manual(values=rep(0:6, 7))+
-  geom_point(aes(color = Class, shape = Class)) +
-  scale_color_viridis_d()+
+Avg_BothSeasons_Livers<- AvgData_BothSeasons_Livers  %>%  ggplot(aes(D13C_mean, D15N_mean, color= Season)) + scale_shape_manual(values=rep(0:6, 7))+
+  geom_point(aes(color = Season, shape = Class)) +
+ # scale_color_viridis_d()+
   labs(title = "All from Both Seasons - Fish livers") +
   theme_bw()+
-  geom_errorbar(aes(ymin = D15N_mean - D15N_SD, ymax = D15N_mean+ D15N_SD))+
-  geom_errorbarh(aes(xmin = D13C_mean - D13C_SD, xmax = D13C_mean + D13C_SD)) +facet_wrap(~factor(Season, levels=c("Summer", "Fall"))) #+ 
+  geom_errorbar(aes(ymin = D15N_mean-D15N_StdError, ymax = D15N_mean+D15N_StdError))+
+  geom_errorbarh(aes(xmin = D13C_mean-D13C_StdError, xmax = D13C_mean+D13C_StdError)) #+facet_wrap(~factor(Season, levels=c("Summer", "Fall"))) #+ 
  # facet_wrap(~factor(Site))  theme(legend.position="none") + scale_color_viridis_d() +
 
 Avg_BothSeasons_Livers
@@ -1039,6 +1045,104 @@ Avg_Fall_Livers<- AvgData_Fall_Livers %>% ggplot(aes(D13C_mean, D15N_mean, color
   geom_errorbarh(aes(xmin = D13C_mean - D13C_SD, xmax = D13C_mean + D13C_SD)) #+ 
   #facet_wrap(~factor(Site))
 Avg_Fall_Livers
+```
+
+```{r}
+AllData.Livers<-rbind(Zoop_SpeciesBothSeason, POMBA_SpeciesBothSeason, Plant_SpeciesBothSeason, SmallInvert_SpeciesBothSeason, LargeInvert_SpeciesBothSeason, FishLiver_SpeciesBothSeason)
+
+AllData.Livers$Site[AllData.Livers$Site %in% "SB"]<-"FM"
+AllData.Livers_BothSeasons_MeansSd<-AllData.Livers%>% 
+  group_by(Species, Season) %>% 
+  summarize(n=n(),
+            alpha = 0.05,
+            D13C_mean = sum(`D13CVPDB(permill)`/n, na.rm=TRUE), 
+            D13C_SD = sqrt(sum((`D13CVPDB(permill)`- (D13C_mean))^2)/(n-1)),
+            D13C_StdError= standard_error(`D13CVPDB(permill)`),
+            D15N_mean = sum(`D15NAir(permill)`/n, na.rm=TRUE),
+            D15N_SD = sqrt(sum((`D15NAir(permill)`- (D15N_mean))^2)/(n-1)),
+            D15N_StdError= standard_error(`D15NAir(permill)`))
+
+AllData.Livers_BothSeasons_MeansSd$D13C_StdError[is.nan(AllData.Livers_BothSeasons_MeansSd$D13C_StdError)]<-0
+
+AllData.Livers_BothSeasons_MeansSd$D13C_SD[is.nan(AllData.Livers_BothSeasons_MeansSd$D13C_SD)]<-0
+
+AllData.Livers_BothSeasons_MeansSd$D13C_UCI[is.nan(AllData.Livers_BothSeasons_MeansSd$D13C_UCI)]<-0
+
+AllData.Livers_BothSeasons_MeansSd$D13C_LCI[is.nan(AllData.Livers_BothSeasons_MeansSd$D13C_LCI)]<-0
+
+AllData.Livers_BothSeasons_MeansSd$D15N_SD[is.nan(AllData.Livers_BothSeasons_MeansSd$D15N_SD)]<-0
+
+AllData.Livers_BothSeasons_MeansSd$D15N_StdError[is.nan(AllData.Livers_BothSeasons_MeansSd$D15N_StdError)]<-0
+
+AllData.Livers_BothSeasons_MeansSd$D15N_UCI[is.nan(AllData.Livers_BothSeasons_MeansSd$D15N_UCI)]<-0
+
+AllData.Livers_BothSeasons_MeansSd$D15N_LCI[is.nan(AllData.Livers_BothSeasons_MeansSd$D15N_LCI)]<-0
+
+AllData.Livers_BothSeasons_MeansSd$Class[AllData.Livers_BothSeasons_MeansSd$Species %in% c("SAGO", "Myriophyllum spicatum", "Filamentous algae")]<- "SAV"
+
+AllData.Livers_BothSeasons_MeansSd$Class[AllData.Livers_BothSeasons_MeansSd$Species %in% c("Phragmites australis", "Typha angustifolia", "Schoenoplectus acutusa", "Schoenoplectus americanus", "Schoenoplectus californicus")]<- "EV"
+
+AllData.Livers_BothSeasons_MeansSd$Class[AllData.Livers_BothSeasons_MeansSd$Species %in% c("Sarcocornia/Salicornia pacifica", "Calystegia sepium", "Jaumea carnosa", "Lepidium latifolium", "Rosa californica", "Lathyrus jepsonii jepsonii", "Juncus balticus", "Lotus corniculatu", "Pluchea odorata")]<- "Terrestrial"
+
+AllData.Livers_BothSeasons_MeansSd$Class[AllData.Livers_BothSeasons_MeansSd$Species %in% c("Lemna sp", "Azolla")]<- "Floating Veg"
+
+AllData.Livers_BothSeasons_MeansSd$Class[AllData.Livers_BothSeasons_MeansSd$Species %in% "DET"]<- "Det"
+
+AllData.Livers_BothSeasons_MeansSd$Class[AllData.Livers_BothSeasons_MeansSd$Species %in% c("SCP", "SG", "YFG", "SKG")]<- "Sculpin/Goby"
+
+AllData.Livers_BothSeasons_MeansSd$Class[AllData.Livers_BothSeasons_MeansSd$Species %in% "ST"]<- "ST"
+
+AllData.Livers_BothSeasons_MeansSd$Class[AllData.Livers_BothSeasons_MeansSd$Species %in% "TP"]<- "TP"
+
+AllData.Livers_BothSeasons_MeansSd$Class[AllData.Livers_BothSeasons_MeansSd$Species %in% "SB"]<- "SB"
+
+AllData.Livers_BothSeasons_MeansSd$Class[AllData.Livers_BothSeasons_MeansSd$Species %in% c("Americorophium spinicorne", "Eogammarus confervicolus", "Gammarus daiberi")]<- "Scud"
+
+AllData.Livers_BothSeasons_MeansSd$Class[AllData.Livers_BothSeasons_MeansSd$Species %in% c("Red swamp crayfish")]<- "Red swamp crayfish"
+
+AllData.Livers_BothSeasons_MeansSd$Class[AllData.Livers_BothSeasons_MeansSd$Species %in% "Harris mud crab"]<- "HMC"
+
+AllData.Livers_BothSeasons_MeansSd$Class[AllData.Livers_BothSeasons_MeansSd$Species %in% "Maeotias"]<- "Maeotias"
+
+AllData.Livers_BothSeasons_MeansSd$Class[AllData.Livers_BothSeasons_MeansSd$Species %in% "Exopalaemon"]<- "EXO"
+
+AllData.Livers_BothSeasons_MeansSd$Class[AllData.Livers_BothSeasons_MeansSd$Species %in% "Corbicula"]<- "Corbicula"
+
+AllData.Livers_BothSeasons_MeansSd$Class[AllData.Livers_BothSeasons_MeansSd$Species %in% "Gnorimosphaeroma insulare"]<- "Isopod"
+
+AllData.Livers_BothSeasons_MeansSd$Class[AllData.Livers_BothSeasons_MeansSd$Species %in% "Crab Zoea"]<- "Crab Zoea"
+
+AllData.Livers_BothSeasons_MeansSd$Class[AllData.Livers_BothSeasons_MeansSd$Species %in% "POM"]<- "POM"
+
+AllData.Livers_BothSeasons_MeansSd$Class[AllData.Livers_BothSeasons_MeansSd$Species %in% "Det"]<- "Det"
+
+AllData.Livers_BothSeasons_MeansSd$Class[AllData.Livers_BothSeasons_MeansSd$Species %in% "Benthic"]<- "Benthic Algae"
+
+AllData.Livers_BothSeasons_MeansSd$Class[AllData.Livers_BothSeasons_MeansSd$Species %in% c("P. forbesi", "A. sinensis", "200-500 um", "100-500 um" ,">500 um")]<- "Zoop"
+
+AllData.Livers_BothSeasons_MeansSd$D15N_SD[AllData.Livers_BothSeasons_MeansSd$D15N_SD %in% c("NaN", "NA")]<- "0"
+AllData.Livers_BothSeasons_MeansSd$D15N_SD<-as.numeric(AllData.Livers_BothSeasons_MeansSd$D15N_SD)
+
+AllData.Livers_BothSeasons_MeansSd$D13C_SD[AllData.Livers_BothSeasons_MeansSd$D13C_SD %in% c("NaN", "NA")]<- "0"
+AllData.Livers_BothSeasons_MeansSd$D13C_SD<-as.numeric(AllData.Livers_BothSeasons_MeansSd$D13C_SD)
+
+View(AllData.Livers_BothSeasons_MeansSd)
+
+unique(AllData.Livers_BothSeasons_MeansSd$Class)
+
+View(AllData.Livers_BothSeasons_MeansSd)
+AllData.Livers_BothSeasons_MeansSd$Class<- factor(AllData.Livers_BothSeasons_MeansSd$Class, levels = c("SB", "ST", "TP", "Sculpin/Goby", "Red swamp crayfish", "HMC", "Maeotias", "EXO", "Corbicula",  "Isopod", "Scud", "Crab Zoea", "Zoop", "Terrestrial", "EV", "Floating Veg", "SAV", "POM", "Benthic Algae", "Det")) #Changing level order 
+
+
+AllData.Livers_Seasons<- AllData.Livers_BothSeasons_MeansSd %>% ggplot(aes(D13C_mean, D15N_mean, color= Class)) + 
+  geom_point(aes(color = Class)) + 
+  labs(title = "Food web with fish livers: Means And Standard Error from Summer and Fall") +
+  theme_bw()+
+  #coord_cartesian(ylim=c(10, 15),  xlim=c(-35, -25))+
+  geom_errorbar(aes(ymin = D15N_mean-D15N_StdError, ymax = D15N_mean+D15N_StdError))+
+  geom_errorbarh(aes(xmin = D13C_mean-D13C_StdError, xmax = D13C_mean+D13C_StdError)) +  facet_wrap(~factor(Season, levels=c("Summer", "Fall")))
+AllData.Livers_Seasons
+
 ```
 
 ### Muscles
