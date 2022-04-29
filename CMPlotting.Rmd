@@ -340,21 +340,6 @@ LargeMacroinvert_IsotopeAndMetaData_040822$`D34SVCDT(permill)`<- as.numeric(Larg
 
 View(LargeMacroinvert_IsotopeAndMetaData_040822)
 
-#Introduce Season column
-LargeMacroinvert_IsotopeAndMetaData_040822$Collection_Date<-mdy(LargeMacroinvert_IsotopeAndMetaData_040822$Collection_Date)
-
-str(LargeMacroinvert_IsotopeAndMetaData_040822$Collection_Date)
-
-LargeMacroinvert_IsotopeAndMetaData_040822$Month<- format(LargeMacroinvert_IsotopeAndMetaData_040822$Collection_Date, format = "%m")
-unique(LargeMacroinvert_IsotopeAndMetaData_040822$Month)
-
-LargeMacroinvert_IsotopeAndMetaData_040822$Season[LargeMacroinvert_IsotopeAndMetaData_040822$Month %in% "06"]<-"Summer"
-LargeMacroinvert_IsotopeAndMetaData_040822$Season[LargeMacroinvert_IsotopeAndMetaData_040822$Month %in% "07"]<-"Summer"
-LargeMacroinvert_IsotopeAndMetaData_040822$Season[LargeMacroinvert_IsotopeAndMetaData_040822$Month %in% "08"]<-"Fall"
-LargeMacroinvert_IsotopeAndMetaData_040822$Season[LargeMacroinvert_IsotopeAndMetaData_040822$Month %in% "09"]<-"Fall"
-View(LargeMacroinvert_IsotopeAndMetaData_040822)
-
-
 BigInvertsSummer<-subset(LargeMacroinvert_IsotopeAndMetaData_040822, Season == "Summer")
 BigInvertsFall<-subset(LargeMacroinvert_IsotopeAndMetaData_040822, Season == "Fall")
 
