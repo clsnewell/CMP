@@ -36,10 +36,6 @@ ZoopInfo <- read_excel("Data/ZoopInfo.xlsx")
 ```
 
 #Read in all the isotope data sheets
-```{r}
-#Created this datasheet in the code below...
-RawIsotopeData_03302022 <- read_excel("Data/RawIsotopeData_03302022.xlsx")
-```
 ### CN
 
 Note: Not reading in the GlassHalfFull or POMParty data since they were test runs and data not useful.
@@ -530,6 +526,20 @@ LargeMacroinvetInfo_040322$Sample_ID<-gsub("-", "", LargeMacroinvetInfo_040322$S
 LargeMacroinvetInfo_040322$SpecimenID<-LargeMacroinvetInfo_040322$Sample_ID
 
 LargeMacroinvert_IsotopeAndMetadata<- merge(LargeMacroinvetInfo_040322, InvertIsotopeData_SampleIDs, by="SpecimenID")
+
+#Introduce Season column
+LargeMacroinvert_IsotopeAndMetadata$Collection_Date<-mdy(LargeMacroinvert_IsotopeAndMetadata$Collection_Date)
+
+str(LargeMacroinvert_IsotopeAndMetadata$Collection_Date)
+
+LargeMacroinvert_IsotopeAndMetadata$Month<- format(LargeMacroinvert_IsotopeAndMetadata$Collection_Date, format = "%m")
+unique(LargeMacroinvert_IsotopeAndMetadata$Month)
+
+LargeMacroinvert_IsotopeAndMetadata$Season[LargeMacroinvert_IsotopeAndMetadata$Month %in% "06"]<-"Summer"
+LargeMacroinvert_IsotopeAndMetadata$Season[LargeMacroinvert_IsotopeAndMetadata$Month %in% "07"]<-"Summer"
+LargeMacroinvert_IsotopeAndMetadata$Season[LargeMacroinvert_IsotopeAndMetadata$Month %in% "08"]<-"Fall"
+LargeMacroinvert_IsotopeAndMetadata$Season[LargeMacroinvert_IsotopeAndMetadata$Month %in% "09"]<-"Fall"
+View(LargeMacroinvert_IsotopeAndMetadata)
 
 #Same issue again. Sulfur and CN are separate but should be in the same row.
 write.csv(LargeMacroinvert_IsotopeAndMetadata, "Data/LargeMacroinvert_IsotopeAndMetaData_042722.csv")
