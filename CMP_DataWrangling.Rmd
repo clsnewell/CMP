@@ -366,7 +366,7 @@ View(FishMuscleData)
 
 write.csv(FishMuscleData, "Data/FishMuscleData_042722.csv")
 
-write.csv(FishLiverData, "Data/FishLiverData_042722.csv")
+write.csv(FishLiverData., "Data/FishLiverData_042722.csv")
 ```
 
 ## Let's do plants next.
@@ -459,8 +459,11 @@ unique(PlantIsotopeAndMetadata$Species)
 PlantIsotopeAndMetadata<- PlantIsotopeAndMetadata %>% unite("SampleID", c("SpecimenID","Trial"), sep="_", remove=FALSE)
 colnames(PlantIsotopeAndMetadata)
 #Okay so each plant does not have a row for sulfur and CN together. The S and CN data is separated.
+#PlantIsotopeAndMetadata
 
-PlantIsotopeAndMetadata2<- PlantIsotopeAndMetadata %>% group_by(SampleID, SpecimenID, Project, Trial, Taxon, Sample_ID, Bag_ID, SpeciesCode, Site, CollectionDate, Season, LabDate, Parts_of_plant_included_in_sample_for_drying, 'TapWaterExposure?', Notes, Initials, MaterialsGrounded, GrindingInitials, Class, Species) %>% summarize("D13CVPDB(permill)" , "TotalC(ug)", "C_Comment", "D15NAir(permill)", "TotalN(ug)", "NComment", "D15N_MeanReferenceSD_plusminus(permill)", "D15N_MeanAbsAccuracy_plusminus(permill)", "D13C_MeanReferenceSD_plusminus(permill)", "D13C_MeanAbsAccuracy_plusminus(permill)", "PlantNumber", "Treatment", "D34SVCDT(permill)", "TotalS(ug)", "S_Comment", "D34S_MeanReferenceSD_plusminus(permill)", "D34S_MeanAbsAccuracy_plusminus(permill)")
+PlantIsotopeAndMetadata2<- PlantIsotopeAndMetadata %>% group_by(SampleID, SpecimenID, Project, Trial, Taxon, Sample_ID, Bag_ID, SpeciesCode, Site, CollectionDate, Season, LabDate, Parts_of_plant_included_in_sample_for_drying, 'TapWaterExposure?', Notes, Initials, MaterialsGrounded, GrindingInitials, Class, Species) %>% summarise_each(funs(first(na.omit(.))))
+  
+#summarize('D13CVPDB(permill)' = sum('D13CVPDB(permill)', na.rm=TRUE), 'TotalC(ug)' = sum(), C_Comment = sum(C_Comment, na.rm=TRUE), 'D15NAir(permill)', 'TotalN(ug)', NComment, 'D15N_MeanReferenceSD_plusminus(permill)', 'D15N_MeanAbsAccuracy_plusminus(permill)', 'D13C_MeanReferenceSD_plusminus(permill)', 'D13C_MeanAbsAccuracy_plusminus(permill)', PlantNumber, Treatment, 'D34SVCDT(permill)', 'TotalS(ug)', S_Comment, 'D34S_MeanReferenceSD_plusminus(permill)', 'D34S_MeanAbsAccuracy_plusminus(permill)')
 
 #SAVE IT
 write.csv(PlantIsotopeAndMetadata, "Data/PlantIsotopeAndMetaData_042722.csv")
@@ -468,13 +471,15 @@ write.csv(PlantIsotopeAndMetadata, "Data/PlantIsotopeAndMetaData_042722.csv")
 
 ## Now zoops
 ```{r}
-ZoopIsotopeData<- RawIsotopeData_04252022 %>% filter(Taxon == "ZOOP")
+ZoopIsotopeData<- RawIsotopeData_04272022 %>% filter(Taxon == "ZOOP")
 
 ZoopIsotopeData_Vials<- separate(ZoopIsotopeData, col=SampleID, into=c('Project', 'Zooplankton', 'Vial', 'CNorS'), sep='-') 
 
 ZoopIsotopeAndMetadata<-merge(ZoopIsotopeData_Vials, ZoopInfo, by="Vial")
 
-write.csv(ZoopIsotopeAndMetadata, "Data/ZoopIsotopeAndMetaData_042522.csv")
+#Problem: Merging by vial gives issues because each sample has a unique vial name. What I really want to combine by is the SampleID minus the CN or S information. So somehow need to remove that info from the string...
+
+write.csv(ZoopIsotopeAndMetadata, "Data/ZoopIsotopeAndMetaData_042722.csv")
 ```
 
 ## Now Pom and BA
@@ -513,7 +518,7 @@ write.csv(POM_BA_IsotopeAndMetadata, "Data/POM_BA_IsotopeAndMetaData_040522.csv"
 
 #Last but not least, inverts.
 ```{r}
-InvertIsotopeData<- RawIsotopeData_04252022 %>% filter(Taxon == "INVERT")
+InvertIsotopeData<- RawIsotopeData_04272022 %>% filter(Taxon == "INVERT")
 InvertIsotopeData$SampleID<-gsub("_", "-", InvertIsotopeData$SampleID)
 InvertIsotopeData_SampleIDs<- separate(InvertIsotopeData, col=SampleID, into=c('Project', 'Invertebrate', 'SpecimenID', 'Trial'), sep='-') #The sulfur data has _ instead of -.
 
@@ -526,7 +531,8 @@ LargeMacroinvetInfo_040322$SpecimenID<-LargeMacroinvetInfo_040322$Sample_ID
 
 LargeMacroinvert_IsotopeAndMetadata<- merge(LargeMacroinvetInfo_040322, InvertIsotopeData_SampleIDs, by="SpecimenID")
 
-write.csv(LargeMacroinvert_IsotopeAndMetadata, "Data/LargeMacroinvert_IsotopeAndMetaData_042522.csv")
+#Same issue again. Sulfur and CN are separate but should be in the same row.
+write.csv(LargeMacroinvert_IsotopeAndMetadata, "Data/LargeMacroinvert_IsotopeAndMetaData_042722.csv")
 
 #Okay, now small macroinverts
 
@@ -534,5 +540,5 @@ View(CMP_SmallMacroinvertInfo_04022022)
 InvertIsotopeData_SampleIDs$SampleID_Simple<-InvertIsotopeData_SampleIDs$SpecimenID
 
 SmallMacroinvert_IsotopeAndMetadata<- merge(InvertIsotopeData_SampleIDs, CMP_SmallMacroinvertInfo_04022022, by="SampleID_Simple")
-write.csv(SmallMacroinvert_IsotopeAndMetadata, "Data/SmallMacroinvert_IsotopeAndMetaData_042522.csv")
+write.csv(SmallMacroinvert_IsotopeAndMetadata, "Data/SmallMacroinvert_IsotopeAndMetaData_042722.csv")
 ```
