@@ -17,6 +17,7 @@ Note: Use corrected sheets for CMPKrabby, POM_VOL_1, 2, 3, 4, 5, CMPZoopSoup, CM
 library(readxl)
 library(tidyverse)
 library(stringr)
+library(lubridate)
 ```
 
 # Read in metadata
@@ -191,7 +192,7 @@ glimpse(CMPISeeDeadCMPeople_S)
 
 CMPlants_S <- read_excel("Data/SIF-S/DataOnly/CMPlants_S.xlsx", col_types = c("text", "numeric", "numeric", "text", "numeric", "text", "text", "text", "numeric", "numeric"))
 
-#CMPLiverGiver (data not back yet)
+CMPLiverGiver_S <- read_excel("Data/SIF-S/DataOnly/CMPLiverGiver_S.xlsx", col_types = c("text", "numeric", "numeric", "text", "numeric", "text", "text", "text", "numeric", "numeric"))
 
 CMPLiverItUp_S <- read_excel("Data/SIF-S/DataOnly/CMPLiverItUp_S.xlsx", col_types = c("text", "numeric", "numeric", "text", "numeric", "text", "text", "text", "numeric", "numeric"))
 glimpse(CMPLiverItUp_S)
@@ -239,7 +240,7 @@ CMPBuffPants: CMP_FISH_379M_S, CMP_FISH_382M_S
 # Merge dataframes
 I will address flagging the warning messages of the data after I have merged everything together.
 ```{r}
-RawIsotopeData<-bind_rows(CMPandemic_CN, CMPeas_CN, CMPFish4Ever_CN, CMPFishRFriends_CN, CMPflanzen_CN, CMPhragmites_CN, CMPKrabby_CN, CMPLeftovers_CN, CMPLiverLaVida_CN, CMPLiverLetDie_CN, CMPLiverPool_CN, CMPLiverRoast_CN, CMPLiverWorst_CN, CMPMuscleBob_CN, CMPMuscleStuffin_CN, CMPMysteryMeat_CN, CMPSilenceOThLab_CN, CMPSkrimp_CN, CMPSkrimp2_CN, CMPSmallFry_CN, CMPTheGovernator_CN, CMPVeryStable_CN, CMPZoopSoup_CN, PomVol1_CN, PomVol2_CN, PomVol3_CN, PomVol4_CN, PomVol5_CN, CMPatty_S, CMPBuffPants_S, CMPChoppedLiver_S, CMPeace_S, CMPeachment_S, CMPISeeDeadCMPeople_S, CMPlants_S, CMPlucheae_S, CMPLiverItUp_S, CMPMudBugs_S, CMPLiverLaughLov_S, CMPLiverOfMine_S, CMPMuscleMeat_S, CMPoaceae_S, CMPNotFood_S, CMPSampler_S, CMPSchwarzeneger_S, CMPScuds_S, CMPTunaOfTheFarm_S, CMPZootopia_S)
+RawIsotopeData<-bind_rows(CMPandemic_CN, CMPeas_CN, CMPFish4Ever_CN, CMPFishRFriends_CN, CMPflanzen_CN, CMPhragmites_CN, CMPKrabby_CN, CMPLeftovers_CN, CMPLiverLaVida_CN, CMPLiverLetDie_CN, CMPLiverPool_CN, CMPLiverRoast_CN, CMPLiverWorst_CN, CMPMuscleBob_CN, CMPMuscleStuffin_CN, CMPMysteryMeat_CN, CMPSilenceOThLab_CN, CMPSkrimp_CN, CMPSkrimp2_CN, CMPSmallFry_CN, CMPTheGovernator_CN, CMPVeryStable_CN, CMPZoopSoup_CN, PomVol1_CN, PomVol2_CN, PomVol3_CN, PomVol4_CN, PomVol5_CN, CMPatty_S, CMPBuffPants_S, CMPChoppedLiver_S, CMPeace_S, CMPeachment_S, CMPISeeDeadCMPeople_S, CMPlants_S, CMPlucheae_S, CMPLiverItUp_S, CMPMudBugs_S, CMPLiverGiver_S, CMPLiverLaughLov_S, CMPLiverOfMine_S, CMPMuscleMeat_S, CMPoaceae_S, CMPNotFood_S, CMPSampler_S, CMPSchwarzeneger_S, CMPScuds_S, CMPTunaOfTheFarm_S, CMPZootopia_S)
 View(RawIsotopeData)
 
 RawIsotopeData$SampleID <- gsub("_", "-", RawIsotopeData$SampleID)
@@ -251,13 +252,13 @@ RawIsotopeData$Taxon[RawIsotopeData$Taxon %in% c("Plant", "PlantT", "PlantD", "D
 RawIsotopeData$Taxon[RawIsotopeData$Taxon %in% "Zoop"] <-"ZOOP"
 RawIsotopeData$Taxon[RawIsotopeData$Taxon %in% "POM"] <-"POM/BA"
 
-write.csv(RawIsotopeData, "Data/RawIsotopeData_04272022.csv")
+write.csv(RawIsotopeData, "Data/RawIsotopeData_05022022.csv")
 
 Raw_CN<- bind_rows(CMPandemic_CN, CMPeas_CN, CMPFish4Ever_CN, CMPFishRFriends_CN, CMPflanzen_CN, CMPhragmites_CN, CMPKrabby_CN, CMPLeftovers_CN, CMPLiverLaVida_CN, CMPLiverLetDie_CN, CMPLiverPool_CN, CMPLiverRoast_CN, CMPLiverWorst_CN, CMPMuscleBob_CN, CMPMuscleStuffin_CN, CMPMysteryMeat_CN, CMPSilenceOThLab_CN, CMPSkrimp_CN, CMPSkrimp2_CN, CMPSmallFry_CN, CMPTheGovernator_CN, CMPVeryStable_CN, CMPZoopSoup_CN, PomVol1_CN, PomVol2_CN, PomVol3_CN, PomVol4_CN, PomVol5_CN)
 write.csv(Raw_CN, "Data/Raw_CN_04072022.csv")
 
 
-Raw_S<- bind_rows(CMPatty_S, CMPBuffPants_S, CMPChoppedLiver_S, CMPeace_S, CMPeachment_S, CMPISeeDeadCMPeople_S, CMPlants_S, CMPlucheae_S, CMPLiverItUp_S, CMPMudBugs_S, CMPLiverLaughLov_S, CMPLiverOfMine_S, CMPMuscleMeat_S, CMPoaceae_S, CMPNotFood_S, CMPSampler_S, CMPSchwarzeneger_S, CMPScuds_S, CMPTunaOfTheFarm_S, CMPZootopia_S)
+Raw_S<- bind_rows(CMPatty_S, CMPBuffPants_S, CMPChoppedLiver_S, CMPeace_S, CMPeachment_S, CMPISeeDeadCMPeople_S, CMPlants_S, CMPlucheae_S, CMPLiverItUp_S, CMPMudBugs_S, CMPLiverGiver_S, CMPLiverLaughLov_S, CMPLiverOfMine_S, CMPMuscleMeat_S, CMPoaceae_S, CMPNotFood_S, CMPSampler_S, CMPSchwarzeneger_S, CMPScuds_S, CMPTunaOfTheFarm_S, CMPZootopia_S)
 #To extract taxa, I use this nifty trick below: switching all _ to - (to make it uniform across trays) and then separating by that - and assigning column names
 
 Raw_S$SampleID <- gsub("_", "-", Raw_S$SampleID)
@@ -267,12 +268,12 @@ unique(Raw_S$Taxon)
 Raw_S$Taxon[Raw_S$Taxon %in% c("Plant", "PlantT", "PlantD", "Detri")] <-"PLANT"
 Raw_S$Taxon[Raw_S$Taxon %in% "Zoop"] <-"ZOOP"
 
-write.csv(Raw_S, "Data/Raw_S_04272022.csv")
+write.csv(Raw_S, "Data/Raw_S_05022022.csv")
 
 #Manually added taxon columns, so read-in the excel versions of the raw data with taxon columns
-RawIsotopeData_04272022 <- read_excel("Data/RawIsotopeData_04272022.xlsx")
+RawIsotopeData_05022022 <- read_excel("Data/RawIsotopeData_05022022.xlsx")
 
-Raw_S_04272022<- read_excel("Data/Raw_S_04272022.xlsx")
+Raw_S_05022022<- read_excel("Data/Raw_S_05022022.xlsx")
 
 
 Raw_CN_04072022 <- read_excel("Data/Raw_CN_04072022.xlsx")
@@ -288,7 +289,7 @@ Raw_CN_04072022 <- read_excel("Data/Raw_CN_04072022.xlsx")
 
 FishIsotopeData_CN<- Raw_CN_04072022 %>% filter(Taxon == "FISH")
 
-FishIsotopeData_S<- Raw_S_04272022 %>% filter(Taxon == "FISH")
+FishIsotopeData_S<- Raw_S_05022022 %>% filter(Taxon == "FISH")
 
 
 FishIsotopeData_CN$Fish_Number<- regmatches(FishIsotopeData_CN$SampleID, gregexpr("[[:digit:]]+", FishIsotopeData_CN$SampleID)) #makes a list.
@@ -360,38 +361,38 @@ View(FishMuscleData)
 
 #Save!
 
-write.csv(FishMuscleData, "Data/FishMuscleData_042722.csv")
+write.csv(FishMuscleData, "Data/FishMuscleData_050222.csv")
 
-write.csv(FishLiverData., "Data/FishLiverData_042722.csv")
+write.csv(FishLiverData., "Data/FishLiverData_050222.csv")
 ```
 
 ## Let's do plants next.
 ```{r}
-RawIsotopeData_04272022
+PlantIsotopeData_CN<- Raw_CN_04072022 %>% filter(Taxon == "PLANT")
+#Okay now I need to create an ID column to merge this dataset with sulfur. 
+PlantIsotopeData_CN$SampleID<-gsub("_", "-", PlantIsotopeData_CN$SampleID) #Making the dashes the same throughout each tray.
+PlantIsotopeData_Specimens_CN<- separate(PlantIsotopeData_CN, col=SampleID, into=c('Project', 'SpecimenID', 'Trial', 'CNorS'), sep='-') #Separating out the SampleID column into its pieces
+PlantIsotopeData_SpecimenID_CN<- PlantIsotopeData_Specimens_CN %>% unite("SampleID", c("SpecimenID","Trial"), sep="_", remove=FALSE) #Uniting the sample ID and Trial so that I don't lose trial information and freak out r.
 
-PlantIsotopeData<- RawIsotopeData_04272022 %>% filter(Taxon == "PLANT")
-#I can't use the quick fix from before. Gotta find another way...
-str(PlantIsotopeData$SampleID)
-writeLines(PlantIsotopeData$SampleID)
+#Now I repeat above steps with sulfur data.
+PlantIsotopeData_S<- Raw_S_05022022 %>% filter(Taxon == "PLANT")
+PlantIsotopeData_S$SampleID<-gsub("_", "-", PlantIsotopeData_S$SampleID) #Making the dashes the same throughout each tray.
+PlantIsotopeData_Specimens_S<- separate(PlantIsotopeData_S, col=SampleID, into=c('Project', 'SpecimenID', 'Trial', 'CNorS'), sep='-') #Separating out the SampleID column into its pieces
+PlantIsotopeData_SpecimenID_S<- PlantIsotopeData_Specimens_S %>% unite("SampleID", c("SpecimenID","Trial"), sep="_", remove=FALSE)
 
-PlantIsotopeData$SampleID<-gsub("_", "-", PlantIsotopeData$SampleID)
+PlantIsotopeData_Simple<-merge(PlantIsotopeData_SpecimenID_S, PlantIsotopeData_SpecimenID_CN, by= "SampleID") %>% select(-ends_with(".y"))
+#Create a column that can merge with plant metadata
+PlantIsotopeData_Simple$PlantID<- sub('Plant', '', PlantIsotopeData_Simple$SpecimenID.x)
 
-PlantIsotopeData_Specimens<- separate(PlantIsotopeData, col=SampleID, into=c('Project', 'SpecimenID', 'Trial', 'CNorS'), sep='-') #PERFECT!
-#Okay now merge plant data with info data
+#Okay, now I want to attach the metadata.
+names(PlantInfo_121721)[names(PlantInfo_121721) == "Sample_ID"] <- "PlantID"
+
+
 PlantInfo_121721$SpecimenID<-PlantInfo_121721$Sample_ID
 View(PlantInfo_121721)
 
-#DetritusData<- merge(PlantIsotopeData_Specimens, PlantInfo_121721, by="SpecimenID")
-#View(DetritusData)
-
-
-PlantIsotopeData_PlantSpecimens<- PlantIsotopeData_Specimens %>%
-    mutate(SpecimenID = str_remove_all(SpecimenID, "Plant"))
-View(PlantIsotopeData_PlantSpecimens) #HALLELUJAH
-
-
 #NOW we merge.
-PlantIsotopeAndMetadata<- merge(PlantIsotopeData_PlantSpecimens, PlantInfo_121721, by="SpecimenID")
+PlantIsotopeAndMetadata<- merge(PlantIsotopeData_Simple, PlantInfo_121721, by="PlantID")
 View(PlantIsotopeAndMetadata)
 
 unique(PlantIsotopeAndMetadata$SpeciesCode)
@@ -447,38 +448,41 @@ PlantIsotopeAndMetadata$Species[PlantIsotopeAndMetadata$SpeciesCode %in% "LEMNA"
 
 PlantIsotopeAndMetadata$Species[PlantIsotopeAndMetadata$SpeciesCode %in% "AZFI"]<- "Azolla"
 
-
 PlantIsotopeAndMetadata$Species[PlantIsotopeAndMetadata$SpeciesCode %in% "DET"]<- "Det"
 
 unique(PlantIsotopeAndMetadata$Species)
 
-PlantIsotopeAndMetadata<- PlantIsotopeAndMetadata %>% unite("SampleID", c("SpecimenID","Trial"), sep="_", remove=FALSE)
-colnames(PlantIsotopeAndMetadata)
-#Okay so each plant does not have a row for sulfur and CN together. The S and CN data is separated.
-#PlantIsotopeAndMetadata
-
-PlantIsotopeAndMetadata2<- PlantIsotopeAndMetadata %>% group_by(SampleID, SpecimenID, Project, Trial, Taxon, Sample_ID, Bag_ID, SpeciesCode, Site, CollectionDate, Season, LabDate, Parts_of_plant_included_in_sample_for_drying, 'TapWaterExposure?', Notes, Initials, MaterialsGrounded, GrindingInitials, Class, Species) %>% summarise_each(funs(first(na.omit(.))))
-  
-#summarize('D13CVPDB(permill)' = sum('D13CVPDB(permill)', na.rm=TRUE), 'TotalC(ug)' = sum(), C_Comment = sum(C_Comment, na.rm=TRUE), 'D15NAir(permill)', 'TotalN(ug)', NComment, 'D15N_MeanReferenceSD_plusminus(permill)', 'D15N_MeanAbsAccuracy_plusminus(permill)', 'D13C_MeanReferenceSD_plusminus(permill)', 'D13C_MeanAbsAccuracy_plusminus(permill)', PlantNumber, Treatment, 'D34SVCDT(permill)', 'TotalS(ug)', S_Comment, 'D34S_MeanReferenceSD_plusminus(permill)', 'D34S_MeanAbsAccuracy_plusminus(permill)')
-
 #SAVE IT
-write.csv(PlantIsotopeAndMetadata, "Data/PlantIsotopeAndMetaData_042722.csv")
+write.csv(PlantIsotopeAndMetadata, "Data/PlantIsotopeAndMetaData_050222.csv")
 ```
 
 ## Now zoops
 ```{r}
-ZoopIsotopeData<- RawIsotopeData_04272022 %>% filter(Taxon == "ZOOP")
+ZoopIsotopeData<- RawIsotopeData_05022022 %>% filter(Taxon == "ZOOP")
 
 ZoopIsotopeData_Vials<- separate(ZoopIsotopeData, col=SampleID, into=c('Project', 'Zooplankton', 'Vial', 'CNorS'), sep='-') 
 
 ZoopIsotopeAndMetadata<-merge(ZoopIsotopeData_Vials, ZoopInfo, by="Vial")
 
 #Problem: Merging by vial gives issues because each sample has a unique vial name. What I really want to combine by is the SampleID minus the CN or S information. So somehow need to remove that info from the string...
+ZoopIsotopeAndMetadata<- ZoopIsotopeAndMetadata %>% unite("SampleID", c("ZoopSpecies","CollectionDate", "Site"), sep="_", remove=FALSE) #Cool, I've created a column to sort this out.
+#This seems silly but I think it will work. I am going to separate this df into 2 (one for CN and one for S) and then merge them back together based upon the newly created SampleID.
+ZoopIsotopeAndMetadata_CN<- ZoopIsotopeAndMetadata %>% filter(CNorS == "CN")
+ZoopIsotopeAndMetadata_S<- ZoopIsotopeAndMetadata %>% filter(CNorS == "S")
+#Delete problem columns
+ZoopIsotopeAndMetadata_CN_Clean<- ZoopIsotopeAndMetadata_CN %>% subset(select= -c(CNorS, SpecimenID, Vial, Well_Id, Analysis, AnalysisNumber, MassSpec, PlantNumber, Treatment, Notes, `SampleWeight(mg)fromSampleList`, `SampleWeight(mg)`, Internal_ID, `TinWeight(g)`, `FullDryWeight(g)`, SampleComposition, ApproxCount, Extra, TrayName, Initials))
 
-write.csv(ZoopIsotopeAndMetadata, "Data/ZoopIsotopeAndMetaData_042722.csv")
+ZoopIsotopeAndMetadata_S_Clean<- ZoopIsotopeAndMetadata_S %>% subset(select= -c(CNorS, SpecimenID, Vial, Well_Id, Analysis, AnalysisNumber, MassSpec, PlantNumber, Treatment, Notes, `SampleWeight(mg)fromSampleList`, `SampleWeight(mg)`, Internal_ID, `TinWeight(g)`, `FullDryWeight(g)`, SampleComposition, ApproxCount, Extra, TrayName, Initials))
+ZoopIsotopeAndMetadata_Clean<-merge(ZoopIsotopeAndMetadata_CN_Clean, ZoopIsotopeAndMetadata_S_Clean, by="SampleID")
+ZoopIsotopeAndMetadata_Cleaned<- ZoopIsotopeAndMetadata_Clean %>% subset(select=-c(`D34SVCDT(permill).x`, `TotalS(ug).x`, S_Comment.x, `D34S_MeanReferenceSD_plusminus(permill).x`, `D34S_MeanAbsAccuracy_plusminus(permill).x`, `D13CVPDB(permill).y`, `D13C_MeanReferenceSD_plusminus(permill).y`, `D13C_MeanAbsAccuracy_plusminus(permill).y`, C_Comment.y, `D15N_MeanAbsAccuracy_plusminus(permill).y`, `D15N_MeanReferenceSD_plusminus(permill).y`, `D15N_MeanAbsAccuracy_plusminus(permill).y`, NComment.y, Type_of_Material.y, Site.y, CollectionDate.y, Season.y, ZoopSpecies.y, `QAQC'd?.y`, Project.y, Zooplankton.y, Taxon.y, `TotalC(ug).y`, `TotalN(ug).y`))
+
+#Can't figure out how to clean the column names to remove .x and .y so I will do it manually in excel...
+
+write.csv(ZoopIsotopeAndMetadata_Cleaned, "Data/ZoopIsotopeAndMetaData_050222.csv")
 ```
 
 ## Now Pom and BA
+Note: No sulfur data available.
 ```{r}
 #ID row for POM and BA were the same. I went through and manually changed BA samples to POM based on Alice's masterfile and the assumption that BA was submitted later than POM.
 IsotopeData_POMEdited_04052022 <- read_excel("Data/IsotopeData_POMEdited_04052022.xlsx")
@@ -514,18 +518,26 @@ write.csv(POM_BA_IsotopeAndMetadata, "Data/POM_BA_IsotopeAndMetaData_040522.csv"
 
 #Last but not least, inverts.
 ```{r}
-InvertIsotopeData<- RawIsotopeData_04272022 %>% filter(Taxon == "INVERT")
-InvertIsotopeData$SampleID<-gsub("_", "-", InvertIsotopeData$SampleID)
-InvertIsotopeData_SampleIDs<- separate(InvertIsotopeData, col=SampleID, into=c('Project', 'Invertebrate', 'SpecimenID', 'Trial'), sep='-') #The sulfur data has _ instead of -.
+InvertIsotopeData_CN<- Raw_CN_04072022 %>% filter(Taxon == "INVERT")
+#Okay now I need to create an ID column to merge this dataset with sulfur. 
+InvertIsotopeData_CN$SampleID<-gsub("_", "-", InvertIsotopeData_CN$SampleID) #Making the dashes the same throughout each tray.
+InvertIsotopeData_Specimens_CN<- separate(InvertIsotopeData_CN, col=SampleID, into=c('Project', 'Invertebrate', 'SpecimenID', 'Trial'), sep='-') #Separating out the SampleID column into its pieces 
+#NOTE: Trial column is CN or S for ones without trial numbers. 
+#InvertIsotopeData_CN<- InvertIsotopeData_CN %>% unite("SampleID", c("SpecimenID","Trial"), sep="_", remove=FALSE) #Uniting the sample ID and Trial so that I don't lose trial information and freak out r.
 
-View(InvertIsotopeData_SampleIDs) #NOTE: Trial column is CN or S for ones without trial numbers. 
+#Now I repeat above steps with sulfur data.
+InvertIsotopeData_S<- Raw_S_05022022 %>% filter(Taxon == "INVERT")
+InvertIsotopeData_S$SampleID<-gsub("_", "-", InvertIsotopeData_S$SampleID) #Making the dashes the same throughout each tray.
+InvertIsotopeData_Specimens_S<- separate(InvertIsotopeData_S, col=SampleID, into=c('Project', 'Invertebrate', 'SpecimenID', 'Trial'), sep='-')
+
+InvertIsotopeData_Simple<-merge(InvertIsotopeData_Specimens_S, InvertIsotopeData_Specimens_CN, by= "SpecimenID") %>% select(-ends_with(".y"))
 
 #Need to delete hyphen from sample ID in the LargeMacroinvert df
 LargeMacroinvetInfo_040322$Sample_ID<-gsub("-", "", LargeMacroinvetInfo_040322$Sample_ID)
 
-LargeMacroinvetInfo_040322$SpecimenID<-LargeMacroinvetInfo_040322$Sample_ID
+names(LargeMacroinvetInfo_040322)[names(LargeMacroinvetInfo_040322) == "Sample_ID"] <- "SpecimenID" #rename
 
-LargeMacroinvert_IsotopeAndMetadata<- merge(LargeMacroinvetInfo_040322, InvertIsotopeData_SampleIDs, by="SpecimenID")
+LargeMacroinvert_IsotopeAndMetadata<- merge(LargeMacroinvetInfo_040322, InvertIsotopeData_Simple, by="SpecimenID")
 
 #Introduce Season column
 LargeMacroinvert_IsotopeAndMetadata$Collection_Date<-mdy(LargeMacroinvert_IsotopeAndMetadata$Collection_Date)
@@ -539,16 +551,17 @@ LargeMacroinvert_IsotopeAndMetadata$Season[LargeMacroinvert_IsotopeAndMetadata$M
 LargeMacroinvert_IsotopeAndMetadata$Season[LargeMacroinvert_IsotopeAndMetadata$Month %in% "07"]<-"Summer"
 LargeMacroinvert_IsotopeAndMetadata$Season[LargeMacroinvert_IsotopeAndMetadata$Month %in% "08"]<-"Fall"
 LargeMacroinvert_IsotopeAndMetadata$Season[LargeMacroinvert_IsotopeAndMetadata$Month %in% "09"]<-"Fall"
-View(LargeMacroinvert_IsotopeAndMetadata)
+#Make site names match (SB = FM)
+unique(LargeMacroinvert_IsotopeAndMetadata$Site)
+LargeMacroinvert_IsotopeAndMetadata$Site[LargeMacroinvert_IsotopeAndMetadata$Site %in% "SB"]<-"FM"
 
-#Same issue again. Sulfur and CN are separate but should be in the same row.
-write.csv(LargeMacroinvert_IsotopeAndMetadata, "Data/LargeMacroinvert_IsotopeAndMetaData_042722.csv")
+#SAVE
+write.csv(LargeMacroinvert_IsotopeAndMetadata, "Data/LargeMacroinvert_IsotopeAndMetaData_050222.csv")
 
 #Okay, now small macroinverts
+names(CMP_SmallMacroinvertInfo_04022022)[names(CMP_SmallMacroinvertInfo_04022022) == "SampleID_Simple"] <- "SpecimenID" #rename
 
-View(CMP_SmallMacroinvertInfo_04022022)
-InvertIsotopeData_SampleIDs$SampleID_Simple<-InvertIsotopeData_SampleIDs$SpecimenID
-
-SmallMacroinvert_IsotopeAndMetadata<- merge(InvertIsotopeData_SampleIDs, CMP_SmallMacroinvertInfo_04022022, by="SampleID_Simple")
-write.csv(SmallMacroinvert_IsotopeAndMetadata, "Data/SmallMacroinvert_IsotopeAndMetaData_042722.csv")
+SmallMacroinvert_IsotopeAndMetadata<- merge(InvertIsotopeData_Simple, CMP_SmallMacroinvertInfo_04022022, by="SpecimenID")%>% select(-ends_with(".y"))
+#SAVE
+write.csv(SmallMacroinvert_IsotopeAndMetadata, "Data/SmallMacroinvert_IsotopeAndMetaData_050222.csv")
 ```
