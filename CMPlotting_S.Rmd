@@ -6,6 +6,10 @@ output: html_document
 editor_options: 
   chunk_output_type: console
 ---
+From Dr. Elliot Arnold: "Please note that some samples were below our LOQ of 15ug or 5ug for our Sercon and Elementar machines, respectively. You could probably push the lower limit of quantification to 10ugS for the Sercon results, but I would exclude all samples below that."
+So I will look out outliers of sulfur and remove those with below 10 ugS.
+
+ 
 ##Load packages
 ```{r}
 library(readxl)
@@ -13,31 +17,44 @@ library(lubridate)
 library(viridis)
 library(RColorBrewer)
 library(ggpubr)
-#library(cowplot)
 library(ggsci)
-#library(Rmisc)
 library(tidyverse)
 standard_error <- function(x) sd(x) / sqrt(length(x)) # Create own function
 ```
 
 #Read in data
 ```{r}
-FishMuscleData_042722 <- read_excel("Data/FishMuscleData_042722.xlsx")
-FishLiverData_042722 <- read_excel("Data/FishLiverData_042722.xlsx")
-SmallMacroinvert_IsotopeAndMetaData_042722 <- read_excel("Data/SmallMacroinvert_IsotopeAndMetaData_042722.xlsx")
-LargeMacroinvert_IsotopeAndMetaData_042722 <- read_excel("Data/LargeMacroinvert_IsotopeAndMetaData_042722.xlsx")
-PlantIsotopeAndMetaData_042722 <- read_excel("Data/PlantIsotopeAndMetaData_042722.xlsx")
-ZoopIsotopeAndMetaData_042722 <- read_excel("Data/ZoopIsotopeAndMetaData_042722.xlsx")
+FishMuscleData_050222 <- read_excel("Data/FishMuscleData_050222.xlsx")
+FishLiverData_050222 <- read_excel("Data/FishLiverData_050222.xlsx")
+SmallMacroinvert_IsotopeAndMetaData_050222 <- read_excel("Data/SmallMacroinvert_IsotopeAndMetaData_050222.xlsx")
+LargeMacroinvert_IsotopeAndMetaData_050222 <- read_excel("Data/LargeMacroinvert_IsotopeAndMetaData_050222.xlsx")
+PlantIsotopeAndMetaData_050222 <- read_excel("Data/PlantIsotopeAndMetaData_050222.xlsx")
+ZoopIsotopeAndMetaData_050222 <- read_excel("Data/ZoopIsotopeAndMetaData_050222.xlsx")
 POM_BA_IsotopeAndMetaData_042522 <- read_excel("Data/POM_BA_IsotopeAndMetaData_042522.xlsx")
 ```
 
 #Summarize info
 ## Fish Muscle
+
+###Look for bad data
 ```{r}
-colnames(FishMuscleData_042722)
-FishMuscleData_042722$`D34SVCDT(permill)`<-as.numeric(FishMuscleData_042722$`D34SVCDT(permill)`)
-str(FishMuscleData_042722)
-FishMuscles_MeansSd<-FishMuscleData_042722%>% 
+#Sulfur
+unique(FishMuscleData_042722$S_Comment)
+
+FishMuscleData_042722_NoOutliers<-FishMuscleData_042722 %>% filter(!S_Comment %in% c("No signal", "H5 and H6 fell in together"))
+
+unique(FishMuscleData_042722_NoOutliers$S_Comment)
+
+#Carbon
+unique(FishMuscleData_042722_NoOutliers$C_Comment)
+FishMuscleData_042722_NoOutliers<- FishMuscleData_042722_NoOutliers %>% filter(!C_Comment == "H3-H6 could be mixed up")
+```
+
+```{r}
+colnames(FishMuscleData_042722_NoOutliers)
+FishMuscleData_042722_NoOutliers$`D34SVCDT(permill)`<-as.numeric(FishMuscleData_042722_NoOutliers$`D34SVCDT(permill)`)
+str(FishMuscleData_042722_NoOutliers)
+FishMuscles_MeansSd<-FishMuscleData_042722_NoOutliers%>% 
   group_by(Species, Site, Season, `Age Class`) %>% 
   summarize(n=n(),
             alpha = 0.05,
@@ -85,10 +102,22 @@ FishMusclePlot
 ```
 
 ## Fish Liver
+###Look for bad data
 ```{r}
-FishLiverData_042722$`D34SVCDT(permill)`<-as.numeric(FishLiverData_042722$`D34SVCDT(permill)`)
-str(FishLiverData_042722)
-FishLivers_MeansSd<-FishLiverData_042722%>% 
+#Sulfur
+#I'm just going to remove sample loss fish and fish below LOQ that had below 10 ug because Dr. Arnold said it was okay.
+FishLiverData_042722_NoOutliers<-FishLiverData_042722 %>% filter(!Fish_Number == 653, !S_Comment == "sample loss")
+
+unique(FishLiverData_042722_NoOutliers$S_Comment)
+
+#Carbon
+unique(FishLiverData_042722_NoOutliers$C_Comment) #lovely.
+```
+
+```{r}
+FishLiverData_042722_NoOutliers$`D34SVCDT(permill)`<-as.numeric(FishLiverData_042722_NoOutliers$`D34SVCDT(permill)`)
+str(FishLiverData_042722_NoOutliers)
+FishLivers_MeansSd<-FishLiverData_042722_NoOutliers%>% 
   group_by(Species, Site, Season, `Age Class`) %>% 
   summarize(n=n(),
             alpha = 0.05,
@@ -118,7 +147,7 @@ FishLivers_MeansSd$D35S_StdError[is.na(FishLivers_MeansSd$D35S_StdError)]<-0
 FishLivers_MeansSd$D35S_SD[is.nan(FishLivers_MeansSd$D35S_SD)]<-0
 ```
 
-###Plot S vs C
+### Plot S vs C
 ```{r}
 FishLiverData_SpeciesBothSeasons<- FishLivers_MeansSd %>% filter(Species %in% c("SB",  "ST",  "YFG", "SG",  "SCP", "SKG", "TP"))
 
@@ -131,4 +160,73 @@ FishLiverPlot<-FishLiverData_SpeciesBothSeasons %>% ggplot(aes(D13C_mean, D35S_m
   geom_errorbarh(aes(xmin = D13C_mean-D13C_StdError, xmax = D13C_mean+D13C_StdError)) + 
   facet_wrap(~factor(Season, levels=c("Summer", "Fall")))
 FishLiverPlot
+```
+
+## Big Inverts
+###Removing rows with warnings from sif
+```{r}
+#Remove rows with combustion column failure
+unique(LargeMacroinvert_IsotopeAndMetaData_042722$C_Comment)
+LargeMacroinvert_IsotopeAndMetaData_BadCommentsRemoved<- LargeMacroinvert_IsotopeAndMetaData_042722 %>% filter(NComment %in% c("Remaining samples moved to another run", "NA"))
+unique(LargeMacroinvert_IsotopeAndMetaData_BadCommentsRemoved$C_Comment)
+#Cool
+unique(LargeMacroinvert_IsotopeAndMetaData_BadCommentsRemoved$C_Comment)
+
+unique(LargeMacroinvert_IsotopeAndMetaData_BadCommentsRemoved$S_Comment)
+LargeMacroinvert_IsotopeAndMetaData_BadCommentsRemoved<- LargeMacroinvert_IsotopeAndMetaData_BadCommentsRemoved %>% filter(S_Comment %in% "NA")
+```
+
+### Summarize
+```{r}
+LargeMacroinvert_IsotopeAndMetaData_BadCommentsRemoved$`D34SVCDT(permill)`<-as.numeric(LargeMacroinvert_IsotopeAndMetaData_BadCommentsRemoved$`D34SVCDT(permill)`)
+
+LargeMacroinvert_IsotopeAndMetaData_BadCommentsRemoved$`D15NAir(permill)`<-as.numeric(LargeMacroinvert_IsotopeAndMetaData_BadCommentsRemoved$`D15NAir(permill)`)
+
+LargeMacroinvert_IsotopeAndMetaData_BadCommentsRemoved$`D13CVPDB(permill)`<-as.numeric(LargeMacroinvert_IsotopeAndMetaData_BadCommentsRemoved$`D13CVPDB(permill)`)
+
+str(LargeMacroinvert_IsotopeAndMetaData_BadCommentsRemoved$`D13CVPDB(permill)`)
+
+BigInverts_MeansSd<-LargeMacroinvert_IsotopeAndMetaData_BadCommentsRemoved%>% 
+  group_by(Species, Site, Season) %>% 
+  summarize(n=n(),
+            alpha = 0.05,
+            D13C_mean = sum(`D13CVPDB(permill)`/n, na.rm=TRUE), 
+            D13C_SD = sqrt(sum((`D13CVPDB(permill)`- (D13C_mean))^2)/(n-1)),
+            D13C_StdError= standard_error(`D13CVPDB(permill)`),
+            D15N_mean = sum(`D15NAir(permill)`/n, na.rm=TRUE),
+            D15N_SD = sqrt(sum((`D15NAir(permill)`- (D15N_mean))^2)/(n-1)),
+            D15N_StdError= standard_error(`D15NAir(permill)`),
+            D35S_mean = sum(`D34SVCDT(permill)`/n, na.rm=TRUE),
+            D35S_SD = sqrt(sum((`D34SVCDT(permill)`- (D35S_mean))^2)/(n-1)),
+            D35S_StdError= standard_error(`D34SVCDT(permill)`)
+            )
+
+BigInverts_MeansSd$D13C_StdError[is.nan(BigInverts_MeansSd$D13C_StdError)]<-0
+
+BigInverts_MeansSd$D13C_StdError[is.na(BigInverts_MeansSd$D13C_StdError)]<-0
+
+BigInverts_MeansSd$D13C_SD[is.nan(BigInverts_MeansSd$D13C_SD)]<-0
+
+BigInverts_MeansSd$D15N_StdError[is.na(BigInverts_MeansSd$D15N_StdError)]<-0
+
+BigInverts_MeansSd$D15N_SD[is.nan(BigInverts_MeansSd$D15N_SD)]<-0
+
+BigInverts_MeansSd$D35S_StdError[is.na(BigInverts_MeansSd$D35S_StdError)]<-0
+
+BigInverts_MeansSd$D35S_SD[is.nan(BigInverts_MeansSd$D35S_SD)]<-0
+```
+
+### Plot S vs C
+```{r}
+#Don't need to filter any species out. We caught all the species in summer and fall (though not for each slough)
+
+BigInvertPlot<-BigInverts_MeansSd %>% ggplot(aes(D13C_mean, D35S_mean, color= Site)) + 
+  geom_point(aes(color = Site, shape=Species), size=3) + 
+  scale_shape_manual(values=rep(0:15, 1))+
+  labs(title = "Big Invert Means And Standard Error Both Seasons") +
+  theme_bw()+ 
+  geom_errorbar(aes(ymin = D35S_mean-D35S_StdError, ymax = D35S_mean+D35S_StdError))+
+  geom_errorbarh(aes(xmin = D13C_mean-D13C_StdError, xmax = D13C_mean+D13C_StdError)) + 
+  facet_wrap(~factor(Season, levels=c("Summer", "Fall")))
+BigInvertPlot
 ```
