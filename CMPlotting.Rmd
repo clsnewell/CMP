@@ -393,13 +393,9 @@ BigInverts_BothSeasons_MeansSd$D15N_UCI[is.nan(BigInverts_BothSeasons_MeansSd$D1
 
 BigInverts_BothSeasons_MeansSd$D15N_LCI[is.nan(BigInverts_BothSeasons_MeansSd$D15N_LCI)]<-0
 
-BigInverts_BothSeasons_MeansSd$Site[BigInverts_BothSeasons_MeansSd$Site %in% "SB"]<-"FM"
-
 
 BigInverts_Seasons<- BigInverts_BothSeasons_MeansSd %>% ggplot(aes(D13C_mean, D15N_mean, color= Site)) + 
   geom_point(aes(color = Site, shape=Species), size=3) + 
-  #scale_shape_manual(values=rep(0:6, 1))+
-  #geom_text(aes(label=Species), hjust=1.25, vjust = 1) +
   labs(title = "Big Inverts Means And Standard Error from Summer and Fall") +
   theme_bw()+
   #coord_cartesian(xlim=c(-35, -20))+
