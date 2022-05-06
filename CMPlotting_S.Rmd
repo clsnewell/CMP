@@ -392,7 +392,7 @@ Plants_MeansSd_BothSeasons$D35S_SD[is.nan(Plants_MeansSd_BothSeasons$D35S_SD)]<-
 #Don't need to filter any species out. We caught all the species in summer and fall (though not for each slough)
 
 PlantPlot<-Plants_MeansSd_BothSeasons %>% ggplot(aes(D13C_mean, D35S_mean, color= Site)) + 
-  geom_point(aes(color = Site, shape=Species), size=3) + 
+  geom_point(aes(color = Site, shape=Species), size=5) + 
   scale_shape_manual(values=rep(0:15, 1))+
   labs(title = "Plant Means And Standard Error Both Seasons") +
   theme_bw()+ 
