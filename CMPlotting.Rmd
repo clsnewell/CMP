@@ -161,10 +161,10 @@ Which species were captured in both summer and fall?
 #I'm going to filter the data for species that were captured in both summer and fall.
 #Use all Zoops, POM, BA. BUT I need to determine which inverts, fish, and plants were sampled both seasons...
 
-FishLiverData_040722 <- read_excel("Data/FishLiverData_040722.xlsx")
+FishLiverData_050222 <- read_excel("Data/FishLiverData_050222.xlsx")
 
-FishLiversSummer<-subset(FishLiverData_040722, Season == "Summer")
-FishLiversFall<-subset(FishLiverData_040722, Season == "Fall")
+FishLiversSummer<-subset(FishLiverData_050222, Season == "Summer")
+FishLiversFall<-subset(FishLiverData_050222, Season == "Fall")
 
 FishLiversBothSeasons<- inner_join(FishLiversFall, FishLiversSummer, by= "Species")
 
@@ -175,9 +175,9 @@ unique(FishLiversBothSeasons$Species)
 
 #Now filter out just these fish species from liver data
 
-unique(FishLiverData_040722$Species)
+unique(FishLiverData_050222$Species)
 
-FishLiverData_SpeciesBothSeasons<- FishLiverData_040722 %>% filter(Species %in% c("SB",  "ST",  "YFG", "SG",  "SCP", "SKG", "TP"))
+FishLiverData_SpeciesBothSeasons<- FishLiverData_050222 %>% filter(Species %in% c("SB",  "ST",  "YFG", "SG",  "SCP", "SKG", "TP"))
 
 unique(FishLiverData_SpeciesBothSeasons$NComment)
 #There is no fish livers (for species of interest) with carbon comments. One SB had an N comment that it contained more nitrogen than the largest reference, but the value isn't that far out. So I don't feel a need to remove any.
@@ -330,18 +330,18 @@ Muscle_Seasons
 ```{r}
 #Went through and manually deleted all the columns for rows which had incorrect readings due to combustion column failure. 
 
-LargeMacroinvert_IsotopeAndMetaData_040822 <- read_excel("Data/LargeMacroinvert_IsotopeAndMetaData_040822_Edited.xlsx")
+LargeMacroinvert_IsotopeAndMetaData_050222 <- read_excel("Data/LargeMacroinvert_IsotopeAndMetaData_050222.xlsx")
 
-LargeMacroinvert_IsotopeAndMetaData_040822$`D13CVPDB(permill)`<- as.numeric(LargeMacroinvert_IsotopeAndMetaData_040822$`D13CVPDB(permill)`)
+LargeMacroinvert_IsotopeAndMetaData_050222$`D13CVPDB(permill)`<- as.numeric(LargeMacroinvert_IsotopeAndMetaData_050222$`D13CVPDB(permill)`)
 
-LargeMacroinvert_IsotopeAndMetaData_040822$`D15NAir(permill)`<- as.numeric(LargeMacroinvert_IsotopeAndMetaData_040822$`D15NAir(permill)`)
+LargeMacroinvert_IsotopeAndMetaData_050222$`D15NAir(permill)`<- as.numeric(LargeMacroinvert_IsotopeAndMetaData_050222$`D15NAir(permill)`)
 
-LargeMacroinvert_IsotopeAndMetaData_040822$`D34SVCDT(permill)`<- as.numeric(LargeMacroinvert_IsotopeAndMetaData_040822$`D34SVCDT(permill)`)
+LargeMacroinvert_IsotopeAndMetaData_050222$`D34SVCDT(permill)`<- as.numeric(LargeMacroinvert_IsotopeAndMetaData_050222$`D34SVCDT(permill)`)
 
-View(LargeMacroinvert_IsotopeAndMetaData_040822)
 
-BigInvertsSummer<-subset(LargeMacroinvert_IsotopeAndMetaData_040822, Season == "Summer")
-BigInvertsFall<-subset(LargeMacroinvert_IsotopeAndMetaData_040822, Season == "Fall")
+BigInvertsSummer<-subset(LargeMacroinvert_IsotopeAndMetaData_050222, Season == "Summer")
+
+BigInvertsFall<-subset(LargeMacroinvert_IsotopeAndMetaData_050222, Season == "Fall")
 
 BigInvertsBothSeasons<- inner_join(BigInvertsFall, BigInvertsSummer, by= "Species")
 
@@ -349,16 +349,16 @@ unique(BigInvertsBothSeasons$Species)
 #Okay, if I did this right, these are the species we caught both seasons: "Corbicula" "Exopalaemon"       "Harris mud crab"    "Maeotias" "Red swamp crayfish"
 #Now filter out just these  species from big invert data
 
-unique(LargeMacroinvert_IsotopeAndMetaData_040822$Species)
+unique(LargeMacroinvert_IsotopeAndMetaData_050222$Species)
 #Looks like we already have all the species. cool.
 
 #Okay, now I want to get the average and sd of C and N values for these inverts.
-View(LargeMacroinvert_IsotopeAndMetaData_040822)
+View(LargeMacroinvert_IsotopeAndMetaData_050222)
 
 unique(BigInvertsBothSeasons$C_Comment.y)
 #Already removed all outliers manually in excel (samples which the combustion column failed)
 
-BigInverts_BothSeasons_MeansSd<-LargeMacroinvert_IsotopeAndMetaData_040822%>% 
+BigInverts_BothSeasons_MeansSd<-LargeMacroinvert_IsotopeAndMetaData_050222%>% 
   group_by(Species, Site, Season) %>% 
   summarize(n=n(),
             alpha = 0.05,
@@ -407,20 +407,19 @@ BigInverts_Seasons
 
 ## Small Inverts 
 ```{r}
-SmallMacroinvert_IsotopeAndMetaData_040422 <- read_excel("Data/SmallMacroinvert_IsotopeAndMetaData_040422.xlsx")
+SmallMacroinvert_IsotopeAndMetaData_050222 <- read_excel("Data/SmallMacroinvert_IsotopeAndMetaData_050222.xlsx")
 
-SmallMacroinvert_IsotopeAndMetaData_040422$`D13CVPDB(permill)`<- as.numeric(SmallMacroinvert_IsotopeAndMetaData_040422$`D13CVPDB(permill)`)
+SmallMacroinvert_IsotopeAndMetaData_050222$`D13CVPDB(permill)`<- as.numeric(SmallMacroinvert_IsotopeAndMetaData_050222$`D13CVPDB(permill)`)
 
-SmallMacroinvert_IsotopeAndMetaData_040422$`D15NAir(permill)`<- as.numeric(SmallMacroinvert_IsotopeAndMetaData_040422$`D15NAir(permill)`)
+SmallMacroinvert_IsotopeAndMetaData_050222$`D15NAir(permill)`<- as.numeric(SmallMacroinvert_IsotopeAndMetaData_050222$`D15NAir(permill)`)
 
-SmallMacroinvert_IsotopeAndMetaData_040422$`D34SVCDT(permill)`<- as.numeric(SmallMacroinvert_IsotopeAndMetaData_040422$`D34SVCDT(permill)`)
+SmallMacroinvert_IsotopeAndMetaData_050222$`D34SVCDT(permill)`<- as.numeric(SmallMacroinvert_IsotopeAndMetaData_050222$`D34SVCDT(permill)`)
 
-#View(SmallMacroinvert_IsotopeAndMetaData_040422)
 
-SmallInvertsSummer<-subset(SmallMacroinvert_IsotopeAndMetaData_040422, Season == "Summer")
+SmallInvertsSummer<-subset(SmallMacroinvert_IsotopeAndMetaData_050222, Season == "Summer")
 unique(SmallInvertsSummer$Species)
 
-SmallInvertsFall<-subset(SmallMacroinvert_IsotopeAndMetaData_040422, Season == "Fall")
+SmallInvertsFall<-subset(SmallMacroinvert_IsotopeAndMetaData_050222, Season == "Fall")
 unique(SmallInvertsFall$Species)
 
 
@@ -432,7 +431,7 @@ unique(SmallInvertsBothSeasons$Species)
 #View(SmallInvertsBothSeasons)
 
 
-SmallInverts_SpeciesBothSeasons<- SmallMacroinvert_IsotopeAndMetaData_040422 %>% filter(Species %in% c("Americorophium spinicorne", "Crab Zoea", "Eogammarus confervicolus", "Gammarus daiberi", "Gnorimosphaeroma insulare"))
+SmallInverts_SpeciesBothSeasons<- SmallMacroinvert_IsotopeAndMetaData_050222 %>% filter(Species %in% c("Americorophium spinicorne", "Crab Zoea", "Eogammarus confervicolus", "Gammarus daiberi", "Gnorimosphaeroma insulare"))
 unique(SmallInverts_SpeciesBothSeasons$C_Comment) #No warnings, all data should be okay.
 #Just kidding the isopods are weird. Do calculation independently later to see where it went wrong.
 #View(SmallInverts_SpeciesBothSeasons)
@@ -487,10 +486,10 @@ View(SmallInverts_BothSeasons_MeansSd)
 
 ## Plants
 ```{r}
-PlantIsotopeAndMetaData_040822 <- read_excel("Data/PlantIsotopeAndMetaData_040822.xlsx")
+PlantIsotopeAndMetaData_050222 <- read_excel("Data/PlantIsotopeAndMetaData_050222.xlsx")
 #View(PlantIsotopeAndMetaData_040822)
-Plants_Summer<-subset(PlantIsotopeAndMetaData_040822, Season == "Summer")
-PlantsFall<-subset(PlantIsotopeAndMetaData_040822, Season == "Fall")
+Plants_Summer<-subset(PlantIsotopeAndMetaData_050222, Season == "Summer")
+PlantsFall<-subset(PlantIsotopeAndMetaData_050222, Season == "Fall")
 
 PlantsBothSeasons<- inner_join(Plants_Summer, PlantsFall, by= "Species")
 
@@ -501,7 +500,7 @@ unique(PlantsBothSeasons$Species)
 
 unique(PlantIsotopeAndMetaData_040822$Species)
 
-Plants_SpeciesBothSeasons<- PlantIsotopeAndMetaData_040822 %>% filter(Species %in% c("Sarcocornia/Salicornia pacifica", "Schoenoplectus acutusa", "Typha angustifolia", "Rosa californica", "Calystegia sepium", "Phragmites australis", "SAGO", "Myriophyllum spicatum", "Lemna sp", "Filamentous algae", "Lathyrus jepsonii jepsonii", "Schoenoplectus americanus", "Det"))
+Plants_SpeciesBothSeasons<- PlantIsotopeAndMetaData_050222 %>% filter(Species %in% c("Sarcocornia/Salicornia pacifica", "Schoenoplectus acutusa", "Typha angustifolia", "Rosa californica", "Calystegia sepium", "Phragmites australis", "SAGO", "Myriophyllum spicatum", "Lemna sp", "Filamentous algae", "Lathyrus jepsonii jepsonii", "Schoenoplectus americanus", "Det"))
 
 #Okay, now I want to get the average and sd of C and N values for these fish livers.
 #View(Plants_SpeciesBothSeasons)
@@ -689,10 +688,11 @@ POMBA_Seasons
 ```
 ## Zoops
 ```{r}
-ZoopIsotopeAndMetaData_040722_edited <- read_excel("Data/ZoopIsotopeAndMetaData_040722_edited.xlsx")
-ZoopIsotopeAndMetaData_040722_edited$Species<-ZoopIsotopeAndMetaData_040722_edited$ZoopSpecies
-Zoops_Summer<-subset(ZoopIsotopeAndMetaData_040722_edited, Season == "Summer")
-ZoopsFall<-subset(ZoopIsotopeAndMetaData_040722_edited, Season == "Fall")
+ZoopIsotopeAndMetaData_050222 <- read_excel("Data/ZoopIsotopeAndMetaData_050222.xlsx")
+
+ZoopIsotopeAndMetaData_050222$Species<-ZoopIsotopeAndMetaData_050222$ZoopSpecies
+Zoops_Summer<-subset(ZoopIsotopeAndMetaData_050222, Season == "Summer")
+ZoopsFall<-subset(ZoopIsotopeAndMetaData_050222, Season == "Fall")
 
 ZoopsBothSeasons<- inner_join(Zoops_Summer, ZoopsFall, by= "Species")
 
@@ -701,9 +701,9 @@ unique(ZoopsBothSeasons$Species)
 
 #Now filter out just these  species 
 
-unique(ZoopIsotopeAndMetaData_040722_edited$Species)
+unique(ZoopIsotopeAndMetaData_050222$Species)
 
-Zoops_SpeciesBothSeasons<- ZoopIsotopeAndMetaData_040722_edited %>% filter(Species %in% c( ">500 um", "200-500 um", "A. sinensis", "P. forbesi", "100-500 um"))
+Zoops_SpeciesBothSeasons<- ZoopIsotopeAndMetaData_050222 %>% filter(Species %in% c( ">500 um", "200-500 um", "A. sinensis", "P. forbesi", "100-500 um"))
 
 #Lets look for outliers
 unique(Zoops_SpeciesBothSeasons$NComment) #Looks like an okay sample. Gonna leave it.
@@ -784,7 +784,7 @@ SmallInvert_SpeciesBothSeason<- SmallInverts_SpeciesBothSeasons[,c("Species", "S
 SmallInvert_SpeciesBothSeason<-SmallInvert_SpeciesBothSeason %>% 
   rename(SpecimenID = SampleID)
 
-LargeInvert_SpeciesBothSeason<- LargeMacroinvert_IsotopeAndMetaData_040822[,c("Species", "Site", "Season", "D13CVPDB(permill)", "D15NAir(permill)", "SpecimenID")]
+LargeInvert_SpeciesBothSeason<- LargeMacroinvert_IsotopeAndMetaData_050222[,c("Species", "Site", "Season", "D13CVPDB(permill)", "D15NAir(permill)", "SpecimenID")]
 
 FishMuscle_SpeciesBothSeason<- FishMuscleData_SpeciesBothSeasons[,c("Species", "Site", "Season", "D13CVPDB(permill)", "D15NAir(permill)", "FishSpecimenID")]
 FishMuscle_SpeciesBothSeason<-FishMuscle_SpeciesBothSeason %>% 
@@ -948,11 +948,8 @@ AvgData_BothSeasons_Livers$D15N_SD<-as.numeric(AvgData_BothSeasons_Livers$D15N_S
 AvgData_BothSeasons_Livers$D13C_SD[AvgData_BothSeasons_Livers$D13C_SD %in% c("NaN", "NA")]<- "0"
 AvgData_BothSeasons_Livers$D13C_SD<-as.numeric(AvgData_BothSeasons_Livers$D13C_SD)
 
-View(AvgData_BothSeasons_Livers)
-
 unique(AvgData_BothSeasons_Livers$Class)
 
-View(AvgData_BothSeasons_Livers)
 AvgData_BothSeasons_Livers$Class<- factor(AvgData_BothSeasons_Livers$Class, levels = c("SB", "ST", "TP", "Sculpin/Goby", "Red swamp crayfish", "HMC", "Maeotias", "EXO", "Corbicula",  "Isopod", "Scud", "Crab Zoea", "Zoop", "Terrestrial", "EV", "Floating Veg", "SAV", "POM", "Benthic Algae", "Det")) #Changing level order 
 
 Avg_BothSeasons_Livers<- AvgData_BothSeasons_Livers  %>%  ggplot(aes(D13C_mean, D15N_mean, color= Season)) + scale_shape_manual(values=rep(0:6, 7))+
@@ -981,31 +978,6 @@ Avg_Summer_Livers<- AvgData_Summer_Livers  %>%  ggplot(aes(D13C_mean, D15N_mean,
 
 Avg_Summer_Livers
 
-#color_legend <-
- # AvgData_Summer_Livers %>%
-  #ggplot(aes(D13C_mean, D15N_mean, color= Class)) + geom_point(aes(color = Class))
-#legend <- cowplot::get_legend(color_legend)
-#legend
-#grid.newpage()
-#grid.draw(legend)
-
-#Shape_legend <-
- # AvgData_Summer_Livers %>%
-  #ggplot(aes(D13C_mean, D15N_mean)) + geom_point(aes(shape = Species))+scale_shape_manual(values=rep(15:20, 7))
-
-#grid.newpage()
-#grid.draw(color_legend)
-  
-#plot_grid(
- # Avg_Summer_Livers
-  #, plot_grid(
-   # get_legend(color_legend)
-    #, get_legend(Shape_legend)
-    #, nrow = 1
-#  )
- # , nrow = 2
-  #, rel_heights = c(8,2)
-#)
 
 AvgData_Fall_Livers<-AvgData_BothSeasons_Livers %>% filter(Season %in% "Fall")
 
@@ -1032,8 +1004,8 @@ Avg_Fall_Livers
 AllData.Livers<-rbind(Zoop_SpeciesBothSeason, POMBA_SpeciesBothSeason, Plant_SpeciesBothSeason, SmallInvert_SpeciesBothSeason, LargeInvert_SpeciesBothSeason, FishLiver_SpeciesBothSeason)
 
 AllData.Livers$Site[AllData.Livers$Site %in% "SB"]<-"FM"
-AllData.Livers_BothSeasons_MeansSd<-AllData.Livers%>% 
-  group_by(Species, Season) %>% 
+AllData.Livers_BothSeasons_Sites_MeansSd<-AllData.Livers%>% 
+  group_by(Species, Season, Site) %>% 
   summarize(n=n(),
             alpha = 0.05,
             D13C_mean = sum(`D13CVPDB(permill)`/n, na.rm=TRUE), 
@@ -1043,87 +1015,97 @@ AllData.Livers_BothSeasons_MeansSd<-AllData.Livers%>%
             D15N_SD = sqrt(sum((`D15NAir(permill)`- (D15N_mean))^2)/(n-1)),
             D15N_StdError= standard_error(`D15NAir(permill)`))
 
-AllData.Livers_BothSeasons_MeansSd$D13C_StdError[is.nan(AllData.Livers_BothSeasons_MeansSd$D13C_StdError)]<-0
+AllData.Livers_BothSeasons_Sites_MeansSd$D13C_StdError[is.nan(AllData.Livers_BothSeasons_Sites_MeansSd$D13C_StdError)]<-0
 
-AllData.Livers_BothSeasons_MeansSd$D13C_SD[is.nan(AllData.Livers_BothSeasons_MeansSd$D13C_SD)]<-0
+AllData.Livers_BothSeasons_Sites_MeansSd$D13C_SD[is.nan(AllData.Livers_BothSeasons_Sites_MeansSd$D13C_SD)]<-0
 
-AllData.Livers_BothSeasons_MeansSd$D13C_UCI[is.nan(AllData.Livers_BothSeasons_MeansSd$D13C_UCI)]<-0
+AllData.Livers_BothSeasons_Sites_MeansSd$D13C_UCI[is.nan(AllData.Livers_BothSeasons_Sites_MeansSd$D13C_UCI)]<-0
 
-AllData.Livers_BothSeasons_MeansSd$D13C_LCI[is.nan(AllData.Livers_BothSeasons_MeansSd$D13C_LCI)]<-0
+AllData.Livers_BothSeasons_Sites_MeansSd$D13C_LCI[is.nan(AllData.Livers_BothSeasons_Sites_MeansSd$D13C_LCI)]<-0
 
-AllData.Livers_BothSeasons_MeansSd$D15N_SD[is.nan(AllData.Livers_BothSeasons_MeansSd$D15N_SD)]<-0
+AllData.Livers_BothSeasons_Sites_MeansSd$D15N_SD[is.nan(AllData.Livers_BothSeasons_Sites_MeansSd$D15N_SD)]<-0
 
-AllData.Livers_BothSeasons_MeansSd$D15N_StdError[is.nan(AllData.Livers_BothSeasons_MeansSd$D15N_StdError)]<-0
+AllData.Livers_BothSeasons_Sites_MeansSd$D15N_StdError[is.nan(AllData.Livers_BothSeasons_Sites_MeansSd$D15N_StdError)]<-0
 
-AllData.Livers_BothSeasons_MeansSd$D15N_UCI[is.nan(AllData.Livers_BothSeasons_MeansSd$D15N_UCI)]<-0
+AllData.Livers_BothSeasons_Sites_MeansSd$D15N_UCI[is.nan(AllData.Livers_BothSeasons_Sites_MeansSd$D15N_UCI)]<-0
 
-AllData.Livers_BothSeasons_MeansSd$D15N_LCI[is.nan(AllData.Livers_BothSeasons_MeansSd$D15N_LCI)]<-0
+AllData.Livers_BothSeasons_Sites_MeansSd$D15N_LCI[is.nan(AllData.Livers_BothSeasons_Sites_MeansSd$D15N_LCI)]<-0
 
-AllData.Livers_BothSeasons_MeansSd$Class[AllData.Livers_BothSeasons_MeansSd$Species %in% c("SAGO", "Myriophyllum spicatum", "Filamentous algae")]<- "SAV"
+AllData.Livers_BothSeasons_Sites_MeansSd$Class[AllData.Livers_BothSeasons_Sites_MeansSd$Species %in% c("SAGO", "Myriophyllum spicatum", "Filamentous algae")]<- "SAV"
 
-AllData.Livers_BothSeasons_MeansSd$Class[AllData.Livers_BothSeasons_MeansSd$Species %in% c("Phragmites australis", "Typha angustifolia", "Schoenoplectus acutusa", "Schoenoplectus americanus", "Schoenoplectus californicus")]<- "EV"
+AllData.Livers_BothSeasons_Sites_MeansSd$Class[AllData.Livers_BothSeasons_Sites_MeansSd$Species %in% c("Phragmites australis", "Typha angustifolia", "Schoenoplectus acutusa", "Schoenoplectus americanus", "Schoenoplectus californicus")]<- "EV"
 
-AllData.Livers_BothSeasons_MeansSd$Class[AllData.Livers_BothSeasons_MeansSd$Species %in% c("Sarcocornia/Salicornia pacifica", "Calystegia sepium", "Jaumea carnosa", "Lepidium latifolium", "Rosa californica", "Lathyrus jepsonii jepsonii", "Juncus balticus", "Lotus corniculatu", "Pluchea odorata")]<- "Terrestrial"
+AllData.Livers_BothSeasons_Sites_MeansSd$Class[AllData.Livers_BothSeasons_Sites_MeansSd$Species %in% c("Sarcocornia/Salicornia pacifica", "Calystegia sepium", "Jaumea carnosa", "Lepidium latifolium", "Rosa californica", "Lathyrus jepsonii jepsonii", "Juncus balticus", "Lotus corniculatu", "Pluchea odorata")]<- "Terrestrial"
 
-AllData.Livers_BothSeasons_MeansSd$Class[AllData.Livers_BothSeasons_MeansSd$Species %in% c("Lemna sp", "Azolla")]<- "Floating Veg"
+AllData.Livers_BothSeasons_Sites_MeansSd$Class[AllData.Livers_BothSeasons_Sites_MeansSd$Species %in% c("Lemna sp", "Azolla")]<- "Floating Veg"
 
-AllData.Livers_BothSeasons_MeansSd$Class[AllData.Livers_BothSeasons_MeansSd$Species %in% "DET"]<- "Det"
+AllData.Livers_BothSeasons_Sites_MeansSd$Class[AllData.Livers_BothSeasons_Sites_MeansSd$Species %in% "DET"]<- "Det"
 
-AllData.Livers_BothSeasons_MeansSd$Class[AllData.Livers_BothSeasons_MeansSd$Species %in% c("SCP", "SG", "YFG", "SKG")]<- "Sculpin/Goby"
+AllData.Livers_BothSeasons_Sites_MeansSd$Class[AllData.Livers_BothSeasons_Sites_MeansSd$Species %in% c("SCP", "SG", "YFG", "SKG")]<- "Sculpin/Goby"
 
-AllData.Livers_BothSeasons_MeansSd$Class[AllData.Livers_BothSeasons_MeansSd$Species %in% "ST"]<- "ST"
+AllData.Livers_BothSeasons_Sites_MeansSd$Class[AllData.Livers_BothSeasons_Sites_MeansSd$Species %in% "ST"]<- "ST"
 
-AllData.Livers_BothSeasons_MeansSd$Class[AllData.Livers_BothSeasons_MeansSd$Species %in% "TP"]<- "TP"
+AllData.Livers_BothSeasons_Sites_MeansSd$Class[AllData.Livers_BothSeasons_Sites_MeansSd$Species %in% "TP"]<- "TP"
 
-AllData.Livers_BothSeasons_MeansSd$Class[AllData.Livers_BothSeasons_MeansSd$Species %in% "SB"]<- "SB"
+AllData.Livers_BothSeasons_Sites_MeansSd$Class[AllData.Livers_BothSeasons_Sites_MeansSd$Species %in% "SB"]<- "SB"
 
-AllData.Livers_BothSeasons_MeansSd$Class[AllData.Livers_BothSeasons_MeansSd$Species %in% c("Americorophium spinicorne", "Eogammarus confervicolus", "Gammarus daiberi")]<- "Scud"
+AllData.Livers_BothSeasons_Sites_MeansSd$Class[AllData.Livers_BothSeasons_Sites_MeansSd$Species %in% c("Americorophium spinicorne", "Eogammarus confervicolus", "Gammarus daiberi")]<- "Scud"
 
-AllData.Livers_BothSeasons_MeansSd$Class[AllData.Livers_BothSeasons_MeansSd$Species %in% c("Red swamp crayfish")]<- "Red swamp crayfish"
+AllData.Livers_BothSeasons_Sites_MeansSd$Class[AllData.Livers_BothSeasons_Sites_MeansSd$Species %in% c("Red swamp crayfish")]<- "Red swamp crayfish"
 
-AllData.Livers_BothSeasons_MeansSd$Class[AllData.Livers_BothSeasons_MeansSd$Species %in% "Harris mud crab"]<- "HMC"
+AllData.Livers_BothSeasons_Sites_MeansSd$Class[AllData.Livers_BothSeasons_Sites_MeansSd$Species %in% "Harris mud crab"]<- "HMC"
 
-AllData.Livers_BothSeasons_MeansSd$Class[AllData.Livers_BothSeasons_MeansSd$Species %in% "Maeotias"]<- "Maeotias"
+AllData.Livers_BothSeasons_Sites_MeansSd$Class[AllData.Livers_BothSeasons_Sites_MeansSd$Species %in% "Maeotias"]<- "Maeotias"
 
-AllData.Livers_BothSeasons_MeansSd$Class[AllData.Livers_BothSeasons_MeansSd$Species %in% "Exopalaemon"]<- "EXO"
+AllData.Livers_BothSeasons_Sites_MeansSd$Class[AllData.Livers_BothSeasons_Sites_MeansSd$Species %in% "Exopalaemon"]<- "EXO"
 
-AllData.Livers_BothSeasons_MeansSd$Class[AllData.Livers_BothSeasons_MeansSd$Species %in% "Corbicula"]<- "Corbicula"
+AllData.Livers_BothSeasons_Sites_MeansSd$Class[AllData.Livers_BothSeasons_Sites_MeansSd$Species %in% "Corbicula"]<- "Corbicula"
 
-AllData.Livers_BothSeasons_MeansSd$Class[AllData.Livers_BothSeasons_MeansSd$Species %in% "Gnorimosphaeroma insulare"]<- "Isopod"
+AllData.Livers_BothSeasons_Sites_MeansSd$Class[AllData.Livers_BothSeasons_Sites_MeansSd$Species %in% "Gnorimosphaeroma insulare"]<- "Isopod"
 
-AllData.Livers_BothSeasons_MeansSd$Class[AllData.Livers_BothSeasons_MeansSd$Species %in% "Crab Zoea"]<- "Crab Zoea"
+AllData.Livers_BothSeasons_Sites_MeansSd$Class[AllData.Livers_BothSeasons_Sites_MeansSd$Species %in% "Crab Zoea"]<- "Crab Zoea"
 
-AllData.Livers_BothSeasons_MeansSd$Class[AllData.Livers_BothSeasons_MeansSd$Species %in% "POM"]<- "POM"
+AllData.Livers_BothSeasons_Sites_MeansSd$Class[AllData.Livers_BothSeasons_Sites_MeansSd$Species %in% "POM"]<- "POM"
 
-AllData.Livers_BothSeasons_MeansSd$Class[AllData.Livers_BothSeasons_MeansSd$Species %in% "Det"]<- "Det"
+AllData.Livers_BothSeasons_Sites_MeansSd$Class[AllData.Livers_BothSeasons_Sites_MeansSd$Species %in% "Det"]<- "Det"
 
-AllData.Livers_BothSeasons_MeansSd$Class[AllData.Livers_BothSeasons_MeansSd$Species %in% "Benthic"]<- "Benthic Algae"
+AllData.Livers_BothSeasons_Sites_MeansSd$Class[AllData.Livers_BothSeasons_Sites_MeansSd$Species %in% "Benthic"]<- "Benthic Algae"
 
-AllData.Livers_BothSeasons_MeansSd$Class[AllData.Livers_BothSeasons_MeansSd$Species %in% c("P. forbesi", "A. sinensis", "200-500 um", "100-500 um" ,">500 um")]<- "Zoop"
+AllData.Livers_BothSeasons_Sites_MeansSd$Class[AllData.Livers_BothSeasons_Sites_MeansSd$Species %in% c("P. forbesi", "A. sinensis", "200-500 um", "100-500 um" ,">500 um")]<- "Zoop"
 
-AllData.Livers_BothSeasons_MeansSd$D15N_SD[AllData.Livers_BothSeasons_MeansSd$D15N_SD %in% c("NaN", "NA")]<- "0"
-AllData.Livers_BothSeasons_MeansSd$D15N_SD<-as.numeric(AllData.Livers_BothSeasons_MeansSd$D15N_SD)
+AllData.Livers_BothSeasons_Sites_MeansSd$D15N_SD[AllData.Livers_BothSeasons_Sites_MeansSd$D15N_SD %in% c("NaN", "NA")]<- "0"
+AllData.Livers_BothSeasons_Sites_MeansSd$D15N_SD<-as.numeric(AllData.Livers_BothSeasons_Sites_MeansSd$D15N_SD)
 
-AllData.Livers_BothSeasons_MeansSd$D13C_SD[AllData.Livers_BothSeasons_MeansSd$D13C_SD %in% c("NaN", "NA")]<- "0"
-AllData.Livers_BothSeasons_MeansSd$D13C_SD<-as.numeric(AllData.Livers_BothSeasons_MeansSd$D13C_SD)
+AllData.Livers_BothSeasons_Sites_MeansSd$D13C_SD[AllData.Livers_BothSeasons_Sites_MeansSd$D13C_SD %in% c("NaN", "NA")]<- "0"
+AllData.Livers_BothSeasons_Sites_MeansSd$D13C_SD<-as.numeric(AllData.Livers_BothSeasons_Sites_MeansSd$D13C_SD)
 
-View(AllData.Livers_BothSeasons_MeansSd)
+View(AllData.Livers_BothSeasons_Sites_MeansSd)
 
-unique(AllData.Livers_BothSeasons_MeansSd$Class)
+unique(AllData.Livers_BothSeasons_Sites_MeansSd$Class)
 
-View(AllData.Livers_BothSeasons_MeansSd)
-AllData.Livers_BothSeasons_MeansSd$Class<- factor(AllData.Livers_BothSeasons_MeansSd$Class, levels = c("SB", "ST", "TP", "Sculpin/Goby", "Red swamp crayfish", "HMC", "Maeotias", "EXO", "Corbicula",  "Isopod", "Scud", "Crab Zoea", "Zoop", "Terrestrial", "EV", "Floating Veg", "SAV", "POM", "Benthic Algae", "Det")) #Changing level order 
+View(AllData.Livers_BothSeasons_Sites_MeansSd)
+
+AllData.Livers_BothSeasons_Sites_MeansSd$Class<- factor(AllData.Livers_BothSeasons_Sites_MeansSd$Class, levels = c("SB", "ST", "TP", "Sculpin/Goby", "Red swamp crayfish", "HMC", "Maeotias", "EXO", "Corbicula",  "Isopod", "Scud", "Crab Zoea", "Zoop", "Terrestrial", "EV", "Floating Veg", "SAV", "POM", "Benthic Algae", "Det")) #Changing level order 
 
 
-AllData.Livers_Seasons<- AllData.Livers_BothSeasons_MeansSd %>% ggplot(aes(D13C_mean, D15N_mean, color= Class)) + 
+AllData.Livers_Seasons<- AllData.Livers_BothSeasons_Sites_MeansSd %>% ggplot(aes(D13C_mean, D15N_mean, color= Class)) + 
   geom_point(aes(color = Class)) + 
   labs(title = "Food web with fish livers: Means And Standard Error from Summer and Fall") +
   theme_bw()+
-  #coord_cartesian(ylim=c(10, 15),  xlim=c(-35, -25))+
   geom_errorbar(aes(ymin = D15N_mean-D15N_StdError, ymax = D15N_mean+D15N_StdError))+
   geom_errorbarh(aes(xmin = D13C_mean-D13C_StdError, xmax = D13C_mean+D13C_StdError)) +  facet_wrap(~factor(Season, levels=c("Summer", "Fall")))
 AllData.Livers_Seasons
+```
 
+### SB plot
+```{r}
+SB.Plot<- AllData.Livers_BothSeasons_Sites_MeansSd %>% filter(Species%in%c("SB", ">500 um", "200-500 um", "A. sinensis", "P. forbesi", "100-500 um")) %>% ggplot(aes(D13C_mean, D15N_mean, color= Site)) + 
+  geom_point(aes(color = Site, shape = Species), size=3) + 
+  labs(title = "Striped Bass Livers and Zooplankton: Carbon, Nitrogen Means And Standard Error from Summer and Fall") +
+  theme_bw()+
+  geom_errorbar(aes(ymin = D15N_mean-D15N_StdError, ymax = D15N_mean+D15N_StdError))+
+  geom_errorbarh(aes(xmin = D13C_mean-D13C_StdError, xmax = D13C_mean+D13C_StdError)) +  facet_wrap(~factor(Season, levels=c("Summer", "Fall")))
+SB.Plot
 ```
 
 ### Muscles
@@ -1228,6 +1210,7 @@ Avg_Muscles
 3. For the lower trophic level stuff, it would be good to roughly visualize approximate overlap among groups, via ordination or just plain visualizing.
 
 4. Next step (I think) would be to visualize the food web by each slough , showing the means only of the primary food web constituents (from step 3). Include both summer and fall means for the main species of fish, differentiating with  some kind of symbol, or in separate plots.
+
 # 2. For organisms caught in summer, species that were caught in every site? Then do for fall. Trying to understand spatial differences.
 ## Fish muscle
 ```{r}
@@ -1898,4 +1881,10 @@ SummerSpatial_FishMuscle_Plot2<-SummerSpatial_FishMuscle %>% ggplot(aes(D13C_mea
   geom_errorbarh(aes(xmin = D13C_mean-D13C_StdError, xmax = D13C_mean+D13C_StdError))+
   facet_wrap(~Site)
 SummerSpatial_FishMuscle_Plot2
+```
+
+Striped Bass Plots
+```{r}
+#plot striped bass with copepods (zoops) and mysids
+
 ```
