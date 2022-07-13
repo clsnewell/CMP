@@ -424,7 +424,7 @@ PlantIsotopeAndMetadata$Species[PlantIsotopeAndMetadata$SpeciesCode %in% "SCAM"]
 
 PlantIsotopeAndMetadata$Species[PlantIsotopeAndMetadata$SpeciesCode %in% "SCCA"]<- "Schoenoplectus californicus"
 
-PlantIsotopeAndMetadata$Species[PlantIsotopeAndMetadata$SpeciesCode %in% "ARSU"]<- "Sarcocornia/Salicornia pacifica" #ARsU is outdated...
+PlantIsotopeAndMetadata$Species[PlantIsotopeAndMetadata$SpeciesCode %in% "ARSU"]<- "Sarcocornia/Salicornia pacifica" #ARSU is outdated...
 
 PlantIsotopeAndMetadata$Species[PlantIsotopeAndMetadata$SpeciesCode %in% "SAPA"]<- "Sarcocornia/Salicornia pacifica"
 

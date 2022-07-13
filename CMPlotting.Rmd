@@ -20,9 +20,6 @@ library(tidyverse)
 standard_error <- function(x) sd(x) / sqrt(length(x)) # Create own function
 ```
 
-```{r}
-#Standard_ErrorTheme<- 
-```
 # Plot Fish Data
 
 ##Liver
@@ -134,7 +131,6 @@ ZoopIsotopeAndMetaData_040722 %>% ggplot(aes(x=`D13CVPDB(permill)`, y= `D15NAir(
 #Plot POM data
 ```{r}
 POM_BA_IsotopeAndMetaData_040522 <- read_excel("Data/POM_BA_IsotopeAndMetaData_040522.xlsx")
-View(POM_BA_IsotopeAndMetaData_040522)
 glimpse(POM_BA_IsotopeAndMetaData_040522)
 
 POM_BA_IsotopeAndMetaData_040522$`D13CVPDB(permill)`<- as.numeric(POM_BA_IsotopeAndMetaData_040522$`D13CVPDB(permill)`)
@@ -146,10 +142,8 @@ POM_BA_IsotopeAndMetaData_040522$`D34SVCDT(permill)`<- as.numeric(POM_BA_Isotope
 #Remove rows with uncertain sites.
 POM_BA_IsotopeAndMetaData<- POM_BA_IsotopeAndMetaData_040522[!(POM_BA_IsotopeAndMetaData_040522$Site == "SD or SM" | POM_BA_IsotopeAndMetaData_040522$Site == "NA"),]
 
-View(POM_BA_IsotopeAndMetaData)
 
 POM_BA_IsotopeAndMetaData %>% ggplot(aes(x=`D13CVPDB(permill)`, y= `D15NAir(permill)`)) + geom_point(aes(color = Site))+facet_wrap(~`Sample Type`) + labs(title = "POM and BA Data all Seasons")
-
 ```
 
 
@@ -183,7 +177,7 @@ unique(FishLiverData_SpeciesBothSeasons$NComment)
 #There is no fish livers (for species of interest) with carbon comments. One SB had an N comment that it contained more nitrogen than the largest reference, but the value isn't that far out. So I don't feel a need to remove any.
 
 #Okay, now I want to get the average, sd, 95%CI of C and N values for these fish livers.
-View(FishLiverData_SpeciesBothSeasons)
+
 #Confidence interval using t-test distribution.
 FishLivers_BothSeasons_MeansSd<-FishLiverData_SpeciesBothSeasons%>% 
   group_by(Species, Site, Season, `Age Class`) %>% 
@@ -353,7 +347,6 @@ unique(LargeMacroinvert_IsotopeAndMetaData_050222$Species)
 #Looks like we already have all the species. cool.
 
 #Okay, now I want to get the average and sd of C and N values for these inverts.
-View(LargeMacroinvert_IsotopeAndMetaData_050222)
 
 unique(BigInvertsBothSeasons$C_Comment.y)
 #Already removed all outliers manually in excel (samples which the combustion column failed)
@@ -634,7 +627,6 @@ POMBA_OutliersRemoved<- POM_BA_IsotopeAndMetaData_040522[!POM_BA_IsotopeAndMetaD
 
 unique(POM_OutliersRemoved$CarolinesLabel)
 
-View(POMBA_OutliersRemoved)  
 ```
 
 ```{r}
@@ -706,12 +698,13 @@ unique(ZoopIsotopeAndMetaData_050222$Species)
 Zoops_SpeciesBothSeasons<- ZoopIsotopeAndMetaData_050222 %>% filter(Species %in% c( ">500 um", "200-500 um", "A. sinensis", "P. forbesi", "100-500 um"))
 
 #Lets look for outliers
-unique(Zoops_SpeciesBothSeasons$NComment) #Looks like an okay sample. Gonna leave it.
+unique(Zoops_SpeciesBothSeasons$Ncomment) #Looks like an okay sample. Gonna leave it.
 
 #Okay, now I want to get the average and sd of C and N values for these fish livers.
-View(Zoops_SpeciesBothSeasons)
 
 Zoops_SpeciesBothSeasons$`D13CVPDB(permill)`<- as.numeric(Zoops_SpeciesBothSeasons$`D13CVPDB(permill)`)
+
+Zoops_SpeciesBothSeasons$`D15NAir(permill)`<-Zoops_SpeciesBothSeasons$`D15NAir(permill)...8`
 
 Zoops_SpeciesBothSeasons$`D15NAir(permill)`<- as.numeric(Zoops_SpeciesBothSeasons$`D15NAir(permill)`)
 
@@ -894,7 +887,6 @@ AllData_SeasonsAndSites
 ```{r}
 #Bind rows
 AvgData_BothSeasons_Livers<-rbind(Zoops_BothSeasons_MeansSd, POMBA_BothSeasons_MeansSd, Plants_BothSeasons_MeanSd, SmallInverts_BothSeasons_MeansSd, BigInverts_BothSeasons_MeansSd, FishLivers_BothSeasons_MeansSd)
-View(AvgData_BothSeasons_Livers)
 #Need to rename SB site to FM
 AvgData_BothSeasons_Livers$Site[AvgData_BothSeasons_Livers$Site == "SB"] <-"FM"
 
@@ -1099,7 +1091,45 @@ AllData.Livers_Seasons
 
 ### SB plot
 ```{r}
-SB.Plot<- AllData.Livers_BothSeasons_Sites_MeansSd %>% filter(Species%in%c("SB", ">500 um", "200-500 um", "A. sinensis", "P. forbesi", "100-500 um")) %>% ggplot(aes(D13C_mean, D15N_mean, color= Site)) + 
+SmallInverts_MeansSd<-SmallMacroinvert_IsotopeAndMetaData_050222%>% 
+  group_by(Species, Site, Season) %>% 
+  summarize(n=n(),
+            alpha = 0.05,
+            D13C_mean = sum(`D13CVPDB(permill)`/n, na.rm=TRUE), 
+            D13C_SD = sqrt(sum((`D13CVPDB(permill)`- (D13C_mean))^2)/(n-1)),
+            D13C_StdError= standard_error(`D13CVPDB(permill)`),
+            D13C_UCI = D13C_mean+qt(1-alpha/2, (n-1))*D13C_SD/sqrt(n),
+            D13C_LCI= D13C_mean-qt(1-alpha/2, (n-1))*D13C_SD/sqrt(n),
+            D15N_mean = sum(`D15NAir(permill)`/n, na.rm=TRUE),
+            D15N_SD = sqrt(sum((`D15NAir(permill)`- (D15N_mean))^2)/(n-1)),
+            D15N_StdError= standard_error(`D15NAir(permill)`),
+            D15N_UCI = D15N_mean+qt(1-alpha/2, (n-1))*D15N_SD/sqrt(n),
+            D15N_LCI = D15N_mean-qt(1-alpha/2, (n-1))*D15N_SD/sqrt(n))
+
+SmallInverts_MeansSd$D13C_StdError[is.nan(SmallInverts_MeansSd$D13C_StdError)]<-0
+
+SmallInverts_MeansSd$D13C_StdError[is.na(SmallInverts_MeansSd$D13C_StdError)]<-0
+
+SmallInverts_MeansSd$D13C_SD[is.nan(SmallInverts_BothSeasons_MeansSd$D13C_SD)]<-0
+
+SmallInverts_MeansSd$D13C_UCI[is.nan(SmallInverts_MeansSd$D13C_UCI)]<-0
+
+SmallInverts_MeansSd$D13C_LCI[is.nan(SmallInverts_MeansSd$D13C_LCI)]<-0
+
+SmallInverts_MeansSd$D15N_StdError[is.nan(SmallInverts_MeansSd$D15N_StdError)]<-0
+
+SmallInverts_MeansSd$D15N_StdError[is.na(SmallInverts_MeansSd$D15N_StdError)]<-0
+
+SmallInverts_MeansSd$D15N_SD[is.nan(SmallInverts_MeansSd$D15N_SD)]<-0
+
+SmallInverts_MeansSd$D15N_UCI[is.nan(SmallInverts_MeansSd$D15N_UCI)]<-0
+
+SmallInverts_MeansSd$D15N_LCI[is.nan(SmallInverts_MeansSd$D15N_LCI)]<-0
+
+AvgData__Livers<-rbind(Zoops_BothSeasons_MeansSd, POMBA_BothSeasons_MeansSd, Plants_BothSeasons_MeanSd, SmallInverts_MeansSd, BigInverts_BothSeasons_MeansSd, FishLivers_BothSeasons_MeansSd)
+
+
+SB.Plot<- AvgData__Livers %>% filter(Species%in%c("SB", ">500 um", "200-500 um", "A. sinensis", "P. forbesi", "100-500 um", "Mysid")) %>% ggplot(aes(D13C_mean, D15N_mean, color= Site)) + 
   geom_point(aes(color = Site, shape = Species), size=3) + 
   labs(title = "Striped Bass Livers and Zooplankton: Carbon, Nitrogen Means And Standard Error from Summer and Fall") +
   theme_bw()+
