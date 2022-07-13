@@ -1126,16 +1126,32 @@ SmallInverts_MeansSd$D15N_UCI[is.nan(SmallInverts_MeansSd$D15N_UCI)]<-0
 
 SmallInverts_MeansSd$D15N_LCI[is.nan(SmallInverts_MeansSd$D15N_LCI)]<-0
 
+POMBA_BothSeasons_MeansSd$Species<- POMBA_BothSeasons_MeansSd$`Sample Type`
+
 AvgData__Livers<-rbind(Zoops_BothSeasons_MeansSd, POMBA_BothSeasons_MeansSd, Plants_BothSeasons_MeanSd, SmallInverts_MeansSd, BigInverts_BothSeasons_MeansSd, FishLivers_BothSeasons_MeansSd)
 
+AvgData__Livers$Species<- factor(AvgData__Livers$Species, levels = c("SB", "ST", "SCP", "YFG", "Exopalaemon", "Harris mud crab", "Mysid", "Americorophium spinicorne", "Eogammarus confervicolus", "Gammarus daiberi", "A. sinensis", "P. forbesi",">500 um", "200-500 um", "100-500 um", "Sarcocornia/Salicornia pacifica", "Schoenoplectus acutusa", "SAGO", "POM", "BA")) #Changing level order 
 
-SB.Plot<- AvgData__Livers %>% filter(Species%in%c("SB", ">500 um", "200-500 um", "A. sinensis", "P. forbesi", "100-500 um", "Mysid")) %>% ggplot(aes(D13C_mean, D15N_mean, color= Site)) + 
-  geom_point(aes(color = Site, shape = Species), size=3) + 
+SB.Plot<- AvgData__Livers %>% filter(Species%in%c("SB", ">500 um", "200-500 um", "A. sinensis", "P. forbesi", "100-500 um", "Mysid", "Americorophium spinicorne")) %>% ggplot(aes(D13C_mean, D15N_mean, color= Site)) + 
+  geom_point(aes(color = Site, shape = Species), size=3) + scale_shape_manual(values=rep(0:6, 1))+ 
   labs(title = "Striped Bass Livers and Zooplankton: Carbon, Nitrogen Means And Standard Error from Summer and Fall") +
   theme_bw()+
   geom_errorbar(aes(ymin = D15N_mean-D15N_StdError, ymax = D15N_mean+D15N_StdError))+
   geom_errorbarh(aes(xmin = D13C_mean-D13C_StdError, xmax = D13C_mean+D13C_StdError)) +  facet_wrap(~factor(Season, levels=c("Summer", "Fall")))
 SB.Plot
+```
+
+### SCP Plot
+```{r}
+#SCP, scuds, primary producers
+AvgData__Livers$Species<- as.factor(AvgData__Livers$Species)
+SCP.Plot<- AvgData__Livers %>% filter(Species%in%c("SCP", "Americorophium spinicorne", "Eogammarus confervicolus", "Gammarus daiberi", "Sarcocornia/Salicornia pacifica", "Schoenoplectus acutusa", "SAGO", "POM", "BA")) %>% ggplot(aes(D13C_mean, D15N_mean, color= Site)) + 
+  geom_point(aes(color = Site, shape = Species), size=3) + scale_shape_manual(values=rep(0:7, 1))+
+  labs(title = "Prickly Sculpin, scuds, primary producers: carbon, nitrogen means and standard error from summer and fall") +
+  theme_bw()+
+  geom_errorbar(aes(ymin = D15N_mean-D15N_StdError, ymax = D15N_mean+D15N_StdError))+
+  geom_errorbarh(aes(xmin = D13C_mean-D13C_StdError, xmax = D13C_mean+D13C_StdError)) +  facet_wrap(~factor(Season, levels=c("Summer", "Fall")))
+SCP.Plot
 ```
 
 ### Muscles
