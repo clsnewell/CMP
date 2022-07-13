@@ -551,6 +551,8 @@ AllData.Livers_Seasons
 ```{r}
 AvgData_BothSeasons_Livers<-rbind(Zoops_BothSeasons_MeansSd, Plants_MeansSd_BothSeasons, Inverts_MeansSd, FishLiverData_SpeciesBothSeasons)
 
+AvgData_BothSeasons_Livers$Species<- factor(AvgData_BothSeasons_Livers$Species, levels = c("SB", "ST", "SCP", "YFG", "Exopalaemon", "Harris mud crab", "Mysid", "Americorophium spinicorne", "Eogammarus confervicolus", "Gammarus daiberi", "A. sinensis", "P. forbesi",">500 um", "200-500 um", "100-500 um", "Sarcocornia/Salicornia pacifica", "Schoenoplectus acutusa", "SAGO", "POM", "BA")) #Changing level order 
+
 SB.Plot<- AvgData_BothSeasons_Livers %>% filter(Species %in% c("SB", ">500 um", "200-500 um", "A. sinensis", "P. forbesi", "100-500 um", "Mysid")) %>% ggplot(aes(D13C_mean, D35S_mean, color= Site)) + 
   geom_point(aes(color = Site, shape=Species), size=3) + 
   labs(title = "Striped Bass Livers and Zooplankton: Carbon, Sulfur Means And Standard Error from Summer and Fall") +
@@ -558,6 +560,17 @@ SB.Plot<- AvgData_BothSeasons_Livers %>% filter(Species %in% c("SB", ">500 um", 
   geom_errorbar(aes(ymin = D35S_mean-D35S_StdError, ymax = D35S_mean+D35S_StdError))+
   geom_errorbarh(aes(xmin = D13C_mean-D13C_StdError, xmax = D13C_mean+D13C_StdError)) +  facet_wrap(~factor(Season, levels=c("Summer", "Fall")))
 SB.Plot
+```
+
+### SCP Plot
+```{r}
+SCP.Plot<- AvgData_BothSeasons_Livers %>% filter(Species %in% c("SCP", "Americorophium spinicorne", "Eogammarus confervicolus", "Gammarus daiberi", "Sarcocornia/Salicornia pacifica", "Schoenoplectus acutusa", "SAGO", "POM", "BA")) %>% ggplot(aes(D13C_mean, D35S_mean, color= Site)) + 
+  geom_point(aes(color = Site, shape=Species), size=3) + scale_shape_manual(values=rep(0:7, 1))+
+  labs(title = "Prickly sculpin, scuds, primary producers: carbon, sulfur means and standard error from summer and fall") +
+  theme_bw()+
+  geom_errorbar(aes(ymin = D35S_mean-D35S_StdError, ymax = D35S_mean+D35S_StdError))+
+  geom_errorbarh(aes(xmin = D13C_mean-D13C_StdError, xmax = D13C_mean+D13C_StdError)) +  facet_wrap(~factor(Season, levels=c("Summer", "Fall")))
+SCP.Plot
 ```
 
 ## Food web with fish muscles (no livers)

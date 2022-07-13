@@ -1147,7 +1147,7 @@ SB.Plot
 AvgData__Livers$Species<- as.factor(AvgData__Livers$Species)
 SCP.Plot<- AvgData__Livers %>% filter(Species%in%c("SCP", "Americorophium spinicorne", "Eogammarus confervicolus", "Gammarus daiberi", "Sarcocornia/Salicornia pacifica", "Schoenoplectus acutusa", "SAGO", "POM", "BA")) %>% ggplot(aes(D13C_mean, D15N_mean, color= Site)) + 
   geom_point(aes(color = Site, shape = Species), size=3) + scale_shape_manual(values=rep(0:7, 1))+
-  labs(title = "Prickly Sculpin, scuds, primary producers: carbon, nitrogen means and standard error from summer and fall") +
+  labs(title = "Prickly sculpin, scuds, primary producers: carbon, nitrogen means and standard error from summer and fall") +
   theme_bw()+
   geom_errorbar(aes(ymin = D15N_mean-D15N_StdError, ymax = D15N_mean+D15N_StdError))+
   geom_errorbarh(aes(xmin = D13C_mean-D13C_StdError, xmax = D13C_mean+D13C_StdError)) +  facet_wrap(~factor(Season, levels=c("Summer", "Fall")))
