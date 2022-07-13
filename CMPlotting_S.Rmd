@@ -542,10 +542,22 @@ AllData.Livers_Seasons<- AvgData_BothSeasons_Livers %>% ggplot(aes(D13C_mean, D3
   scale_shape_manual(values=rep(0:6, 7))+
   labs(title = "Food web with fish livers: Means And Standard Error from Summer and Fall") +
   theme_bw()+
-  #coord_cartesian(ylim=c(10, 15),  xlim=c(-35, -25))+
   geom_errorbar(aes(ymin = D35S_mean-D35S_StdError, ymax = D35S_mean+D35S_StdError))+
   geom_errorbarh(aes(xmin = D13C_mean-D13C_StdError, xmax = D13C_mean+D13C_StdError)) +  facet_wrap(~factor(Season, levels=c("Summer", "Fall")))
 AllData.Livers_Seasons
+```
+
+### Striper plot
+```{r}
+AvgData_BothSeasons_Livers<-rbind(Zoops_BothSeasons_MeansSd, Plants_MeansSd_BothSeasons, Inverts_MeansSd, FishLiverData_SpeciesBothSeasons)
+
+SB.Plot<- AvgData_BothSeasons_Livers %>% filter(Species %in% c("SB", ">500 um", "200-500 um", "A. sinensis", "P. forbesi", "100-500 um", "Mysid")) %>% ggplot(aes(D13C_mean, D35S_mean, color= Site)) + 
+  geom_point(aes(color = Site, shape=Species), size=3) + 
+  labs(title = "Striped Bass Livers and Zooplankton: Carbon, Sulfur Means And Standard Error from Summer and Fall") +
+  theme_bw()+
+  geom_errorbar(aes(ymin = D35S_mean-D35S_StdError, ymax = D35S_mean+D35S_StdError))+
+  geom_errorbarh(aes(xmin = D13C_mean-D13C_StdError, xmax = D13C_mean+D13C_StdError)) +  facet_wrap(~factor(Season, levels=c("Summer", "Fall")))
+SB.Plot
 ```
 
 ## Food web with fish muscles (no livers)
