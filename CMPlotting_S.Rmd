@@ -646,3 +646,75 @@ Avg_Muscles<- AvgData_BothSeasons_Muscles  %>%  ggplot(aes(D13C_mean, D35S_mean,
   geom_errorbarh(aes(xmin = D13C_mean - D13C_StdError, xmax = D13C_mean + D13C_StdError)) +facet_wrap(~factor(Season, levels=c("Summer", "Fall")) )
 Avg_Muscles
 ```
+
+## Muscle vs livers
+```{r}
+FishMuscleData_050222
+FishLiverData_050222
+Fishes<-rbind(FishLiverData_050222, FishMuscleData_050222)
+Fishes$LorM<-gsub('[[:digit:]]+', '', Fishes$FishSpecimenID)
+
+DietShift<-Fishes %>% ggplot(aes(`D13CVPDB(permill)`, `D15NAir(permill)`, color=LorM))+ geom_point(aes(color = LorM), size=3) + labs(title = "Fish liver vs muscle") +  theme_bw()+
+  facet_wrap(~Species)
+DietShift
+
+DietShiftSummer<- Fishes %>% filter(Season%in%"Summer") %>%  ggplot(aes(`D13CVPDB(permill)`, `D15NAir(permill)`, color=LorM))+ geom_point(aes(color = LorM), size=3) + labs(title = "Fish liver vs muscle from Summer") +
+  theme_bw()+
+  facet_wrap(~Species)
+DietShiftSummer
+
+DietShiftFall<- Fishes %>% filter(Season%in%"Fall") %>%  ggplot(aes(`D13CVPDB(permill)`, `D15NAir(permill)`, color=LorM))+ geom_point(aes(color = LorM), size=3) + labs(title = "Fish liver vs muscle from Fall") +
+  theme_bw()+
+  facet_wrap(~Species)
+DietShiftFall
+
+
+
+#Break it down by species now
+ASH.LvM<-Fishes %>% filter(Fish_Number%in%c(404, 405, 407, 409, 806, 808, 809, 811)) %>% ggplot(aes(`D13CVPDB(permill)`, `D15NAir(permill)`, color=LorM))+ geom_point(aes(color = LorM)) + geom_text(aes(label=Site))+ 
+  labs(title = "American Shad YOY Fall liver vs muscle") +
+  theme_bw()+
+  facet_wrap(~factor(Fish_Number))
+ASH.LvM
+
+Carp.LvM<-Fishes %>% filter(Fish_Number%in%c(59, 92, 93, 101, 103, 105, 106, 107, 108, 110, 123, 750)) %>% ggplot(aes(`D13CVPDB(permill)`, `D15NAir(permill)`, color=LorM))+ geom_point(aes(color = LorM)) + geom_text(aes(label=Site))+ 
+  labs(title = "Carp Summer liver vs muscle", subtitle="All YOY except 123 and 750 are Age 1") +
+  theme_bw()+
+  facet_wrap(~factor(Fish_Number))
+Carp.LvM #All YOY except 123 and 750 are age 1
+
+SKG.Summer.LvM<-Fishes %>% filter(Fish_Number%in%c(351, 531, 578, 584, 585, 586, 587, 588, 589, 590, 591, 592, 618, 619, 620, 759)) %>% filter(Season=="Summer") %>%  ggplot(aes(`D13CVPDB(permill)`, `D15NAir(permill)`, color=LorM))+ geom_point(aes(color = LorM), size=3) + 
+  labs(title = "SKG Age 1 Summer HL liver vs muscle") +
+  theme_bw()+
+  facet_wrap(~factor(Fish_Number))
+SKG.Summer.LvM 
+
+SKG.Fall.LvM<-Fishes %>% filter(Fish_Number%in%c(351, 531, 578, 584, 585, 586, 587, 588, 589, 590, 591, 592, 618, 619, 620, 759)) %>% filter(Season=="Fall") %>%  ggplot(aes(`D13CVPDB(permill)`, `D15NAir(permill)`, color=LorM))+ geom_point(aes(color = LorM)) + geom_text(aes(label=Site))+ 
+  labs(title = "SKG Fall liver vs muscle", subtitle="All YOY except 351 is Age 1") +
+  theme_bw()+
+  facet_wrap(~factor(Fish_Number))
+SKG.Fall.LvM 
+
+TFS.LvM<-Fishes %>% filter(Fish_Number%in%c(218, 219, 220, 221, 222, 223, 224, 251, 252, 253, 414)) %>%
+  ggplot(aes(`D13CVPDB(permill)`, `D15NAir(permill)`, color=LorM))+ geom_point(aes(color = LorM)) + geom_text(aes(label=Site))+ 
+  labs(title = "TFS Fall Age 1 liver vs muscle") +
+  theme_bw()+
+  facet_wrap(~factor(Fish_Number))
+TFS.LvM
+
+#Sulfur Shift?
+Fishes$`D34SVCDT(permill)`<-as.numeric(Fishes$`D34SVCDT(permill)`)
+SulfurShift<-Fishes %>% ggplot(aes(`D13CVPDB(permill)`, `D34SVCDT(permill)`, color=LorM))+ geom_point(aes(color = LorM), size=3) + labs(title = "Fish liver vs muscle") +  theme_bw()+ 
+  facet_wrap(~Species)
+SulfurShift
+
+DietShiftSummer<- Fishes %>% filter(Season%in%"Summer") %>%  ggplot(aes(`D13CVPDB(permill)`, `D15NAir(permill)`, color=LorM))+ geom_point(aes(color = LorM), size=3) + labs(title = "Fish liver vs muscle from Summer") +
+  theme_bw()+
+  facet_wrap(~Species)
+DietShiftSummer
+
+DietShiftFall<- Fishes %>% filter(Season%in%"Fall") %>%  ggplot(aes(`D13CVPDB(permill)`, `D15NAir(permill)`, color=LorM))+ geom_point(aes(color = LorM), size=3) + labs(title = "Fish liver vs muscle from Fall") +
+  theme_bw()+
+  facet_wrap(~Species)
+DietShiftFall
+```
